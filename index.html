@@ -3,127 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Everlyn: City of Wonder</title>
+    <title>Everlyn: City of Wonders</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Inline styles for the landing page */
+        .landing-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-family: Arial, sans-serif;
+        }
+        .welcome-panel {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            background-color: #34495e;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .welcome-panel input {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ecf0f1;
+            margin-right: 10px;
+        }
+        .welcome-panel button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            background-color: #1abc9c;
+            color: #ecf0f1;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to Everlyn</h1>
-        <h2>The City of Wonder</h2>
-        <p>Anything is possible and all paths lead to the Pinnacle.</p>
-    </header>
-    <nav>
-        <div class="tabs">
-            <button class="tab-button" onclick="showTab('map')">Map</button>
-            <button class="tab-button" onclick="showTab('skills')">Skills</button>
-            <button class="tab-button" onclick="showTab('adventure')">Adventure</button>
-            <button class="tab-button" onclick="showTab('character')">Character</button>
+    <!-- Landing Page Stub -->
+    <div id="landing-page" class="landing-page">
+        <div class="welcome-panel">
+            <h1>Welcome to Everlyn: City of Wonder</h1>
+            <p>Who comes to enter our city?</p>
+            <input id="player-name" type="text" placeholder="Enter your name">
+            <button onclick="enterCity()">Enter the City</button>
         </div>
-    </nav>
-    <main>
-        <aside class="sidebar">
-            <h3>Resources</h3>
-            <div class="resource-item">Gold: 0/10</div>
-            <div class="resource-item">Research: 0/25</div>
-            <div class="resource-item">Skins: 0/10</div>
-        </aside>
-        <div class="content">
-            <section id="map">
-                <h2>Map</h2>
-                <div class="map-container">
-                    <object id="city-map" data="./maps/everlyn-map.svg" type="image/svg+xml"></object>
-                </div>
-                <div class="location-info">
-                    <h3>Current Location</h3>
-                    <p>Click on a location to learn more about it.</p>
-                </div>
-            </section>            
-            <section id="skills" style="display: none;">
-                <h2>Skills</h2>
-                <p>This is the skills section.</p>
-            </section>
-            <section id="adventure" style="display: none;">
-                <h2>Adventure</h2>
-                <p>This is the adventure section.</p>
-            </section>
-            <section id="character" style="display: none;">
-                <h2>Character</h2>
-                <p>This is the character section.</p>
-            </section>
-        </div>
-        <!-- Updated sidebar with progress bars -->
-        <aside class="sidebar">
-            <h3>Stats</h3>
-            
-            <!-- Health bar -->
-            <div class="stat-item">
-                <div class="progress-container">
-                    <div class="progress-bar health-bar" style="width: 100%;">
-                        <span class="progress-bar-text">Health: 10/10</span>
-                    </div>                    
-                </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content" style="display: none;">
+        <header>
+            <h1>Welcome to Everlyn</h1>
+            <h2>The City of Wonder</h2>
+            <p>Anything is possible and all paths lead to the Pinnacle.</p>
+        </header>
+        <nav>
+            <div class="tabs">
+                <button class="tab-button" onclick="showTab('map')">Map</button>
+                <button class="tab-button" onclick="showTab('skills')">Skills</button>
+                <button class="tab-button" onclick="showTab('adventure')">Adventure</button>
+                <button class="tab-button" onclick="showTab('character')">Character</button>
             </div>
-            
-            <!-- Stamina bar -->
-            <div class="stat-item">
-                <div class="progress-container">
-                    <div class="progress-bar stamina-bar" style="width: 100%;">
-                        <span class="progress-bar-text">Stamina: 10/10</span>
+        </nav>
+        <main>
+            <aside class="sidebar">
+                <h3>Resources</h3>
+                <div class="resource-item">Gold: 0/10</div>
+                <div class="resource-item">Research: 0/25</div>
+                <div class="resource-item">Skins: 0/10</div>
+            </aside>
+            <div class="content">
+                <section id="map">
+                    <h2>Map</h2>
+                    <div class="map-container">
+                        <object id="city-map" data="./maps/everlyn-map.svg" type="image/svg+xml"></object>
+                    </div>
+                    <div class="location-info">
+                        <h3>Current Location</h3>
+                        <p>Click on a location to learn more about it.</p>
+                    </div>
+                </section>            
+                <section id="skills" style="display: none;">
+                    <h2>Skills</h2>
+                    <p>This is the skills section.</p>
+                </section>
+                <section id="adventure" style="display: none;">
+                    <h2>Adventure</h2>
+                    <p>This is the adventure section.</p>
+                </section>
+                <section id="character" style="display: none;">
+                    <h2>Character</h2>
+                    <p>This is the character section.</p>
+                </section>
+            </div>
+            <aside class="sidebar">
+                <h3>Stats</h3>
+                
+                <!-- Health bar -->
+                <div class="stat-item">
+                    <div class="progress-container">
+                        <div class="progress-bar health-bar" style="width: 100%;">
+                            <span class="progress-bar-text">Health: 10/10</span>
+                        </div>                    
                     </div>
                 </div>
-            </div>
-            
-            <!-- Mana bar -->
-            <div class="stat-item">
-                <div class="progress-container">
-                    <div class="progress-bar mana-bar" style="width: 100%;">
-                        <span class="progress-bar-text">Mana: 10/10</span>
+                
+                <!-- Stamina bar -->
+                <div class="stat-item">
+                    <div class="progress-container">
+                        <div class="progress-bar stamina-bar" style="width: 100%;">
+                            <span class="progress-bar-text">Stamina: 10/10</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Earth Mana bar -->
-            <div class="stat-item">
-                <div class="progress-container">
-                    <div class="progress-bar earth-mana-bar" style="width: 0%;">
-                        <span class="progress-bar-text">Earth Mana: 0/0</span>
+                
+                <!-- Mana bar -->
+                <div class="stat-item">
+                    <div class="progress-container">
+                        <div class="progress-bar mana-bar" style="width: 100%;">
+                            <span class="progress-bar-text">Mana: 10/10</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Fire Mana bar -->
-            <div class="stat-item">
-                <div class="progress-container">
-                    <div class="progress-bar fire-mana-bar" style="width: 0%;">
-                        <span class="progress-bar-text">Fire Mana: 0/0</span>
+                
+                <!-- Earth Mana bar -->
+                <div class="stat-item">
+                    <div class="progress-container">
+                        <div class="progress-bar earth-mana-bar" style="width: 0%;">
+                            <span class="progress-bar-text">Earth Mana: 0/0</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Air Mana bar -->
-            <div class="stat-item">
-                <div class="progress-container">
-                    <div class="progress-bar air-mana-bar" style="width: 0%;">
-                        <span class="progress-bar-text">Air Mana: 0/0</span>
+                
+                <!-- Fire Mana bar -->
+                <div class="stat-item">
+                    <div class="progress-container">
+                        <div class="progress-bar fire-mana-bar" style="width: 0%;">
+                            <span class="progress-bar-text">Fire Mana: 0/0</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Water Mana bar -->
-            <div class="stat-item">
-                <div class="progress-container">
-                    <div class="progress-bar water-mana-bar" style="width: 0%;">
-                        <span class="progress-bar-text">Water Mana: 0/0</span>
+                
+                <!-- Air Mana bar -->
+                <div class="stat-item">
+                    <div class="progress-container">
+                        <div class="progress-bar air-mana-bar" style="width: 0%;">
+                            <span class="progress-bar-text">Air Mana: 0/0</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </aside>
-    </main>
-    <footer>
-        <p>&copy; 2025 Synapes Interactive LLC</p>
-    </footer>
-    <!-- Include the external JavaScript file -->
+                
+                <!-- Water Mana bar -->
+                <div class="stat-item">
+                    <div class="progress-container">
+                        <div class="progress-bar water-mana-bar" style="width: 0%;">
+                            <span class="progress-bar-text">Water Mana: 0/0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+        <footer>
+            <p>&copy; 2025 Synapes Interactive LLC</p>
+        </footer>
+    </div>
     <script src="./js/map.js"></script>
     <script src="./js/stats.js"></script>
+    <script>
+        // Function to handle entering the city
+        function enterCity() {
+            const playerName = document.getElementById('player-name').value.trim();
+            if (playerName) {
+                alert(`Welcome, ${playerName}!`);
+                document.getElementById('landing-page').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                alert('Please enter your name to proceed.');
+            }
+        }
+
+        // Function to handle tab switching
+        function showTab(sectionId) {
+            document.querySelectorAll('main section').forEach(section => {
+                section.style.display = section.id === sectionId ? 'block' : 'none';
+            });
+        }
+    </script>
 </body>
 </html>
