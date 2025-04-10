@@ -281,3 +281,36 @@ footer {
     margin-bottom: 3px;
     font-weight: bold;
   }
+
+/* Inline styles for the landing page */
+.landing-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-family: Arial, sans-serif;
+}
+.welcome-panel {
+    text-align: center;
+    padding: 20px;
+    border: 2px solid #ecf0f1;
+    border-radius: 10px;
+    background-color: #34495e;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.welcome-panel input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ecf0f1;
+    margin-right: 10px;
+}
+.welcome-panel button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    background-color: #1abc9c;
+    color: #ecf0f1;
+    cursor: pointer;
+}

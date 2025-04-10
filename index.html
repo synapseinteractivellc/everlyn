@@ -5,40 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Everlyn: City of Wonders</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Inline styles for the landing page */
-        .landing-page {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            font-family: Arial, sans-serif;
-        }
-        .welcome-panel {
-            text-align: center;
-            padding: 20px;
-            border: 2px solid #ecf0f1;
-            border-radius: 10px;
-            background-color: #34495e;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .welcome-panel input {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ecf0f1;
-            margin-right: 10px;
-        }
-        .welcome-panel button {
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: none;
-            background-color: #1abc9c;
-            color: #ecf0f1;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="./css/character-styles.css">
 </head>
 <body>
     <!-- Landing Page Stub -->
@@ -64,6 +31,7 @@
                 <button class="tab-button" onclick="showTab('skills')">Skills</button>
                 <button class="tab-button" onclick="showTab('adventure')">Adventure</button>
                 <button class="tab-button" onclick="showTab('character')">Character</button>
+                <button class="tab-button" onclick="wipeSaveData()">Wipe</button>
             </div>
         </nav>
         <main>
@@ -94,7 +62,7 @@
                 </section>
                 <section id="character" style="display: none;">
                     <h2>Character</h2>
-                    <p>This is the character section.</p>
+                    <p>Your character details will appear here.</p>
                 </section>
             </div>
             <aside class="sidebar">
@@ -168,27 +136,9 @@
             <p>&copy; 2025 Synapes Interactive LLC</p>
         </footer>
     </div>
-    <script src="./js/map.js"></script>
+    <!-- Load scripts -->
     <script src="./js/stats.js"></script>
-    <script>
-        // Function to handle entering the city
-        function enterCity() {
-            const playerName = document.getElementById('player-name').value.trim();
-            if (playerName) {
-                alert(`Welcome, ${playerName}!`);
-                document.getElementById('landing-page').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-            } else {
-                alert('Please enter your name to proceed.');
-            }
-        }
-
-        // Function to handle tab switching
-        function showTab(sectionId) {
-            document.querySelectorAll('main section').forEach(section => {
-                section.style.display = section.id === sectionId ? 'block' : 'none';
-            });
-        }
-    </script>
+    <script src="./js/character-integration.js"></script>
+    <script src="./js/map.js"></script>
 </body>
 </html>
