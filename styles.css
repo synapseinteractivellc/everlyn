@@ -202,3 +202,82 @@ footer {
     padding: 1rem 0;
     margin-top: 1rem;
 }
+
+/* Progress Bar Styling */
+.progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    height: 20px;
+    color: white;
+    font-size: 12px;
+    transition: width 0.3s ease-in-out;
+    position: relative;
+  }
+  
+  .progress-container {
+    position: relative;
+  }
+  
+  .progress-bar-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    left: 0;
+    top: 0;
+    height: 20px;
+    line-height: 20px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+  }
+  
+  /* Specific colors for different stat types */
+  .health-bar {
+    background-color: #dc3545; /* Red */
+  }
+  
+  .stamina-bar {
+    background-color: #28a745; /* Green */
+  }
+  
+  .mana-bar {
+    background-color: #007bff; /* Blue */
+  }
+  
+  /* Element-specific mana bars */
+  .earth-mana-bar {
+    background-color: #6b5b3d; /* Brown for Earth */
+  }
+  
+  .fire-mana-bar {
+    background-color: #ff7700; /* Orange for Fire */
+  }
+  
+  .air-mana-bar {
+    background-color: #c0c0c0; /* Silver for Air */
+  }
+  
+  .water-mana-bar {
+    background-color: #4fc3f7; /* Light Blue for Water */
+  }
+  
+  /* Update the existing stat-item to work with progress bars */
+  .stat-item {
+    margin-bottom: 12px;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+    border-left: 3px solid #28a745;
+  }
+  
+  .stat-label {
+    margin-bottom: 3px;
+    font-weight: bold;
+  }

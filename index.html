@@ -51,15 +51,72 @@
                 <p>This is the character section.</p>
             </section>
         </div>
+        <!-- Updated sidebar with progress bars -->
         <aside class="sidebar">
             <h3>Stats</h3>
-            <div class="stat-item">Health: 10/10</div>
-            <div class="stat-item">Stamina: 10/10</div>
-            <div class="stat-item">Mana: 10/10</div>
-            <div class="stat-item">Earth Mana: 0/0</div>
-            <div class="stat-item">Fire Mana: 0/0</div>
-            <div class="stat-item">Air Mana: 0/0</div>
-            <div class="stat-item">Water Mana: 0/0</div>
+            
+            <!-- Health bar -->
+            <div class="stat-item">
+                <div class="progress-container">
+                    <div class="progress-bar health-bar" style="width: 100%;">
+                        <span class="progress-bar-text">Health: 10/10</span>
+                    </div>                    
+                </div>
+            </div>
+            
+            <!-- Stamina bar -->
+            <div class="stat-item">
+                <div class="progress-container">
+                    <div class="progress-bar stamina-bar" style="width: 100%;">
+                        <span class="progress-bar-text">Stamina: 10/10</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mana bar -->
+            <div class="stat-item">
+                <div class="progress-container">
+                    <div class="progress-bar mana-bar" style="width: 100%;">
+                        <span class="progress-bar-text">Mana: 10/10</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Earth Mana bar -->
+            <div class="stat-item">
+                <div class="progress-container">
+                    <div class="progress-bar earth-mana-bar" style="width: 0%;">
+                        <span class="progress-bar-text">Earth Mana: 0/0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fire Mana bar -->
+            <div class="stat-item">
+                <div class="progress-container">
+                    <div class="progress-bar fire-mana-bar" style="width: 0%;">
+                        <span class="progress-bar-text">Fire Mana: 0/0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Air Mana bar -->
+            <div class="stat-item">
+                <div class="progress-container">
+                    <div class="progress-bar air-mana-bar" style="width: 0%;">
+                        <span class="progress-bar-text">Air Mana: 0/0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Water Mana bar -->
+            <div class="stat-item">
+                <div class="progress-container">
+                    <div class="progress-bar water-mana-bar" style="width: 0%;">
+                        <span class="progress-bar-text">Water Mana: 0/0</span>
+                    </div>
+                </div>
+            </div>
         </aside>
     </main>
     <footer>
@@ -67,5 +124,6 @@
     </footer>
     <!-- Include the external JavaScript file -->
     <script src="./js/map.js"></script>
+    <script src="./js/stats.js"></script>
 </body>
 </html>
