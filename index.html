@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everlyn: City of Wonder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Everlyn</h1>
+        <h2>The City of Wonder</h2>
+        <p>Anything is possible and all paths lead to the Pinnacle.</p>
+    </header>
+    <nav>
+        <div class="tabs">
+            <button class="tab-button" onclick="showTab('map')">Map</button>
+            <button class="tab-button" onclick="showTab('skills')">Skills</button>
+            <button class="tab-button" onclick="showTab('adventure')">Adventure</button>
+            <button class="tab-button" onclick="showTab('character')">Character</button>
+            
+        </div>
+    </nav>
+    <main>
+        <aside class="sidebar">
+            <p>Left</p>
+        </aside>
+        <div class="content">
+            <section id="map">
+                <h2>Map</h2>
+                <p>This is the map section.</p>
+            </section>            
+            <section id="skills" style="display: none;">
+                <h2>Skills</h2>
+                <p>This is the skills section.</p>
+            </section>
+            <section id="adventure" style="display: none;">
+                <h2>Adventure</h2>
+                <p>This is the adventure section.</p>
+            </section>
+            <section id="character" style="display: none;">
+                <h2>Character</h2>
+                <p>This is the character section.</p>
+            </section>
+        </div>
+        <aside class="sidebar">
+            <p>Right</p>
+        </aside>
+    </main>
+    <footer>
+        <p>&copy; 2025 Synapes Interactive LLC</p>
+    </footer>
+    <script>
+        function showTab(sectionId) {
+            document.querySelectorAll('main section').forEach(section => {
+                section.style.display = section.id === sectionId ? 'block' : 'none';
+            });
+        }
+        // Show the map tab by default
+        document.addEventListener('DOMContentLoaded', () => showTab('map'));
+    </script>
+</body>
+</html>
