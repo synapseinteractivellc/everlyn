@@ -136,6 +136,64 @@ main section {
     margin-bottom: 1rem;
 }
 
+/* Sidebar Styling */
+.sidebar {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: fit-content;
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+/* Resource and Stat Items */
+.resource-item, .stat-item {
+    margin-bottom: 8px;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+    border-left: 3px solid #007bff;
+}
+
+.resource-item {
+    border-left-color: #ffc107; /* Gold color for resources */
+}
+
+.stat-item {
+    border-left-color: #28a745; /* Green color for stats */
+}
+
+/* Map Styling */
+.map-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.map-container object {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.location-info {
+    padding: 10px;
+    background-color: #f0f0f0;
+    margin-top: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+
 /* Footer Styling */
 footer {
     text-align: center;

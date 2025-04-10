@@ -5,32 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Everlyn: City of Wonder</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Additional styles for the map */
-        .map-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .map-container object {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-        
-        .location-info {
-            padding: 10px;
-            background-color: #f0f0f0;
-            margin-top: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #007bff;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -44,12 +18,14 @@
             <button class="tab-button" onclick="showTab('skills')">Skills</button>
             <button class="tab-button" onclick="showTab('adventure')">Adventure</button>
             <button class="tab-button" onclick="showTab('character')">Character</button>
-            
         </div>
     </nav>
     <main>
         <aside class="sidebar">
-            <p>Left</p>
+            <h3>Resources</h3>
+            <div class="resource-item">Gold: 0/10</div>
+            <div class="resource-item">Research: 0/25</div>
+            <div class="resource-item">Skins: 0/10</div>
         </aside>
         <div class="content">
             <section id="map">
@@ -76,7 +52,14 @@
             </section>
         </div>
         <aside class="sidebar">
-            <p>Right</p>
+            <h3>Stats</h3>
+            <div class="stat-item">Health: 10/10</div>
+            <div class="stat-item">Stamina: 10/10</div>
+            <div class="stat-item">Mana: 10/10</div>
+            <div class="stat-item">Earth Mana: 0/0</div>
+            <div class="stat-item">Fire Mana: 0/0</div>
+            <div class="stat-item">Air Mana: 0/0</div>
+            <div class="stat-item">Water Mana: 0/0</div>
         </aside>
     </main>
     <footer>
