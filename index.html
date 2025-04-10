@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Everlyn: City of Wonder</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styles for the map */
+        .map-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .map-container object {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .location-info {
+            padding: 10px;
+            background-color: #f0f0f0;
+            margin-top: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -28,7 +54,13 @@
         <div class="content">
             <section id="map">
                 <h2>Map</h2>
-                <p>This is the map section.</p>
+                <div class="map-container">
+                    <object id="city-map" data="./maps/everlyn-map.svg" type="image/svg+xml"></object>
+                </div>
+                <div class="location-info">
+                    <h3>Current Location</h3>
+                    <p>Click on a location to learn more about it.</p>
+                </div>
             </section>            
             <section id="skills" style="display: none;">
                 <h2>Skills</h2>
@@ -50,14 +82,7 @@
     <footer>
         <p>&copy; 2025 Synapes Interactive LLC</p>
     </footer>
-    <script>
-        function showTab(sectionId) {
-            document.querySelectorAll('main section').forEach(section => {
-                section.style.display = section.id === sectionId ? 'block' : 'none';
-            });
-        }
-        // Show the map tab by default
-        document.addEventListener('DOMContentLoaded', () => showTab('map'));
-    </script>
+    <!-- Include the external JavaScript file -->
+    <script src="./js/map.js"></script>
 </body>
 </html>
