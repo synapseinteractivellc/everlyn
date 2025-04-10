@@ -87,15 +87,15 @@ function enterCity() {
         // Store the character in localStorage for persistence between sessions
         saveGame();
         
-        // Update the UI to show character information
+        // Switch from landing page to main game
+        document.getElementById('landing-page').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        
+        // Update the UI to show character information AFTER the main content is displayed
         updatePlayerStats();
         
         // Show welcome message
         alert(`Welcome, ${playerName}!`);
-        
-        // Switch from landing page to main game
-        document.getElementById('landing-page').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
     } else {
         alert('Please enter your name to proceed.');
     }
@@ -105,13 +105,21 @@ function enterCity() {
 function updatePlayerStats() {
     if (!playerCharacter) return;
     
-    // Update resource displays
-    document.querySelector('.resource-item:nth-child(1)').textContent = 
-        `Gold: ${playerCharacter.gold}/${playerCharacter.maxGold}`;
-    document.querySelector('.resource-item:nth-child(2)').textContent = 
-        `Research: ${playerCharacter.research}/${playerCharacter.maxResearch}`;
-    document.querySelector('.resource-item:nth-child(3)').textContent = 
-        `Skins: ${playerCharacter.skins}/${playerCharacter.maxSkins}`;
+    // Update resource displays - add null checks
+    const goldElement = document.querySelector('.resource-item:nth-child(1)');
+    if (goldElement) {
+        goldElement.textContent = `Gold: ${playerCharacter.gold}/${playerCharacter.maxGold}`;
+    }
+    
+    const researchElement = document.querySelector('.resource-item:nth-child(2)');
+    if (researchElement) {
+        researchElement.textContent = `Research: ${playerCharacter.research}/${playerCharacter.maxResearch}`;
+    }
+    
+    const skinsElement = document.querySelector('.resource-item:nth-child(3)');
+    if (skinsElement) {
+        skinsElement.textContent = `Skins: ${playerCharacter.skins}/${playerCharacter.maxSkins}`;
+    }
     
     // Update stat bars
     updateProgressBar('health', playerCharacter.health.current, playerCharacter.health.max);
