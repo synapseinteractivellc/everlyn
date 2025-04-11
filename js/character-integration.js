@@ -5,13 +5,20 @@ import Character from './models/Character.js';
 import CharacterManager from './managers/character-manager.js';
 import GameState from './managers/GameState.js';
 import UIManager from './managers/ui-manager.js';
+import DOMCache from './managers/DOMCache.js';
 
 /**
  * Entry point function for the game
  * Called when the player enters their name and starts the game
  */
 function enterCity() {
-    const playerName = document.getElementById('player-name').value.trim();
+    const playerNameInput = DOMCache.get('playerName');
+    if (!playerNameInput) {
+        console.error('Player name input not found');
+        return;
+    }
+    
+    const playerName = playerNameInput.value.trim();
     if (!playerName) {
         alert('Please enter your name to proceed.');
         return;
@@ -26,9 +33,16 @@ function enterCity() {
     // Store the character in localStorage for persistence between sessions
     CharacterManager.saveGame();
     
-    // Switch from landing page to main game
-    document.getElementById('landing-page').style.display = 'none';
-    document.getElementById('main-content').style.display = 'block';
+    // Switch from landing page to main game using DOMCache
+    const landingPage = DOMCache.get('landingPage');
+    const mainContent = DOMCache.get('mainContent');
+    
+    if (landingPage && mainContent) {
+        landingPage.style.display = 'none';
+        mainContent.style.display = 'block';
+    } else {
+        console.error('Landing page or main content elements not found');
+    }
 }
 
 /**
@@ -52,8 +66,13 @@ function checkAndLoadSavedGame() {
     
     if (loaded) {
         // Skip the landing page and go straight to the game
-        document.getElementById('landing-page').style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
+        const landingPage = DOMCache.get('landingPage');
+        const mainContent = DOMCache.get('mainContent');
+        
+        if (landingPage && mainContent) {
+            landingPage.style.display = 'none';
+            mainContent.style.display = 'block';
+        }
     }
     
     return loaded;

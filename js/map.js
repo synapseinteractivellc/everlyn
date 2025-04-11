@@ -1,29 +1,11 @@
-// Import the UIManager and GameState
+// Import the UIManager, GameState, LocationService and DOMCache
 import UIManager from './managers/ui-manager.js';
 import GameState from './managers/GameState.js';
+import LocationService from './services/LocationService.js';
+import DOMCache from './managers/DOMCache.js';
 
 // Map interaction functionality
 document.addEventListener('DOMContentLoaded', () => {
-  // Location details object - moved outside function for better memory management
-  const locationDetails = {
-    'City Square': {
-      description: 'The bustling heart of Everlyn where citizens gather. Many important announcements are made here.',
-      quests: ['Help the town crier', 'Find the lost child']
-    },
-    'Market': {
-      description: 'A vibrant marketplace where merchants sell goods from all over the realm.',
-      quests: ['Bargain with the merchants', 'Deliver goods to the inn']
-    },
-    'Inn': {
-      description: 'The Sleeping Dragon Inn offers rest and refreshment to weary travelers.',
-      quests: ['Help the innkeeper', 'Listen for rumors']
-    },
-    'Forest': {
-      description: 'A dense forest east of the city. Home to various creatures and valuable resources.',
-      quests: ['Gather herbs', 'Hunt for food', 'Clear monster nests']
-    }
-  };
-
   // Create a mapping between SVG elements and their locations
   // This will be populated once the SVG loads
   const elementToLocationMap = new Map();
@@ -36,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * Uses event delegation for better performance
    */
   function initMap() {
-    const cityMap = document.getElementById('city-map');
+    const cityMap = DOMCache.get('cityMap');
     
     if (!cityMap) {
       console.warn('City map element not found');
@@ -168,8 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
       GameState.setLocation(locationName);
       
       // Update the location info in UI (redundant if UIManager subscribes to GameState)
-      if (locationDetails[locationName]) {
-        UIManager.updateLocationInfo(locationName, locationDetails[locationName]);
+      const locationDetails = LocationService.getLocationDetails(locationName);
+      if (locationDetails) {
+        UIManager.updateLocationInfo(locationName, locationDetails);
       }
     }
   }
