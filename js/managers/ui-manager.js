@@ -167,26 +167,79 @@ const UIManager = {
         if (!character) return;
 
         const characterSection = this.elements.characterSection;
-        if (characterSection) {
-            const stats = character.displayStats();
-            characterSection.innerHTML = `
-                <h2>Character Profile</h2>
-                <div class="character-profile card">
-                    <div class="character-header">
-                        <h2 class="character-name">${stats.name}</h2>
-                        <div class="character-subtitle">Level ${stats.level} ${stats.class}</div>
-                    </div>
-                    <div class="xp-section">
-                        <div class="progress-container">
-                            <div class="progress-bar xp-bar" style="width: ${(stats.xp / stats.xpToNextLevel) * 100}%; background-color: #9c27b0;">
-                                <span class="progress-bar-text">XP: ${stats.xp}/${stats.xpToNextLevel}</span>
-                            </div>
-                        </div>
-                        <div class="xp-info">Next level in: ${stats.xpToNextLevel - stats.xp} XP</div>
-                    </div>
-                </div>
-            `;
+        if (!characterSection) return;
+        
+        // Check if the character profile already exists
+        let characterProfile = characterSection.querySelector('.character-profile');
+        
+        if (!characterProfile) {
+            // Create the profile structure if it doesn't exist
+            characterProfile = document.createElement('div');
+            characterProfile.className = 'character-profile card';
+            
+            const header = document.createElement('div');
+            header.className = 'character-header';
+            
+            const nameElement = document.createElement('h2');
+            nameElement.className = 'character-name';
+            
+            const subtitleElement = document.createElement('div');
+            subtitleElement.className = 'character-subtitle';
+            
+            header.appendChild(nameElement);
+            header.appendChild(subtitleElement);
+            
+            const xpSection = document.createElement('div');
+            xpSection.className = 'xp-section';
+            
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'progress-container';
+            
+            const progressBar = document.createElement('div');
+            progressBar.className = 'progress-bar xp-bar';
+            
+            const progressText = document.createElement('span');
+            progressText.className = 'progress-bar-text';
+            
+            progressBar.appendChild(progressText);
+            progressContainer.appendChild(progressBar);
+            
+            const xpInfo = document.createElement('div');
+            xpInfo.className = 'xp-info';
+            
+            xpSection.appendChild(progressContainer);
+            xpSection.appendChild(xpInfo);
+            
+            characterProfile.appendChild(header);
+            characterProfile.appendChild(xpSection);
+            
+            // Clear and append the new profile
+            characterSection.innerHTML = '<h2>Character Profile</h2>';
+            characterSection.appendChild(characterProfile);
         }
+        
+        // Update only the content that needs to change
+        const stats = character.displayStats();
+        
+        // Update name and level
+        const nameElement = characterProfile.querySelector('.character-name');
+        if (nameElement) nameElement.textContent = stats.name;
+        
+        const subtitleElement = characterProfile.querySelector('.character-subtitle');
+        if (subtitleElement) subtitleElement.textContent = `Level ${stats.level} ${stats.class}`;
+        
+        // Update XP bar
+        const progressBar = characterProfile.querySelector('.progress-bar');
+        if (progressBar) {
+            progressBar.style.width = `${(stats.xp / stats.xpToNextLevel) * 100}%`;
+            
+            const progressText = progressBar.querySelector('.progress-bar-text');
+            if (progressText) progressText.textContent = `XP: ${stats.xp}/${stats.xpToNextLevel}`;
+        }
+        
+        // Update XP info
+        const xpInfo = characterProfile.querySelector('.xp-info');
+        if (xpInfo) xpInfo.textContent = `Next level in: ${stats.xpToNextLevel - stats.xp} XP`;
     },
 
     /**

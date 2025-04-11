@@ -2,32 +2,56 @@ class GameState {
     constructor() {
         this.character = null;
         this.currentLocation = null;
-        this.subscribers = [];
+        this.subscribers = new Map(); // Using Map to store categories of subscribers
     }
     
-    subscribe(callback) {
-        this.subscribers.push(callback);
+    subscribe(category, callback) {
+        if (!this.subscribers.has(category)) {
+            this.subscribers.set(category, []);
+        }
+        this.subscribers.get(category).push(callback);
+        
         return () => { 
-            this.subscribers = this.subscribers.filter(cb => cb !== callback);
+            const categorySubscribers = this.subscribers.get(category);
+            if (categorySubscribers) {
+                this.subscribers.set(
+                    category, 
+                    categorySubscribers.filter(cb => cb !== callback)
+                );
+            }
         };
     }
     
-    notify() {
-        this.subscribers.forEach(callback => callback(this));
+    notify(category) {
+        if (category) {
+            // Notify only specific category subscribers
+            const categorySubscribers = this.subscribers.get(category);
+            if (categorySubscribers) {
+                categorySubscribers.forEach(callback => callback(this));
+            }
+        } else {
+            // Notify all subscribers
+            this.subscribers.forEach((callbacks) => {
+                callbacks.forEach(callback => callback(this));
+            });
+        }
     }
     
     setCharacter(character) {
         this.character = character;
-        this.notify();
+        this.notify('character');
     }
     
     setLocation(location) {
         this.currentLocation = location;
-        this.notify();
+        this.notify('location');
     }
     
-    // Additional state management methods
+    // Update specific character stats without triggering full UI updates
+    updateCharacterStat(statCategory, statName, value) {
+        if (!this.character || !this.character[statCategory]) return;
+        
+        this.character[statCategory][statName] = value;
+        this.notify(`character-${statCategory}-${statName}`);
+    }
 }
-
-// Export a singleton instance
-export default new GameState();

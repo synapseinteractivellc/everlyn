@@ -4,7 +4,7 @@ import GameState from './managers/GameState.js';
 
 // Character.js modified for browser use
 class Character {
-    constructor(name, charClass = "Adventurer", config = {}) {
+    constructor(name, charClass = "Waif", config = {}) {
         this.name = name;
         this.charClass = charClass;
         
