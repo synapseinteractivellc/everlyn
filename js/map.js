@@ -81,32 +81,42 @@ const MapModule = (() => {
    */
   function setupMapInteractions() {
     const end = PerformanceMonitor.start('MapModule.setupMapInteractions');
-    
+
     ErrorUtils.tryCatch(() => {
-      // Map location elements using data attributes
-      const locationNodes = svgDocument.querySelectorAll('.location');
-      
-      // Clear existing mapping
-      locationElements.clear();
-      
-      // Create new mapping
-      locationNodes.forEach(node => {
-        const locationName = node.getAttribute('data-location');
-        
-        if (locationName && LocationService.locationExists(locationName)) {
-          locationElements.set(locationName, node);
-          
-          // Add click event listener
-          node.addEventListener('click', () => handleLocationClick(locationName));
-        } else if (locationName) {
-          console.warn(`Location "${locationName}" from SVG not found in LocationService`);
+        // Map location elements using data attributes
+        const locationNodes = svgDocument.querySelectorAll('.location');
+
+        // Clear existing mapping
+        locationElements.clear();
+
+        // Create new mapping
+        locationNodes.forEach(node => {
+            const locationName = node.getAttribute('data-location');
+
+            if (locationName && LocationService.locationExists(locationName)) {
+                locationElements.set(locationName, node);
+
+                // Add click event listener for locations
+                node.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent background click from triggering
+                    handleLocationClick(locationName);
+                });
+            } else if (locationName) {
+                console.warn(`Location "${locationName}" from SVG not found in LocationService`);
+            }
+        });
+
+        // Add click event listener to the map background
+        const mapBackground = svgDocument.querySelector('.map-background');
+        if (mapBackground) {
+            mapBackground.addEventListener('click', clearLocationInfo);
+        } else {
+            console.warn('Map background element not found. Ensure the SVG has a background element with the class "map-background".');
         }
-      });
-      
-      // Log results
-      console.log(`Mapped ${locationElements.size} locations on the map`);
+
+        console.log(`Mapped ${locationElements.size} locations on the map`);
     }, 'MapModule.setupMapInteractions');
-    
+
     end();
   }
   
@@ -116,30 +126,34 @@ const MapModule = (() => {
    */
   function handleLocationClick(locationName) {
     const end = PerformanceMonitor.start('MapModule.handleLocationClick');
-    
+
     ErrorUtils.tryCatch(() => {
-      if (!locationName || !LocationService.locationExists(locationName)) {
-        throw ErrorUtils.createError(
-          `Invalid location clicked: ${locationName}`, 
-          ErrorCodes.INVALID_LOCATION
-        );
-      }
-      
-      // Check if it's a different location than current
-      if (locationName !== GameState.currentLocation) {
-        // Update game state with new location
-        GameState.setLocation(locationName);
-        
-        // Get location details
-        const locationDetails = LocationService.getLocationDetails(locationName);
-        
-        // Update UI with location info
-        if (locationDetails) {
-          UIManager.updateLocationInfo(locationName, locationDetails);
+        // Validate the clicked location
+        if (!locationName || !LocationService.locationExists(locationName)) {
+            throw ErrorUtils.createError(
+                `Invalid location clicked: ${locationName}`,
+                ErrorCodes.INVALID_LOCATION
+            );
         }
-      }
+
+        // Check if the clicked location is different from the current location
+        if (locationName !== GameState.currentLocation) {
+            // Update the game state with the new location
+            GameState.setLocation(locationName);
+
+            // Get location details
+            const locationDetails = LocationService.getLocationDetails(locationName);
+
+            // Update the UI with the new location info
+            if (locationDetails) {
+                UIManager.updateLocationInfo(locationName, locationDetails);
+            }
+
+            // Highlight the new location on the map
+            highlightLocation(locationName);
+        }
     }, 'MapModule.handleLocationClick');
-    
+
     end();
   }
   
