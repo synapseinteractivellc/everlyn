@@ -1,104 +1,120 @@
 // ui-manager.js - Comprehensive UI Management
+// This module handles all UI updates throughout the application
+// It centralizes UI updates to ensure consistency and reduce code duplication
 
 /**
  * UIManager - Handles all UI updates throughout the application
  * This centralized approach helps maintain consistency and reduces code duplication
  */
 const UIManager = {
+    // Cache DOM elements for performance
+    init: function() {
+        this.elements = {
+            playerNameDisplay: document.getElementById('player-name-display'),
+            resources: {
+                gold: document.getElementById('gold-display'),
+                research: document.getElementById('research-display'),
+                skins: document.getElementById('skins-display'),
+            },
+            stats: {
+                health: document.getElementById('health-bar-display'),
+                stamina: document.getElementById('stamina-bar-display'),
+                mana: document.getElementById('mana-bar-display'),
+                earthMana: document.getElementById('earth-mana-bar-display'),
+                fireMana: document.getElementById('fire-mana-bar-display'),
+                airMana: document.getElementById('air-mana-bar-display'),
+                waterMana: document.getElementById('water-mana-bar-display'),
+            },
+            locationInfo: document.querySelector('.location-info'),
+            characterSection: document.getElementById('character'),
+        };
+
+        // Initialize progress bars on page load
+        this.initProgressBars();
+    },
+
     /**
      * Updates the player name display in the header
      * @param {string} playerName - The name of the player
      */
     updatePlayerNameDisplay: function(playerName) {
-        const playerNameDisplay = document.getElementById('player-name-display');
+        const playerNameDisplay = this.elements.playerNameDisplay;
         if (playerNameDisplay) {
             playerNameDisplay.textContent = playerName;
         } else {
             console.error('Element with id "player-name-display" not found.');
         }
     },
-    
+
     /**
      * Updates all progress bars for player stats
      * @param {Object} character - The player character object
      */
     updateStatBars: function(character) {
         if (!character) return;
-        
-        // Update all stat bars using the stats.js utility function
-        this.updateProgressBar('health', character.health.current, character.health.max);
-        this.updateProgressBar('stamina', character.stamina.current, character.stamina.max);
-        this.updateProgressBar('mana', character.mana.current, character.mana.max);
-        this.updateProgressBar('earth-mana', character.earthMana.current, character.earthMana.max);
-        this.updateProgressBar('fire-mana', character.fireMana.current, character.fireMana.max);
-        this.updateProgressBar('air-mana', character.airMana.current, character.airMana.max);
-        this.updateProgressBar('water-mana', character.waterMana.current, character.waterMana.max);
+
+        // Use cached elements to update progress bars
+        this.updateProgressBar(this.elements.stats.health, character.health.current, character.health.max, 'Health');
+        this.updateProgressBar(this.elements.stats.stamina, character.stamina.current, character.stamina.max, 'Stamina');
+        this.updateProgressBar(this.elements.stats.mana, character.mana.current, character.mana.max, 'Mana');
+        this.updateProgressBar(this.elements.stats.earthMana, character.earthMana.current, character.earthMana.max, 'Earth Mana');
+        this.updateProgressBar(this.elements.stats.fireMana, character.fireMana.current, character.fireMana.max, 'Fire Mana');
+        this.updateProgressBar(this.elements.stats.airMana, character.airMana.current, character.airMana.max, 'Air Mana');
+        this.updateProgressBar(this.elements.stats.waterMana, character.waterMana.current, character.waterMana.max, 'Water Mana');
     },
-    
+
     /**
      * Updates a progress bar with current and max values
-     * @param {string} statName - The name of the stat (used in class names)
+     * @param {HTMLElement} progressBarElement - The progress bar element
      * @param {number} currentValue - Current value of the stat
      * @param {number} maxValue - Maximum value of the stat
+     * @param {string} statName - The name of the stat (for display purposes)
      */
-    updateProgressBar: function(statName, currentValue, maxValue) {
+    updateProgressBar: function(progressBarElement, currentValue, maxValue, statName) {
+        if (!progressBarElement) return;
+
         // Calculate the percentage
         const percentage = (currentValue / maxValue) * 100;
-        
-        // Find the progress bar container
-        const progressContainer = document.querySelector(`.stat-item:has(.${statName}-bar) .progress-container`);
-        
-        if (progressContainer) {
-            // Find the progress bar element
-            const progressBar = progressContainer.querySelector(`.${statName}-bar`);
-            
-            // Find the text element
-            const progressText = progressContainer.querySelector('.progress-bar-text');
-            
-            if (progressBar) {
-                // Update the width based on the percentage
-                progressBar.style.width = `${percentage}%`;
-            }
-            
-            if (progressText) {
-                // Update the text with the stat name and values
-                progressText.textContent = `${statName.charAt(0).toUpperCase() + statName.slice(1).replace('-', ' ')}: ${currentValue}/${maxValue}`;
-            }
+
+        // Update the width of the progress bar
+        progressBarElement.style.width = `${percentage}%`;
+
+        // Update the text inside the progress bar
+        const progressText = progressBarElement.querySelector('.progress-bar-text');
+        if (progressText) {
+            progressText.textContent = `${statName}: ${currentValue}/${maxValue}`;
         }
     },
-    
+
     /**
      * Updates the resources display in the sidebar
      * @param {Object} character - The player character object
      */
     updateResources: function(character) {
         if (!character) return;
-        
-        // Update resource displays with null checks
-        const goldElement = document.querySelector('.resource-item:nth-child(1)');
-        if (goldElement) {
-            goldElement.textContent = `Gold: ${character.gold}/${character.maxGold}`;
+
+        // Use cached elements to update resources
+        const { gold, research, skins } = this.elements.resources;
+
+        if (gold) {
+            gold.textContent = `Gold: ${character.gold}/${character.maxGold}`;
         }
-        
-        const researchElement = document.querySelector('.resource-item:nth-child(2)');
-        if (researchElement) {
-            researchElement.textContent = `Research: ${character.research}/${character.maxResearch}`;
+        if (research) {
+            research.textContent = `Research: ${character.research}/${character.maxResearch}`;
         }
-        
-        const skinsElement = document.querySelector('.resource-item:nth-child(3)');
-        if (skinsElement) {
-            skinsElement.textContent = `Skins: ${character.skins}/${character.maxSkins}`;
+        if (skins) {
+            skins.textContent = `Skins: ${character.skins}/${character.maxSkins}`;
         }
     },
-    
+
     /**
      * Updates the character profile section with detailed information
      * @param {Object} character - The player character object
      */
     updateCharacterProfile: function(character) {
         if (!character) return;
-        
-        const characterSection = document.getElementById('character');
+
+        const characterSection = this.elements.characterSection;
         if (characterSection) {
             const stats = character.displayStats();
             characterSection.innerHTML = `
@@ -108,7 +124,6 @@ const UIManager = {
                         <h2 class="character-name">${stats.name}</h2>
                         <div class="character-subtitle">Level ${stats.level} ${stats.class}</div>
                     </div>
-                    
                     <div class="xp-section">
                         <div class="progress-container">
                             <div class="progress-bar xp-bar" style="width: ${(stats.xp / stats.xpToNextLevel) * 100}%; background-color: #9c27b0;">
@@ -117,48 +132,23 @@ const UIManager = {
                         </div>
                         <div class="xp-info">Next level in: ${stats.xpToNextLevel - stats.xp} XP</div>
                     </div>
-                    
-                    <div class="character-sections">
-                        <div class="character-stats-section">
-                            <h3>Character Stats</h3>
-                            <ul class="character-stats-list">
-                                <li><span>Health:</span> ${stats.health.current}/${stats.health.max}</li>
-                                <li><span>Stamina:</span> ${stats.stamina.current}/${stats.stamina.max}</li>
-                                <li><span>Mana:</span> ${stats.mana.current}/${stats.mana.max}</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="character-resources-section">
-                            <h3>Resources</h3>
-                            <ul class="character-resources-list">
-                                <li><span>Gold:</span> ${stats.gold}/${stats.maxGold}</li>
-                                <li><span>Research:</span> ${stats.research}/${stats.maxResearch}</li>
-                                <li><span>Skins:</span> ${stats.skins}/${stats.maxSkins}</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="character-journey">
-                        <h3>Journey</h3>
-                        <p>Continue your adventures in Everlyn to unlock new skills, discover hidden locations, and build your legend.</p>
-                    </div>
                 </div>
             `;
         }
     },
-    
+
     /**
      * Updates the location info panel when a map location is clicked
      * @param {string} locationName - The name of the clicked location
      * @param {Object} details - The details of the location
      */
     updateLocationInfo: function(locationName, details) {
-        const locationInfo = document.querySelector('.location-info');
+        const locationInfo = this.elements.locationInfo;
         if (!locationInfo) return;
-        
+
         if (details) {
             let questsHTML = '';
-            
+
             if (details.quests && details.quests.length > 0) {
                 questsHTML = '<h4>Available Quests:</h4><ul>';
                 details.quests.forEach(quest => {
@@ -166,7 +156,7 @@ const UIManager = {
                 });
                 questsHTML += '</ul>';
             }
-            
+
             locationInfo.innerHTML = `
                 <h3>${locationName}</h3>
                 <p>${details.description}</p>
@@ -180,7 +170,7 @@ const UIManager = {
             `;
         }
     },
-    
+
     /**
      * Shows/hides tab content
      * @param {string} sectionId - The ID of the section to show
@@ -190,57 +180,35 @@ const UIManager = {
             section.style.display = section.id === sectionId ? 'block' : 'none';
         });
     },
-    
+
     /**
      * Updates all UI elements at once with the current character data
      * @param {Object} character - The player character object
      */
     updateAllUI: function(character) {
         if (!character) return;
-        
+
         this.updatePlayerNameDisplay(character.name);
         this.updateStatBars(character);
         this.updateResources(character);
         this.updateCharacterProfile(character);
     },
-    
+
     /**
      * Initializes progress bars on page load
      */
     initProgressBars: function() {
-        const statItems = document.querySelectorAll('.stat-item');
-        
-        statItems.forEach(item => {
-            // Find the progress bar
-            const progressBar = item.querySelector('.progress-bar');
-            if (!progressBar) return;
-            
-            // Get the stat name from the progress bar class
-            const classNames = progressBar.className.split(' ');
-            const barClassName = classNames.find(className => className.endsWith('-bar'));
-            if (!barClassName) return;
-            
-            const statName = barClassName.replace('-bar', '');
-            
-            // Get the text element
-            const progressText = item.querySelector('.progress-bar-text');
+        Object.values(this.elements.stats).forEach(progressBarElement => {
+            if (!progressBarElement) return;
+
+            const progressText = progressBarElement.querySelector('.progress-bar-text');
             if (progressText) {
-                // Parse current/max values from the text
-                const textContent = progressText.textContent;
-                const valuesPart = textContent.split(':')[1]?.trim() || '';
-                const values = valuesPart.split('/');
-                
-                if (values.length === 2) {
-                    const currentValue = parseInt(values[0], 10);
-                    const maxValue = parseInt(values[1], 10);
-                    
-                    // Set initial width
-                    const percentage = (currentValue / maxValue) * 100;
-                    progressBar.style.width = `${percentage}%`;
-                }
+                const [current, max] = progressText.textContent.match(/\d+/g).map(Number);
+                const percentage = (current / max) * 100;
+                progressBarElement.style.width = `${percentage}%`;
             }
         });
-    }
+    },
 };
 
 // Export the UIManager for use in other modules

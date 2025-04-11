@@ -36,9 +36,9 @@
         <main>
             <aside class="sidebar">
                 <h3>Resources</h3>
-                <div class="resource-item">Gold: 0/10</div>
-                <div class="resource-item">Research: 0/25</div>
-                <div class="resource-item">Skins: 0/10</div>
+                <div class="resource-item" id="gold-display">Gold: 0/10</div>
+                <div class="resource-item" id="research-display">Research: 0/25</div>
+                <div class="resource-item" id="skins-display">Skins: 0/10</div>
             </aside>
             <div class="content">
                 <section id="map">
@@ -70,7 +70,7 @@
                 <!-- Health bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div class="progress-bar health-bar" style="width: 100%;">
+                        <div id="health-bar-display" class="progress-bar health-bar" style="width: 100%;">
                             <span class="progress-bar-text">Health: 10/10</span>
                         </div>                    
                     </div>
@@ -79,7 +79,7 @@
                 <!-- Stamina bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div class="progress-bar stamina-bar" style="width: 100%;">
+                        <div id="stamina-bar-display" class="progress-bar stamina-bar" style="width: 100%;">
                             <span class="progress-bar-text">Stamina: 10/10</span>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                 <!-- Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div class="progress-bar mana-bar" style="width: 100%;">
+                        <div id="mana-bar-display" class="progress-bar mana-bar" style="width: 100%;">
                             <span class="progress-bar-text">Mana: 10/10</span>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                 <!-- Earth Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div class="progress-bar earth-mana-bar" style="width: 0%;">
+                        <div id="earth-mana-bar-display" class="progress-bar earth-mana-bar" style="width: 0%;">
                             <span class="progress-bar-text">Earth Mana: 0/0</span>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                 <!-- Fire Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div class="progress-bar fire-mana-bar" style="width: 0%;">
+                        <div id="fire-mana-bar-display" class="progress-bar fire-mana-bar" style="width: 0%;">
                             <span class="progress-bar-text">Fire Mana: 0/0</span>
                         </div>
                     </div>
@@ -115,7 +115,7 @@
                 <!-- Air Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div class="progress-bar air-mana-bar" style="width: 0%;">
+                        <div id="air-mana-bar-display" class="progress-bar air-mana-bar" style="width: 0%;">
                             <span class="progress-bar-text">Air Mana: 0/0</span>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                 <!-- Water Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div class="progress-bar water-mana-bar" style="width: 0%;">
+                        <div id="water-mana-bar-display" class="progress-bar water-mana-bar" style="width: 0%;">
                             <span class="progress-bar-text">Water Mana: 0/0</span>
                         </div>
                     </div>

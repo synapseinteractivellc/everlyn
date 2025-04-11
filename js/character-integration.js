@@ -3,29 +3,75 @@ import UIManager from './managers/ui-manager.js';
 
 // Character.js modified for browser use
 class Character {
-    constructor(name, charClass) {
+    constructor(name, charClass = "Adventurer", config = {}) {
         this.name = name;
-        this.charClass = charClass || "Adventurer"; // Default class if none specified
-        this.level = 1;
-        this.xp = 0;
-        this.xpToNextLevel = 100;
+        this.charClass = charClass;
         
-        // Add stats that match the UI
-        this.health = {current: 10, max: 10};
-        this.stamina = {current: 10, max: 10};
-        this.mana = {current: 10, max: 10};
-        this.earthMana = {current: 0, max: 0};
-        this.fireMana = {current: 0, max: 0};
-        this.airMana = {current: 0, max: 0};
-        this.waterMana = {current: 0, max: 0};
+        // Default values
+        const defaults = {
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 100,
+            stats: {
+                health: {current: 10, max: 10},
+                stamina: {current: 10, max: 10},
+                mana: {current: 10, max: 10},
+                elementalMana: {
+                    earth: {current: 0, max: 0},
+                    fire: {current: 0, max: 0},
+                    air: {current: 0, max: 0},
+                    water: {current: 0, max: 0}
+                }
+            },
+            resources: {
+                gold: {current: 0, max: 10},
+                research: {current: 0, max: 25},
+                skins: {current: 0, max: 10}
+            }
+        };
         
-        // Resources
-        this.gold = 0;
-        this.maxGold = 10;
-        this.research = 0;
-        this.maxResearch = 25;
-        this.skins = 0;
-        this.maxSkins = 10;
+        // Merge defaults with config
+        const merged = this.mergeDeep(defaults, config);
+        
+        // Apply merged configuration
+        Object.assign(this, merged);
+        
+        // For backward compatibility
+        this.health = this.stats.health;
+        this.stamina = this.stats.stamina;
+        this.mana = this.stats.mana;
+        this.earthMana = this.stats.elementalMana.earth;
+        this.fireMana = this.stats.elementalMana.fire;
+        this.airMana = this.stats.elementalMana.air;
+        this.waterMana = this.stats.elementalMana.water;
+        this.gold = this.resources.gold.current;
+        this.maxGold = this.resources.gold.max;
+        this.research = this.resources.research.current;
+        this.maxResearch = this.resources.research.max;
+        this.skins = this.resources.skins.current;
+        this.maxSkins = this.resources.skins.max;
+    }
+    
+    // Helper method for deep merging
+    mergeDeep(target, source) {
+        const output = Object.assign({}, target);
+        if (this.isObject(target) && this.isObject(source)) {
+            Object.keys(source).forEach(key => {
+                if (this.isObject(source[key])) {
+                    if (!(key in target))
+                        Object.assign(output, { [key]: source[key] });
+                    else
+                        output[key] = this.mergeDeep(target[key], source[key]);
+                } else {
+                    Object.assign(output, { [key]: source[key] });
+                }
+            });
+        }
+        return output;
+    }
+    
+    isObject(item) {
+        return (item && typeof item === 'object' && !Array.isArray(item));
     }
 
     gainXP(amount) {
