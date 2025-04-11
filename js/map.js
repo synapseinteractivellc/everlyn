@@ -19,6 +19,50 @@ const MapModule = (() => {
   let locationElements = new Map();
   
   /**
+   * CSS styles to be injected into the SVG document
+   * These are the same styles from map.css
+   */
+  const mapStyles = `
+    /* Define the pulse animation */
+    @keyframes pulse {
+      0% { filter: brightness(0.8); }
+      50% { filter: brightness(1.2); }
+      100% { filter: brightness(0.8); }
+    }
+    
+    /* Active Location with pulsing effect */
+    .location.active {
+      animation: pulse 2s infinite ease-in-out;
+    }
+    
+    /* Base Location Styling */
+    .location {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    /* Hover Effect */
+    .location:hover {
+      filter: brightness(1.2);
+    }
+    
+    /* Location Text */
+    .location-text {
+      font-family: Arial, sans-serif;
+      text-anchor: middle;
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    /* Gates */
+    .gate {
+      fill: #8B4513;
+      stroke: #4B2617;
+      stroke-width: 1;
+    }
+  `;
+  
+  /**
    * Initialize map functionality
    */
   function init() {
@@ -62,6 +106,9 @@ const MapModule = (() => {
         throw ErrorUtils.createError('Could not access SVG document', ErrorCodes.ELEMENT_NOT_FOUND);
       }
       
+      // Inject CSS styles into the SVG document
+      injectSvgStyles();
+      
       // Initialize map only once
       if (!mapInitialized) {
         setupMapInteractions();
@@ -74,6 +121,31 @@ const MapModule = (() => {
     }, 'MapModule.handleSvgLoad');
     
     end();
+  }
+  
+  /**
+   * Inject CSS styles into the SVG document
+   */
+  function injectSvgStyles() {
+    if (!svgDocument) return;
+    
+    ErrorUtils.tryCatch(() => {
+      // Check if style element already exists
+      let styleElement = svgDocument.getElementById('injected-map-styles');
+      
+      if (!styleElement) {
+        // Create a new style element
+        styleElement = svgDocument.createElementNS('http://www.w3.org/2000/svg', 'style');
+        styleElement.id = 'injected-map-styles';
+        styleElement.textContent = mapStyles;
+        
+        // Add style to the SVG document
+        const svgRoot = svgDocument.documentElement;
+        svgRoot.appendChild(styleElement);
+        
+        console.log('Map styles injected into SVG');
+      }
+    }, 'MapModule.injectSvgStyles');
   }
   
   /**
