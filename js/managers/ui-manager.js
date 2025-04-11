@@ -234,11 +234,23 @@ const UIManager = {
                     details.quests || []
                 );
             } else {
-                // Fallback for locations without detailed info
-                locationInfo.innerHTML = `
-                    <h3>${locationName}</h3>
-                    <p>You are now at the ${locationName}. Explore this area to discover quests and resources.</p>
-                `;
+                // Get details from LocationService if not provided
+                const locationDetails = LocationService.getLocationDetails(locationName);
+                if (locationDetails) {
+                    TemplateManager.render(
+                        locationInfo,
+                        'locationInfo',
+                        locationName,
+                        locationDetails.description,
+                        locationDetails.quests || []
+                    );
+                } else {
+                    // Fallback for locations without details
+                    locationInfo.innerHTML = `
+                        <h3>${locationName}</h3>
+                        <p>You are now at the ${locationName}. Explore this area to discover quests and resources.</p>
+                    `;
+                }
             }
         }, 'UIManager.updateLocationInfo');
     },

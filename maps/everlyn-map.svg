@@ -1,49 +1,164 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Map Styles -->
+  <style>
+    /* Base Location Styling */
+    .location {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    /* Hover Effect */
+    .location:hover {
+      filter: brightness(1.2);
+    }
+    
+    /* Active Location */
+    .location.active {
+      stroke: #0277bd;
+      stroke-width: 3px;
+      filter: brightness(1.3);
+    }
+    
+    /* Location Text */
+    .location-text {
+      font-family: Arial, sans-serif;
+      text-anchor: middle;
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    /* Gates */
+    .gate {
+      fill: #8B4513;
+      stroke: #4B2617;
+      stroke-width: 1;
+    }
+  </style>
+
   <!-- Background -->
-  <rect width="500" height="400" fill="#f8f9fa" />
+  <rect width="700" height="600" fill="#f8f9fa" />
   
-  <!-- City Wall (rectangular) -->
-  <rect x="100" y="80" width="300" height="240" fill="none" stroke="#8B4513" stroke-width="8" />
-  
-  <!-- Forest (East - completely outside walls) -->
-  <g transform="translate(450, 200)">
-    <circle cx="0" cy="0" r="40" fill="#90EE90" />
-    <!-- Trees -->
-    <circle cx="-15" cy="-15" r="12" fill="#228B22" />
-    <circle cx="15" cy="-8" r="14" fill="#228B22" />
-    <circle cx="0" cy="15" r="16" fill="#228B22" />
-    <circle cx="-18" cy="12" r="10" fill="#228B22" />
-    <circle cx="18" cy="18" r="11" fill="#228B22" />
-    <text x="0" y="45" text-anchor="middle" fill="#333" font-size="12">Forest</text>
+  <!-- City Wall -->
+  <g class="location" id="location-city-wall" data-location="City Wall">
+    <rect x="150" y="120" width="400" height="360" fill="none" stroke="#8B4513" stroke-width="10" />
+    <text x="350" y="110" class="location-text">City Wall</text>
   </g>
   
-  <!-- City Square (square instead of circle) -->
-  <rect x="220" y="170" width="60" height="60" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2" />
-  <text x="250" y="205" text-anchor="middle" fill="#333" font-size="12">City Square</text>
+  <!-- City Gates -->
+  <!-- North Gate -->
+  <g class="location" id="location-north-gate" data-location="North Gate">
+    <rect x="340" y="115" width="30" height="20" class="gate" />
+    <text x="355" y="100" class="location-text">North Gate</text>
+  </g>
   
-  <!-- Inn (by City Square) -->
-  <rect x="280" y="140" width="40" height="30" fill="#CD853F" />
-  <polygon points="280,140 300,120 320,140" fill="#8B4513" />
-  <text x="300" y="180" text-anchor="middle" fill="#333" font-size="12">Inn</text>
+  <!-- South Gate -->
+  <g class="location" id="location-south-gate" data-location="South Gate">
+    <rect x="340" y="465" width="30" height="20" class="gate" />
+    <text x="355" y="505" class="location-text">South Gate</text>
+  </g>
   
-  <!-- Market (West of Square) -->
-  <g transform="translate(170, 200)">
-    <rect x="-30" y="-20" width="60" height="40" fill="#F5DEB3" stroke="#DEB887" stroke-width="2" />
-    <!-- Market stalls -->
-    <rect x="-25" y="-15" width="10" height="10" fill="#DEB887" />
-    <rect x="-10" y="-15" width="10" height="10" fill="#DEB887" />
-    <rect x="5" y="-15" width="10" height="10" fill="#DEB887" />
-    <rect x="-25" y="0" width="10" height="10" fill="#DEB887" />
-    <rect x="-10" y="0" width="10" height="10" fill="#DEB887" />
-    <rect x="5" y="0" width="10" height="10" fill="#DEB887" />
-    <text x="0" y="30" text-anchor="middle" fill="#333" font-size="12">Market</text>
+  <!-- East Gate -->
+  <g class="location" id="location-east-gate" data-location="East Gate">
+    <rect x="545" y="290" width="20" height="30" class="gate" />
+    <text x="590" y="305" class="location-text">East Gate</text>
+  </g>
+  
+  <!-- West Gate -->
+  <g class="location" id="location-west-gate" data-location="West Gate">
+    <rect x="135" y="290" width="20" height="30" class="gate" />
+    <text x="100" y="305" class="location-text">West Gate</text>
+  </g>
+  
+  <!-- Forest (full length outside Eastern wall) -->
+  <g class="location" id="location-forest" data-location="Forest">
+    <ellipse cx="620" cy="300" rx="40" ry="180" fill="#90EE90" />
+    <!-- Trees -->
+    <circle cx="605" cy="200" r="15" fill="#228B22" />
+    <circle cx="635" cy="230" r="17" fill="#228B22" />
+    <circle cx="610" cy="280" r="20" fill="#228B22" />
+    <circle cx="640" cy="330" r="18" fill="#228B22" />
+    <circle cx="605" cy="370" r="15" fill="#228B22" />
+    <circle cx="630" cy="410" r="16" fill="#228B22" />
+    <text x="620" y="500" class="location-text">Forest</text>
+  </g>
+  
+  <!-- Mines (north of Western gate, not touching the wall) -->
+  <g class="location" id="location-mines" data-location="Mines">
+    <path d="M45,200 L85,175 L125,200 L125,240 L85,265 L45,240 Z" fill="#808080" stroke="#696969" stroke-width="2" />
+    <circle cx="65" cy="205" r="7" fill="#2F4F4F" /> <!-- Mine entrance -->
+    <text x="85" y="280" class="location-text">Mines</text>
+  </g>
+  
+  <!-- City Square -->
+  <g class="location" id="location-city-square" data-location="City Square">
+    <rect x="320" y="255" width="80" height="80" fill="#D3D3D3" stroke="#A9A9A9" stroke-width="2" />
+    <text x="360" y="350" class="location-text">City Square</text>
+  </g>
+  
+  <!-- Inn -->
+  <g class="location" id="location-inn" data-location="Inn">
+    <rect x="410" y="210" width="60" height="45" fill="#CD853F" />
+    <polygon points="410,210 440,180 470,210" fill="#8B4513" />
+    <text x="440" y="270" class="location-text">Inn</text>
+  </g>
+  
+  <!-- Stables (attached to the Inn on the east) -->
+  <g class="location" id="location-stables" data-location="Stables">
+    <rect x="470" y="210" width="50" height="45" fill="#B8860B" />
+    <rect x="475" y="215" width="40" height="35" fill="#F5DEB3" />
+    <text x="495" y="270" class="location-text">Stables</text>
+  </g>
+  
+  <!-- Market -->
+  <g class="location" id="location-market" data-location="Market">
+    <g transform="translate(250, 300)">
+      <rect x="-40" y="-30" width="80" height="60" fill="#F5DEB3" stroke="#DEB887" stroke-width="2" />
+      <!-- Market stalls -->
+      <rect x="-35" y="-25" width="15" height="15" fill="#DEB887" />
+      <rect x="-15" y="-25" width="15" height="15" fill="#DEB887" />
+      <rect x="5" y="-25" width="15" height="15" fill="#DEB887" />
+      <rect x="25" y="-25" width="15" height="15" fill="#DEB887" />
+      <rect x="-35" y="0" width="15" height="15" fill="#DEB887" />
+      <rect x="-15" y="0" width="15" height="15" fill="#DEB887" />
+      <rect x="5" y="0" width="15" height="15" fill="#DEB887" />
+      <rect x="25" y="0" width="15" height="15" fill="#DEB887" />
+    </g>
+    <text x="250" y="350" class="location-text">Market</text>
+  </g>
+  
+  <!-- Blacksmith (inside western wall, north of gate) -->
+  <g class="location" id="location-blacksmith" data-location="Blacksmith">
+    <rect x="155" y="200" width="50" height="45" fill="#696969" />
+    <text x="205" y="260" class="location-text">Blacksmith</text>
+  </g>
+  
+  <!-- Temple (Moved closer to Southern Gate) -->
+  <g class="location" id="location-temple" data-location="Temple">
+    <rect x="330" y="380" width="60" height="75" fill="#F5F5F5" stroke="#D3D3D3" stroke-width="2" />
+    <!-- Temple dome -->
+    <ellipse cx="360" cy="380" rx="30" ry="15" fill="#E0E0E0" stroke="#D3D3D3" stroke-width="1" />
+    <!-- Temple steps -->
+    <rect x="340" y="455" width="40" height="7" fill="#E0E0E0" />
+    <text x="360" y="475" class="location-text">Temple</text>
+  </g>
+  
+  <!-- Library -->
+  <g class="location" id="location-library" data-location="Library">
+    <rect x="430" y="320" width="65" height="50" fill="#A0522D" />
+    <!-- Library roof -->
+    <polygon points="430,320 462.5,290 495,320" fill="#8B4513" />
+    <!-- Library columns -->
+    <rect x="437" y="320" width="7" height="50" fill="#F5F5DC" />
+    <rect x="459" y="320" width="7" height="50" fill="#F5F5DC" />
+    <rect x="481" y="320" width="7" height="50" fill="#F5F5DC" />
+    <text x="462" y="385" class="location-text">Library</text>
   </g>
   
   <!-- Title -->
-  <text x="250" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">Everlyn City Map</text>
+  <text x="350" y="50" text-anchor="middle" font-size="24" font-weight="bold" fill="#333">Everlyn City Map</text>
   
   <!-- Legend -->
-  <rect x="30" y="340" width="120" height="20" fill="#8B4513" stroke="none" opacity="0.7" />
-  <text x="90" y="355" text-anchor="middle" fill="white" font-size="12">City Wall</text>
+  <rect x="40" y="540" width="150" height="30" fill="#8B4513" stroke="none" opacity="0.7" />
+  <text x="115" y="560" text-anchor="middle" fill="white" font-size="14">City Wall</text>
 </svg>
