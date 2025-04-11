@@ -38,6 +38,9 @@ const MapModule = (() => {
       // Subscribe to location changes for highlighting
       GameState.subscribe('location', handleLocationChange);
       
+      // Make clearLocationInfo function available globally for SVG access
+      window.clearLocationInfo = clearLocationInfo;
+      
       console.log('Map module initialized');
     }, 'MapModule.init');
     
@@ -141,6 +144,43 @@ const MapModule = (() => {
   }
   
   /**
+   * Clear location information and deselect active location
+   * Called when background of map is clicked
+   */
+  function clearLocationInfo() {
+    const end = PerformanceMonitor.start('MapModule.clearLocationInfo');
+    
+    ErrorUtils.tryCatch(() => {
+      // Clear location info panel
+      const locationInfo = DOMCache.get('locationInfo');
+      if (locationInfo) {
+        locationInfo.innerHTML = `
+          <h3>Current Location</h3>
+          <p>Click on a location to learn more about it.</p>
+        `;
+      }
+      
+      // Clear current location in GameState if set
+      if (GameState.currentLocation) {
+        GameState.setLocation(null);
+      }
+      
+      // Clear active class from all location elements
+      if (svgDocument) {
+        svgDocument.querySelectorAll('.location.active').forEach(element => {
+          element.classList.remove('active');
+        });
+      }
+      
+      console.log('Location selection cleared');
+    }, 'MapModule.clearLocationInfo');
+    
+    end();
+    
+    return true; // Return value for SVG script to check
+  }
+  
+  /**
    * Handle location change in GameState
    * @param {Object} state - Game state
    * @param {Object} data - Event data
@@ -148,6 +188,11 @@ const MapModule = (() => {
   function handleLocationChange(state, data) {
     if (state.currentLocation && svgDocument) {
       highlightLocation(state.currentLocation);
+    } else if (!state.currentLocation && svgDocument) {
+      // If location is set to null, clear all highlights
+      svgDocument.querySelectorAll('.location').forEach(element => {
+        element.classList.remove('active');
+      });
     }
   }
   
@@ -238,7 +283,8 @@ const MapModule = (() => {
     isInitialized,
     getLocationElement,
     reload,
-    getMappedLocations
+    getMappedLocations,
+    clearLocationInfo
   };
 })();
 
