@@ -2,6 +2,8 @@
 // This module handles all UI updates throughout the application
 // It centralizes UI updates to ensure consistency and reduce code duplication
 
+import GameState from './GameState.js';
+
 /**
  * UIManager - Handles all UI updates throughout the application
  * This centralized approach helps maintain consistency and reduces code duplication
@@ -31,6 +33,56 @@ const UIManager = {
 
         // Initialize progress bars on page load
         this.initProgressBars();
+        
+        // Subscribe to GameState changes
+        GameState.subscribe(this.handleStateChange.bind(this));
+    },
+    
+    /**
+     * Handle state changes from GameState
+     * @param {Object} state - The current game state
+     */
+    handleStateChange: function(state) {
+        if (state.character) {
+            this.updateAllUI(state.character);
+        }
+        
+        if (state.currentLocation) {
+            // This could be extended to get location details from a locations store/service
+            const locationDetails = this.getLocationDetails(state.currentLocation);
+            if (locationDetails) {
+                this.updateLocationInfo(state.currentLocation, locationDetails);
+            }
+        }
+    },
+    
+    /**
+     * Get location details by name
+     * @param {string} locationName - The name of the location
+     * @returns {Object|null} - The location details or null if not found
+     */
+    getLocationDetails: function(locationName) {
+        // This could be moved to a separate locations service
+        const locationDetails = {
+            'City Square': {
+                description: 'The bustling heart of Everlyn where citizens gather. Many important announcements are made here.',
+                quests: ['Help the town crier', 'Find the lost child']
+            },
+            'Market': {
+                description: 'A vibrant marketplace where merchants sell goods from all over the realm.',
+                quests: ['Bargain with the merchants', 'Deliver goods to the inn']
+            },
+            'Inn': {
+                description: 'The Sleeping Dragon Inn offers rest and refreshment to weary travelers.',
+                quests: ['Help the innkeeper', 'Listen for rumors']
+            },
+            'Forest': {
+                description: 'A dense forest east of the city. Home to various creatures and valuable resources.',
+                quests: ['Gather herbs', 'Hunt for food', 'Clear monster nests']
+            }
+        };
+        
+        return locationDetails[locationName] || null;
     },
 
     /**
@@ -210,6 +262,11 @@ const UIManager = {
         });
     },
 };
+
+// Initialize the UIManager when the module loads
+document.addEventListener('DOMContentLoaded', () => {
+    UIManager.init();
+});
 
 // Export the UIManager for use in other modules
 export default UIManager;

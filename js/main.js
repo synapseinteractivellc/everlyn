@@ -3,6 +3,7 @@
 
 // Import our modules
 import UIManager from './managers/ui-manager.js';
+import GameState from './managers/GameState.js';
 import './character-integration.js'; // This will execute the code in character-integration.js
 import './map.js'; // This will execute the code in map.js
 

@@ -1,5 +1,6 @@
-// Import the UIManager
+// Import the UIManager and GameState
 import UIManager from './managers/ui-manager.js';
+import GameState from './managers/GameState.js';
 
 // Map interaction functionality
 document.addEventListener('DOMContentLoaded', () => {
@@ -55,6 +56,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add event delegation for the entire SVG
         setupMapInteractivity(svgDoc);
+        
+        // If there's a current location in GameState, highlight it
+        if (GameState.currentLocation) {
+          highlightLocation(svgDoc, GameState.currentLocation);
+        }
+        
+        // Subscribe to GameState changes to update map highlights
+        GameState.subscribe((state) => {
+          if (state.currentLocation) {
+            highlightLocation(svgDoc, state.currentLocation);
+          }
+        });
       } catch (error) {
         console.error('Error initializing map:', error);
       }
@@ -150,8 +163,34 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     
-    if (locationName && locationDetails[locationName]) {
-      UIManager.updateLocationInfo(locationName, locationDetails[locationName]);
+    if (locationName) {
+      // Update the current location in GameState
+      GameState.setLocation(locationName);
+      
+      // Update the location info in UI (redundant if UIManager subscribes to GameState)
+      if (locationDetails[locationName]) {
+        UIManager.updateLocationInfo(locationName, locationDetails[locationName]);
+      }
+    }
+  }
+
+  /**
+   * Highlight the current location on the map
+   * @param {Document} svgDoc - The SVG document
+   * @param {string} locationName - The name of the location to highlight
+   */
+  function highlightLocation(svgDoc, locationName) {
+    // First remove any existing highlights
+    const allLocationElements = svgDoc.querySelectorAll('.location-highlight');
+    allLocationElements.forEach(element => {
+      element.classList.remove('location-highlight');
+    });
+    
+    // Find the element(s) for the current location
+    for (const [element, name] of elementToLocationMap.entries()) {
+      if (name === locationName) {
+        element.classList.add('location-highlight');
+      }
     }
   }
 
@@ -234,6 +273,13 @@ document.addEventListener('DOMContentLoaded', () => {
       circle:hover:not([r="40"]) {
         fill: #ffcc66 !important;
         transition: fill 0.3s ease;
+      }
+      
+      /* Current location highlight */
+      .location-highlight {
+        fill: #4fc3f7 !important;
+        stroke-width: 2px;
+        stroke: #0277bd;
       }
     `;
     

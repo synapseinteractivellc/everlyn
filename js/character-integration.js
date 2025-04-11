@@ -1,5 +1,6 @@
-// Import the UIManager
+// Import the UIManager and GameState
 import UIManager from './managers/ui-manager.js';
+import GameState from './managers/GameState.js';
 
 // Character.js modified for browser use
 class Character {
@@ -95,8 +96,8 @@ class Character {
         this.mana.max += 1;
         this.mana.current = this.mana.max;
         
-        // Update UI with new stats
-        updatePlayerUI();
+        // Update the character in GameState to trigger UI update
+        GameState.setCharacter(this);
     }
 
     displayStats() {
@@ -123,21 +124,24 @@ class Character {
     }
 }
 
-// Global variable to store the player character
-let playerCharacter = null;
-
 // Function to update all UI elements using the UIManager
 function updatePlayerUI() {
-    if (!playerCharacter) return;
-    UIManager.updateAllUI(playerCharacter);
+    if (!GameState.character) return;
+    UIManager.updateAllUI(GameState.character);
 }
 
-// Function to handle entering the city - modified to use UIManager
+// Function to handle entering the city - modified to use GameState
 function enterCity() {
     const playerName = document.getElementById('player-name').value.trim();
     if (playerName) {
         // Create a new character instance with the player's name
-        playerCharacter = new Character(playerName);
+        const playerCharacter = new Character(playerName);
+        
+        // Store the character in GameState
+        GameState.setCharacter(playerCharacter);
+        
+        // Set a default location
+        GameState.setLocation('City Square');
         
         // Store the character in localStorage for persistence between sessions
         saveGame();
@@ -145,10 +149,6 @@ function enterCity() {
         // Switch from landing page to main game
         document.getElementById('landing-page').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
-        
-        // Update the UI using UIManager
-        updatePlayerUI();
-        
     } else {
         alert('Please enter your name to proceed.');
     }
@@ -156,8 +156,12 @@ function enterCity() {
 
 // Function to save game data
 function saveGame() {
-    if (playerCharacter) {
-        localStorage.setItem('everlynSaveData', JSON.stringify(playerCharacter));
+    if (GameState.character) {
+        const saveData = {
+            character: GameState.character,
+            location: GameState.currentLocation
+        };
+        localStorage.setItem('everlynSaveData', JSON.stringify(saveData));
         console.log('Game saved successfully');
     }
 }
@@ -167,22 +171,30 @@ function loadGame() {
     const savedData = localStorage.getItem('everlynSaveData');
     if (savedData) {
         try {
-            const characterData = JSON.parse(savedData);
+            const gameData = JSON.parse(savedData);
+            const characterData = gameData.character;
             
             // Create a new Character instance with the saved name
-            playerCharacter = new Character(characterData.name, characterData.charClass);
+            const playerCharacter = new Character(characterData.name, characterData.charClass);
             
             // Copy all properties from saved data to the new character instance
             Object.assign(playerCharacter, characterData);
+            
+            // Set the character in GameState
+            GameState.setCharacter(playerCharacter);
+            
+            // Set the location in GameState
+            if (gameData.location) {
+                GameState.setLocation(gameData.location);
+            } else {
+                GameState.setLocation('City Square'); // Default location
+            }
             
             console.log('Game loaded successfully');
             
             // Skip the landing page and go straight to the game
             document.getElementById('landing-page').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
-            
-            // Update the UI with the loaded character stats using UIManager
-            updatePlayerUI();
             
             return true;
         } catch (error) {
@@ -207,6 +219,11 @@ window.showTab = UIManager.showTab;
 
 // Check for saved game on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Subscribe UIManager to GameState changes
+    GameState.subscribe(() => {
+        updatePlayerUI();
+    });
+    
     // Try to load saved game
     const loaded = loadGame();
     
