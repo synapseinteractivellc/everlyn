@@ -43,21 +43,6 @@ class Character {
         
         // Apply merged configuration
         Object.assign(this, merged);
-        
-        // For backward compatibility and easier access
-        this.health = this.stats.health;
-        this.stamina = this.stats.stamina;
-        this.mana = this.stats.mana;
-        this.earthMana = this.stats.elementalMana.earth;
-        this.fireMana = this.stats.elementalMana.fire;
-        this.airMana = this.stats.elementalMana.air;
-        this.waterMana = this.stats.elementalMana.water;
-        this.gold = this.resources.gold.current;
-        this.maxGold = this.resources.gold.max;
-        this.research = this.resources.research.current;
-        this.maxResearch = this.resources.research.max;
-        this.skins = this.resources.skins.current;
-        this.maxSkins = this.resources.skins.max;
     }
     
     /**
@@ -113,12 +98,12 @@ class Character {
         console.log(`${this.name} leveled up! Now at level ${this.level}`);
         
         // Increase max stats on level up
-        this.health.max += 2;
-        this.health.current = this.health.max; // Restore health on level up
-        this.stamina.max += 1;
-        this.stamina.current = this.stamina.max;
-        this.mana.max += 1;
-        this.mana.current = this.mana.max;
+        this.stats.health.max += 2;
+        this.stats.health.current = this.stats.health.max; // Restore health on level up
+        this.stats.stamina.max += 1;
+        this.stats.stamina.current = this.stats.stamina.max;
+        this.stats.mana.max += 1;
+        this.stats.mana.current = this.stats.mana.max;
     }
     
     /**
@@ -137,17 +122,8 @@ class Character {
         // Clamp value between 0 and max
         newValue = Math.max(0, Math.min(newValue, max));
         
-        // Update both the resource object and compatibility property
+        // Update the resource value
         this.resources[resource].current = newValue;
-        
-        // Update compatibility properties
-        if (resource === 'gold') {
-            this.gold = newValue;
-        } else if (resource === 'research') {
-            this.research = newValue;
-        } else if (resource === 'skins') {
-            this.skins = newValue;
-        }
         
         return true;
     }
@@ -168,17 +144,8 @@ class Character {
         // Clamp value between 0 and max
         newValue = Math.max(0, Math.min(newValue, max));
         
-        // Update both the stat object and compatibility property
+        // Update the stat value
         this.stats[stat].current = newValue;
-        
-        // Update compatibility properties
-        if (stat === 'health') {
-            this.health.current = newValue;
-        } else if (stat === 'stamina') {
-            this.stamina.current = newValue;
-        } else if (stat === 'mana') {
-            this.mana.current = newValue;
-        }
         
         return true;
     }
@@ -199,19 +166,8 @@ class Character {
         // Clamp value between 0 and max
         newValue = Math.max(0, Math.min(newValue, max));
         
-        // Update both the elemental mana object and compatibility property
+        // Update the elemental mana value
         this.stats.elementalMana[element].current = newValue;
-        
-        // Update compatibility properties
-        if (element === 'earth') {
-            this.earthMana.current = newValue;
-        } else if (element === 'fire') {
-            this.fireMana.current = newValue;
-        } else if (element === 'air') {
-            this.airMana.current = newValue;
-        } else if (element === 'water') {
-            this.waterMana.current = newValue;
-        }
         
         return true;
     }
@@ -227,20 +183,52 @@ class Character {
             level: this.level,
             xp: this.xp,
             xpToNextLevel: this.xpToNextLevel,
-            health: this.health,
-            stamina: this.stamina,
-            mana: this.mana,
-            earthMana: this.earthMana,
-            fireMana: this.fireMana,
-            airMana: this.airMana,
-            waterMana: this.waterMana,
-            gold: this.gold,
-            maxGold: this.maxGold,
-            research: this.research,
-            maxResearch: this.maxResearch,
-            skins: this.skins,
-            maxSkins: this.maxSkins
+            health: this.stats.health,
+            stamina: this.stats.stamina,
+            mana: this.stats.mana,
+            earthMana: this.stats.elementalMana.earth,
+            fireMana: this.stats.elementalMana.fire,
+            airMana: this.stats.elementalMana.air,
+            waterMana: this.stats.elementalMana.water,
+            gold: this.resources.gold.current,
+            maxGold: this.resources.gold.max,
+            research: this.resources.research.current,
+            maxResearch: this.resources.research.max,
+            skins: this.resources.skins.current,
+            maxSkins: this.resources.skins.max
         };
+    }
+    
+    // Getters for backward compatibility
+    
+    // Stats getters
+    get health() { return this.stats.health; }
+    get stamina() { return this.stats.stamina; }
+    get mana() { return this.stats.mana; }
+    
+    // Elemental mana getters
+    get earthMana() { return this.stats.elementalMana.earth; }
+    get fireMana() { return this.stats.elementalMana.fire; }
+    get airMana() { return this.stats.elementalMana.air; }
+    get waterMana() { return this.stats.elementalMana.water; }
+    
+    // Resource getters
+    get gold() { return this.resources.gold.current; }
+    get maxGold() { return this.resources.gold.max; }
+    get research() { return this.resources.research.current; }
+    get maxResearch() { return this.resources.research.max; }
+    get skins() { return this.resources.skins.current; }
+    get maxSkins() { return this.resources.skins.max; }
+    
+    // Resource setters
+    set gold(value) { 
+        this.resources.gold.current = Math.max(0, Math.min(value, this.resources.gold.max)); 
+    }
+    set research(value) { 
+        this.resources.research.current = Math.max(0, Math.min(value, this.resources.research.max)); 
+    }
+    set skins(value) { 
+        this.resources.skins.current = Math.max(0, Math.min(value, this.resources.skins.max)); 
     }
 }
 
