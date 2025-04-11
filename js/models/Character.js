@@ -1,6 +1,8 @@
 // Character.js - Character model class
 // This module defines the Character class for player character data
 
+import StatResource from './StatResource.js';
+
 /**
  * Character class representing the player character
  */
@@ -15,66 +17,62 @@ class Character {
         this.name = name;
         this.charClass = charClass;
         
-        // Default values
-        const defaults = {
-            level: 1,
-            xp: 0,
-            xpToNextLevel: 100,
-            stats: {
-                health: {current: 10, max: 10},
-                stamina: {current: 10, max: 10},
-                mana: {current: 10, max: 10},
-                elementalMana: {
-                    earth: {current: 0, max: 0},
-                    fire: {current: 0, max: 0},
-                    air: {current: 0, max: 0},
-                    water: {current: 0, max: 0}
-                }
-            },
-            resources: {
-                gold: {current: 0, max: 10},
-                research: {current: 0, max: 25},
-                skins: {current: 0, max: 10}
-            }
+        // Level and XP
+        this.level = config.level || 1;
+        this.xp = config.xp || 0;
+        this.xpToNextLevel = config.xpToNextLevel || 100;
+
+        // Initialize stats using StatResource
+        this.stats = {
+            health: new StatResource(
+                config.health?.current || 10,
+                config.health?.max || 10
+            ),
+            stamina: new StatResource(
+                config.stamina?.current || 10,
+                config.stamina?.max || 10
+            ),
+            mana: new StatResource(
+                config.mana?.current || 10,
+                config.mana?.max || 10
+            )
         };
         
-        // Merge defaults with config
-        const merged = this.mergeDeep(defaults, config);
+        // Initialize elemental mana
+        this.elementalMana = {
+            earth: new StatResource(
+                config.elementalMana?.earth?.current || 0, 
+                config.elementalMana?.earth?.max || 0
+            ),
+            fire: new StatResource(
+                config.elementalMana?.fire?.current || 0, 
+                config.elementalMana?.fire?.max || 0
+            ),
+            air: new StatResource(
+                config.elementalMana?.air?.current || 0, 
+                config.elementalMana?.air?.max || 0
+            ),
+            water: new StatResource(
+                config.elementalMana?.water?.current || 0, 
+                config.elementalMana?.water?.max || 0
+            )
+        };
         
-        // Apply merged configuration
-        Object.assign(this, merged);
-    }
-    
-    /**
-     * Helper method for deep merging objects
-     * @param {Object} target - Target object to merge into
-     * @param {Object} source - Source object to merge from
-     * @returns {Object} - Merged object
-     */
-    mergeDeep(target, source) {
-        const output = Object.assign({}, target);
-        if (this.isObject(target) && this.isObject(source)) {
-            Object.keys(source).forEach(key => {
-                if (this.isObject(source[key])) {
-                    if (!(key in target))
-                        Object.assign(output, { [key]: source[key] });
-                    else
-                        output[key] = this.mergeDeep(target[key], source[key]);
-                } else {
-                    Object.assign(output, { [key]: source[key] });
-                }
-            });
-        }
-        return output;
-    }
-    
-    /**
-     * Check if value is an object
-     * @param {*} item - Item to check
-     * @returns {boolean} - True if item is an object
-     */
-    isObject(item) {
-        return (item && typeof item === 'object' && !Array.isArray(item));
+        // Initialize resources
+        this.resources = {
+            gold: new StatResource(
+                config.resources?.gold?.current || 0, 
+                config.resources?.gold?.max || 10
+            ),
+            research: new StatResource(
+                config.resources?.research?.current || 0, 
+                config.resources?.research?.max || 25
+            ),
+            skins: new StatResource(
+                config.resources?.skins?.current || 0, 
+                config.resources?.skins?.max || 10
+            )
+        };
     }
 
     /**
@@ -98,12 +96,12 @@ class Character {
         console.log(`${this.name} leveled up! Now at level ${this.level}`);
         
         // Increase max stats on level up
-        this.stats.health.max += 2;
-        this.stats.health.current = this.stats.health.max; // Restore health on level up
-        this.stats.stamina.max += 1;
-        this.stats.stamina.current = this.stats.stamina.max;
-        this.stats.mana.max += 1;
-        this.stats.mana.current = this.stats.mana.max;
+        this.stats.health.setMax(this.stats.health.max + 2);
+        this.stats.health.setCurrent(this.stats.health.max); // Restore health on level up
+        this.stats.stamina.setMax(this.stats.stamina.max + 1);
+        this.stats.stamina.setCurrent(this.stats.stamina.max); // Restore stamina on level up
+        this.stats.mana.setMax(this.stats.mana.max + 1);
+        this.stats.mana.setCurrent(this.stats.mana.max); // Restore mana on level up
     }
     
     /**
@@ -114,18 +112,7 @@ class Character {
      */
     updateResource(resource, amount) {
         if (!this.resources[resource]) return false;
-        
-        const current = this.resources[resource].current;
-        const max = this.resources[resource].max;
-        let newValue = current + amount;
-        
-        // Clamp value between 0 and max
-        newValue = Math.max(0, Math.min(newValue, max));
-        
-        // Update the resource value
-        this.resources[resource].current = newValue;
-        
-        return true;
+        return this.resources[resource].update(amount);
     }
     
     /**
@@ -136,18 +123,7 @@ class Character {
      */
     updateStat(stat, amount) {
         if (!this.stats[stat]) return false;
-        
-        const current = this.stats[stat].current;
-        const max = this.stats[stat].max;
-        let newValue = current + amount;
-        
-        // Clamp value between 0 and max
-        newValue = Math.max(0, Math.min(newValue, max));
-        
-        // Update the stat value
-        this.stats[stat].current = newValue;
-        
-        return true;
+        return this.stats[stat].update(amount);
     }
     
     /**
@@ -157,19 +133,8 @@ class Character {
      * @returns {boolean} - Success status
      */
     updateElementalMana(element, amount) {
-        if (!this.stats.elementalMana[element]) return false;
-        
-        const current = this.stats.elementalMana[element].current;
-        const max = this.stats.elementalMana[element].max;
-        let newValue = current + amount;
-        
-        // Clamp value between 0 and max
-        newValue = Math.max(0, Math.min(newValue, max));
-        
-        // Update the elemental mana value
-        this.stats.elementalMana[element].current = newValue;
-        
-        return true;
+        if (!this.elementalMana[element]) return false;
+        return this.elementalMana[element].update(amount);
     }
 
     /**
@@ -186,10 +151,10 @@ class Character {
             health: this.stats.health,
             stamina: this.stats.stamina,
             mana: this.stats.mana,
-            earthMana: this.stats.elementalMana.earth,
-            fireMana: this.stats.elementalMana.fire,
-            airMana: this.stats.elementalMana.air,
-            waterMana: this.stats.elementalMana.water,
+            earthMana: this.elementalMana.earth,
+            fireMana: this.elementalMana.fire,
+            airMana: this.elementalMana.air,
+            waterMana: this.elementalMana.water,
             gold: this.resources.gold.current,
             maxGold: this.resources.gold.max,
             research: this.resources.research.current,
@@ -199,18 +164,89 @@ class Character {
         };
     }
     
-    // Getters for backward compatibility
+    /**
+     * Serialize character data for storage
+     * @returns {Object} - Serialized character data
+     */
+    toJSON() {
+        return {
+            name: this.name,
+            charClass: this.charClass,
+            level: this.level,
+            xp: this.xp,
+            xpToNextLevel: this.xpToNextLevel,
+            stats: {
+                health: this.stats.health.toJSON(),
+                stamina: this.stats.stamina.toJSON(),
+                mana: this.stats.mana.toJSON()
+            },
+            elementalMana: {
+                earth: this.elementalMana.earth.toJSON(),
+                fire: this.elementalMana.fire.toJSON(),
+                air: this.elementalMana.air.toJSON(),
+                water: this.elementalMana.water.toJSON()
+            },
+            resources: {
+                gold: this.resources.gold.toJSON(),
+                research: this.resources.research.toJSON(),
+                skins: this.resources.skins.toJSON()
+            }
+        };
+    }
     
-    // Stats getters
+    /**
+     * Create a Character instance from serialized data
+     * @param {Object} data - Serialized character data
+     * @returns {Character} - Character instance
+     */
+    static fromJSON(data) {
+        const character = new Character(data.name, data.charClass);
+        
+        // Set basic properties
+        character.level = data.level;
+        character.xp = data.xp;
+        character.xpToNextLevel = data.xpToNextLevel;
+        
+        // Set stats
+        for (const stat in data.stats) {
+            if (character.stats[stat]) {
+                Object.assign(character.stats[stat], StatResource.fromJSON(data.stats[stat]));
+            }
+        }
+        
+        // Set elemental mana
+        for (const element in data.elementalMana) {
+            if (character.elementalMana[element]) {
+                Object.assign(
+                    character.elementalMana[element], 
+                    StatResource.fromJSON(data.elementalMana[element])
+                );
+            }
+        }
+        
+        // Set resources
+        for (const resource in data.resources) {
+            if (character.resources[resource]) {
+                Object.assign(
+                    character.resources[resource], 
+                    StatResource.fromJSON(data.resources[resource])
+                );
+            }
+        }
+        
+        return character;
+    }
+    
+    // Getters for backward compatibility
     get health() { return this.stats.health; }
     get stamina() { return this.stats.stamina; }
     get mana() { return this.stats.mana; }
     
     // Elemental mana getters
-    get earthMana() { return this.stats.elementalMana.earth; }
-    get fireMana() { return this.stats.elementalMana.fire; }
-    get airMana() { return this.stats.elementalMana.air; }
-    get waterMana() { return this.stats.elementalMana.water; }
+    get earthMana() { return this.elementalMana.earth; }
+    get fireMana() { return this.elementalMana.fire; }
+    get airMana() { return this.elementalMana.air; }
+    get waterMana() { return this.elementalMana.water; }
     
     // Resource getters
     get gold() { return this.resources.gold.current; }
@@ -221,15 +257,9 @@ class Character {
     get maxSkins() { return this.resources.skins.max; }
     
     // Resource setters
-    set gold(value) { 
-        this.resources.gold.current = Math.max(0, Math.min(value, this.resources.gold.max)); 
-    }
-    set research(value) { 
-        this.resources.research.current = Math.max(0, Math.min(value, this.resources.research.max)); 
-    }
-    set skins(value) { 
-        this.resources.skins.current = Math.max(0, Math.min(value, this.resources.skins.max)); 
-    }
+    set gold(value) { this.resources.gold.setCurrent(value); }
+    set research(value) { this.resources.research.setCurrent(value); }
+    set skins(value) { this.resources.skins.setCurrent(value); }
 }
 
 export default Character;

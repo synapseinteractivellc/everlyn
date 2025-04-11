@@ -6,6 +6,9 @@ import GameState from './GameState.js';
 import LocationService from '../services/LocationService.js';
 import DOMCache from './DOMCache.js';
 import TemplateManager from './TemplateManager.js';
+import ErrorUtils from '../utils/ErrorUtils.js';
+import { ErrorCodes } from '../utils/ErrorUtils.js';
+import GameConfig from '../config.js';
 
 /**
  * UIManager - Handles all UI updates throughout the application
@@ -21,24 +24,30 @@ const UIManager = {
         
         // Subscribe to GameState changes
         GameState.subscribe(this.handleStateChange.bind(this));
+        
+        // Set animation speed from config
+        this.animationSpeed = GameConfig.ui.progressBarAnimationSpeed || 300;
     },
     
     /**
      * Handle state changes from GameState
      * @param {Object} state - The current game state
+     * @param {Object} data - Change event data
      */
-    handleStateChange: function(state) {
-        if (state.character) {
-            this.updateAllUI(state.character);
-        }
-        
-        if (state.currentLocation) {
-            // Use the LocationService to get location details
-            const locationDetails = LocationService.getLocationDetails(state.currentLocation);
-            if (locationDetails) {
-                this.updateLocationInfo(state.currentLocation, locationDetails);
+    handleStateChange: function(state, data) {
+        ErrorUtils.tryCatch(() => {
+            if (state.character) {
+                this.updateAllUI(state.character);
             }
-        }
+            
+            if (state.currentLocation) {
+                // Use the LocationService to get location details
+                const locationDetails = LocationService.getLocationDetails(state.currentLocation);
+                if (locationDetails) {
+                    this.updateLocationInfo(state.currentLocation, locationDetails);
+                }
+            }
+        }, 'UIManager.handleStateChange');
     },
 
     /**
@@ -50,7 +59,14 @@ const UIManager = {
         if (playerNameDisplay) {
             playerNameDisplay.textContent = playerName;
         } else {
-            console.error('Element with id "player-name-display" not found.');
+            ErrorUtils.logError(
+                ErrorUtils.createError(
+                    'Element with id "player-name-display" not found.',
+                    ErrorCodes.ELEMENT_NOT_FOUND
+                ),
+                'UIManager.updatePlayerNameDisplay',
+                ErrorUtils.LogLevel.WARN
+            );
         }
     },
 
@@ -62,36 +78,45 @@ const UIManager = {
         if (!character) return;
 
         // Use cached elements to update progress bars
-        this.updateProgressBar('stats.health', character.health.current, character.health.max, 'Health');
-        this.updateProgressBar('stats.stamina', character.stamina.current, character.stamina.max, 'Stamina');
-        this.updateProgressBar('stats.mana', character.mana.current, character.mana.max, 'Mana');
-        this.updateProgressBar('stats.earthMana', character.earthMana.current, character.earthMana.max, 'Earth Mana');
-        this.updateProgressBar('stats.fireMana', character.fireMana.current, character.fireMana.max, 'Fire Mana');
-        this.updateProgressBar('stats.airMana', character.airMana.current, character.airMana.max, 'Air Mana');
-        this.updateProgressBar('stats.waterMana', character.waterMana.current, character.waterMana.max, 'Water Mana');
+        this.updateProgressBar('stats.health', character.health, 'Health');
+        this.updateProgressBar('stats.stamina', character.stamina, 'Stamina');
+        this.updateProgressBar('stats.mana', character.mana, 'Mana');
+        this.updateProgressBar('stats.earthMana', character.earthMana, 'Earth Mana');
+        this.updateProgressBar('stats.fireMana', character.fireMana, 'Fire Mana');
+        this.updateProgressBar('stats.airMana', character.airMana, 'Air Mana');
+        this.updateProgressBar('stats.waterMana', character.waterMana, 'Water Mana');
     },
 
     /**
      * Updates a progress bar with current and max values
      * @param {string} progressBarSelector - Selector for the progress bar element
-     * @param {number} currentValue - Current value of the stat
-     * @param {number} maxValue - Maximum value of the stat
+     * @param {Object} statResource - StatResource object with current and max values
      * @param {string} statName - The name of the stat (for display purposes)
      */
-    updateProgressBar: function(progressBarSelector, currentValue, maxValue, statName) {
+    updateProgressBar: function(progressBarSelector, statResource, statName) {
         const progressBarElement = DOMCache.get(progressBarSelector);
         if (!progressBarElement) return;
 
-        // Calculate the percentage
-        const percentage = (currentValue / maxValue) * 100;
+        // Calculate the percentage using StatResource
+        const percentage = statResource.getPercentage();
 
-        // Update the width of the progress bar
-        progressBarElement.style.width = `${percentage}%`;
+        // Update the width of the progress bar with animation
+        const currentWidth = parseFloat(progressBarElement.style.width) || 0;
+        
+        // Only animate if the difference is significant
+        if (Math.abs(percentage - currentWidth) > 1) {
+            // Set transition if needed
+            if (this.animationSpeed > 0 && progressBarElement.style.transition === '') {
+                progressBarElement.style.transition = `width ${this.animationSpeed}ms ease-in-out`;
+            }
+            
+            progressBarElement.style.width = `${percentage}%`;
+        }
 
         // Update the text inside the progress bar
         const progressText = progressBarElement.querySelector('.progress-bar-text');
         if (progressText) {
-            progressText.textContent = `${statName}: ${currentValue}/${maxValue}`;
+            progressText.textContent = `${statName}: ${statResource.current}/${statResource.max}`;
         }
     },
 
@@ -103,9 +128,24 @@ const UIManager = {
         if (!character) return;
 
         // Update each resource
-        this.updateResource('resources.gold', 'Gold', character.gold, character.maxGold);
-        this.updateResource('resources.research', 'Research', character.research, character.maxResearch);
-        this.updateResource('resources.skins', 'Skins', character.skins, character.maxSkins);
+        this.updateResource(
+            'resources.gold', 
+            'Gold', 
+            character.resources.gold.current, 
+            character.resources.gold.max
+        );
+        this.updateResource(
+            'resources.research', 
+            'Research', 
+            character.resources.research.current, 
+            character.resources.research.max
+        );
+        this.updateResource(
+            'resources.skins', 
+            'Skins', 
+            character.resources.skins.current, 
+            character.resources.skins.max
+        );
     },
 
     /**
@@ -129,46 +169,49 @@ const UIManager = {
     updateCharacterProfile: function(character) {
         if (!character) return;
 
-        const characterSection = DOMCache.get('character');
-        if (!characterSection) return;
-        
-        // Check if the character profile already exists
-        let characterProfile = characterSection.querySelector('.character-profile');
-        
-        if (!characterProfile) {
-            // Use TemplateManager to create the profile structure
-            characterSection.innerHTML = '<h2>Character Profile</h2>';
+        ErrorUtils.tryCatch(() => {
+            const characterSection = DOMCache.get('character');
+            if (!characterSection) return;
             
-            // Create and append the character profile
-            const profileElement = TemplateManager.createElement('characterProfile');
-            characterSection.appendChild(profileElement);
+            // Check if the character profile already exists
+            let characterProfile = characterSection.querySelector('.character-profile');
             
-            // Update DOMCache with the new elements
-            DOMCache.clearCache(['characterProfile', 'characterName', 'characterSubtitle', 'xpBar', 'xpInfo']);
-        }
-        
-        // Get character stats for display
-        const stats = character.displayStats();
-        
-        // Update name and level
-        const nameElement = DOMCache.get('characterName') || characterSection.querySelector('.character-name');
-        if (nameElement) nameElement.textContent = stats.name;
-        
-        const subtitleElement = DOMCache.get('characterSubtitle') || characterSection.querySelector('.character-subtitle');
-        if (subtitleElement) subtitleElement.textContent = `Level ${stats.level} ${stats.class}`;
-        
-        // Update XP bar
-        const progressBar = DOMCache.get('xpBar') || characterSection.querySelector('.xp-bar');
-        if (progressBar) {
-            progressBar.style.width = `${(stats.xp / stats.xpToNextLevel) * 100}%`;
+            if (!characterProfile) {
+                // Use TemplateManager to create the profile structure
+                characterSection.innerHTML = '<h2>Character Profile</h2>';
+                
+                // Create and append the character profile
+                const profileElement = TemplateManager.createElement('characterProfile');
+                characterSection.appendChild(profileElement);
+                
+                // Update DOMCache with the new elements
+                DOMCache.clearCache(['characterProfile', 'characterName', 'characterSubtitle', 'xpBar', 'xpInfo']);
+            }
             
-            const progressText = progressBar.querySelector('.progress-bar-text');
-            if (progressText) progressText.textContent = `XP: ${stats.xp}/${stats.xpToNextLevel}`;
-        }
-        
-        // Update XP info
-        const xpInfo = DOMCache.get('xpInfo') || characterSection.querySelector('.xp-info');
-        if (xpInfo) xpInfo.textContent = `Next level in: ${stats.xpToNextLevel - stats.xp} XP`;
+            // Get character stats for display
+            const stats = character.displayStats();
+            
+            // Update name and level
+            const nameElement = DOMCache.get('characterName') || characterSection.querySelector('.character-name');
+            if (nameElement) nameElement.textContent = stats.name;
+            
+            const subtitleElement = DOMCache.get('characterSubtitle') || characterSection.querySelector('.character-subtitle');
+            if (subtitleElement) subtitleElement.textContent = `Level ${stats.level} ${stats.class}`;
+            
+            // Update XP bar
+            const progressBar = DOMCache.get('xpBar') || characterSection.querySelector('.xp-bar');
+            if (progressBar) {
+                const xpPercentage = (stats.xp / stats.xpToNextLevel) * 100;
+                progressBar.style.width = `${xpPercentage}%`;
+                
+                const progressText = progressBar.querySelector('.progress-bar-text');
+                if (progressText) progressText.textContent = `XP: ${stats.xp}/${stats.xpToNextLevel}`;
+            }
+            
+            // Update XP info
+            const xpInfo = DOMCache.get('xpInfo') || characterSection.querySelector('.xp-info');
+            if (xpInfo) xpInfo.textContent = `Next level in: ${stats.xpToNextLevel - stats.xp} XP`;
+        }, 'UIManager.updateCharacterProfile');
     },
 
     /**
@@ -180,22 +223,24 @@ const UIManager = {
         const locationInfo = DOMCache.get('locationInfo');
         if (!locationInfo) return;
 
-        if (details) {
-            // Use TemplateManager to render location info
-            TemplateManager.render(
-                locationInfo,
-                'locationInfo',
-                locationName,
-                details.description,
-                details.quests || []
-            );
-        } else {
-            // Fallback for locations without detailed info
-            locationInfo.innerHTML = `
-                <h3>${locationName}</h3>
-                <p>You are now at the ${locationName}. Explore this area to discover quests and resources.</p>
-            `;
-        }
+        ErrorUtils.tryCatch(() => {
+            if (details) {
+                // Use TemplateManager to render location info
+                TemplateManager.render(
+                    locationInfo,
+                    'locationInfo',
+                    locationName,
+                    details.description,
+                    details.quests || []
+                );
+            } else {
+                // Fallback for locations without detailed info
+                locationInfo.innerHTML = `
+                    <h3>${locationName}</h3>
+                    <p>You are now at the ${locationName}. Explore this area to discover quests and resources.</p>
+                `;
+            }
+        }, 'UIManager.updateLocationInfo');
     },
 
     /**
@@ -203,10 +248,23 @@ const UIManager = {
      * @param {string} sectionId - The ID of the section to show
      */
     showTab: function(sectionId) {
-        const sections = document.querySelectorAll('main section');
-        sections.forEach(section => {
-            section.style.display = section.id === sectionId ? 'block' : 'none';
-        });
+        ErrorUtils.tryCatch(() => {
+            const sections = document.querySelectorAll('main section');
+            sections.forEach(section => {
+                section.style.display = section.id === sectionId ? 'block' : 'none';
+            });
+            
+            // Update active tab button
+            const tabButtons = DOMCache.getAll('tabButtons');
+            tabButtons.forEach(button => {
+                const tabId = button.getAttribute('data-tab');
+                if (tabId === sectionId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }, 'UIManager.showTab');
     },
 
     /**
@@ -226,19 +284,93 @@ const UIManager = {
      * Initializes progress bars on page load
      */
     initProgressBars: function() {
-        const statSelectors = Object.values(DOMCache._selectors.stats);
-        
-        statSelectors.forEach(selector => {
-            const progressBarElement = document.querySelector(selector);
-            if (!progressBarElement) return;
+        ErrorUtils.tryCatch(() => {
+            const statSelectors = Object.values(DOMCache._selectors.stats);
+            
+            statSelectors.forEach(selector => {
+                const progressBarElement = document.querySelector(selector);
+                if (!progressBarElement) return;
 
-            const progressText = progressBarElement.querySelector('.progress-bar-text');
-            if (progressText) {
-                const [current, max] = progressText.textContent.match(/\d+/g).map(Number);
-                const percentage = (current / max) * 100;
-                progressBarElement.style.width = `${percentage}%`;
+                const progressText = progressBarElement.querySelector('.progress-bar-text');
+                if (progressText) {
+                    const [current, max] = progressText.textContent.match(/\d+/g).map(Number);
+                    const percentage = (current / max) * 100;
+                    progressBarElement.style.width = `${percentage}%`;
+                }
+            });
+        }, 'UIManager.initProgressBars');
+    },
+    
+    /**
+     * Shows a notification message to the user
+     * @param {string} message - Message to display
+     * @param {string} type - Message type (info, success, warning, error)
+     * @param {number} [duration=3000] - How long to show the message (ms)
+     */
+    showNotification: function(message, type = 'info', duration = 3000) {
+        // Implementation for showing notifications to the user
+        // This would create a temporary element to display the message
+        ErrorUtils.tryCatch(() => {
+            // Check if notification container exists
+            let container = document.querySelector('.notification-container');
+            
+            // Create container if it doesn't exist
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'notification-container';
+                document.body.appendChild(container);
+                
+                // Add styles if needed
+                const style = document.createElement('style');
+                style.textContent = `
+                    .notification-container {
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        z-index: 1000;
+                    }
+                    .notification {
+                        padding: 10px 20px;
+                        margin-bottom: 10px;
+                        border-radius: 4px;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        opacity: 0;
+                        transform: translateX(100%);
+                        transition: all 0.3s ease-in-out;
+                    }
+                    .notification.show {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                    .notification.info { background-color: #e3f2fd; color: #0d47a1; }
+                    .notification.success { background-color: #e8f5e9; color: #1b5e20; }
+                    .notification.warning { background-color: #fff8e1; color: #ff6f00; }
+                    .notification.error { background-color: #ffebee; color: #b71c1c; }
+                `;
+                document.head.appendChild(style);
             }
-        });
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            // Add to container
+            container.appendChild(notification);
+            
+            // Trigger animation
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // Remove after duration
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, duration);
+        }, 'UIManager.showNotification');
     }
 };
 

@@ -3,7 +3,6 @@
 
 import Character from '../models/Character.js';
 import GameState from './GameState.js';
-import UIManager from './ui-manager.js';
 
 /**
  * Character Manager - Handles all character-related operations
@@ -28,10 +27,19 @@ const CharacterManager = {
      * @returns {Character} - The loaded character instance
      */
     loadCharacter: function(savedData) {
-        const character = new Character(savedData.name, savedData.charClass);
-        Object.assign(character, savedData);
-        GameState.setCharacter(character);
-        return character;
+        try {
+            // Use the static fromJSON method for proper deserialization
+            const character = Character.fromJSON(savedData);
+            GameState.setCharacter(character);
+            return character;
+        } catch (error) {
+            console.error('Error loading character:', error);
+            // Fallback to the old method if the new one fails
+            const character = new Character(savedData.name, savedData.charClass);
+            Object.assign(character, savedData);
+            GameState.setCharacter(character);
+            return character;
+        }
     },
     
     /**
@@ -44,7 +52,8 @@ const CharacterManager = {
         const saveData = {
             character: GameState.character,
             location: GameState.currentLocation,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            version: '1.0.0' // Adding version for future compatibility
         };
         
         try {
@@ -53,7 +62,27 @@ const CharacterManager = {
             return true;
         } catch (error) {
             console.error('Error saving game:', error);
-            return false;
+            // Try to save with less data if the first attempt failed (might be quota issues)
+            try {
+                const minimalSaveData = {
+                    character: {
+                        name: GameState.character.name,
+                        charClass: GameState.character.charClass,
+                        level: GameState.character.level,
+                        xp: GameState.character.xp
+                    },
+                    location: GameState.currentLocation,
+                    timestamp: Date.now(),
+                    version: '1.0.0',
+                    isMinimal: true
+                };
+                localStorage.setItem('everlynSaveData', JSON.stringify(minimalSaveData));
+                console.log('Minimal game data saved successfully');
+                return true;
+            } catch (fallbackError) {
+                console.error('Critical error saving game:', fallbackError);
+                return false;
+            }
         }
     },
     
@@ -68,20 +97,38 @@ const CharacterManager = {
         try {
             const gameData = JSON.parse(savedData);
             
-            // Load character
-            if (gameData.character) {
-                this.loadCharacter(gameData.character);
-            }
-            
-            // Set location
-            if (gameData.location) {
-                GameState.setLocation(gameData.location);
+            // Check for version compatibility
+            const savedVersion = gameData.version || '0.0.1';
+            if (this._isVersionCompatible(savedVersion)) {
+                // Load character
+                if (gameData.character) {
+                    this.loadCharacter(gameData.character);
+                }
+                
+                // Set location
+                if (gameData.location) {
+                    GameState.setLocation(gameData.location);
+                } else {
+                    GameState.setLocation('City Square'); // Default location
+                }
+                
+                console.log(`Game loaded successfully (save version: ${savedVersion})`);
+                return true;
             } else {
-                GameState.setLocation('City Square'); // Default location
+                console.warn(`Save version ${savedVersion} may not be compatible with current game version`);
+                // Still try to load, but warn the user
+                if (gameData.character) {
+                    this.loadCharacter(gameData.character);
+                }
+                
+                if (gameData.location) {
+                    GameState.setLocation(gameData.location);
+                } else {
+                    GameState.setLocation('City Square');
+                }
+                
+                return true;
             }
-            
-            console.log('Game loaded successfully');
-            return true;
         } catch (error) {
             console.error('Error loading save data:', error);
             return false;
@@ -150,12 +197,67 @@ const CharacterManager = {
     },
     
     /**
+     * Update an elemental mana value
+     * @param {string} element - Element name
+     * @param {number} amount - Amount to add/subtract
+     * @returns {boolean} - Success status
+     */
+    updateElementalMana: function(element, amount) {
+        if (!GameState.character) return false;
+        
+        const success = GameState.character.updateElementalMana(element, amount);
+        if (success) {
+            GameState.notify('character'); // Trigger UI update
+        }
+        return success;
+    },
+    
+    /**
      * Initialize auto-save feature
      * @param {number} interval - Auto-save interval in milliseconds
      */
     initAutoSave: function(interval = 60000) {
-        setInterval(() => this.saveGame(), interval);
+        this.autoSaveInterval = setInterval(() => this.saveGame(), interval);
         console.log(`Auto-save initialized with ${interval}ms interval`);
+    },
+    
+    /**
+     * Check if a saved version is compatible with current game version
+     * @param {string} savedVersion - Version from saved data
+     * @returns {boolean} - Whether versions are compatible
+     * @private
+     */
+    _isVersionCompatible: function(savedVersion) {
+        // For now, consider all versions compatible
+        // In the future, implement version compatibility logic
+        return true;
+    },
+    
+    /**
+     * Calculate the required XP for a specific level
+     * @param {number} level - Target level
+     * @returns {number} - Required XP
+     */
+    getXPForLevel: function(level) {
+        let xp = 0;
+        let xpToNextLevel = 100; // Starting XP needed for level 2
+        
+        for (let i = 1; i < level; i++) {
+            xp += xpToNextLevel;
+            xpToNextLevel = Math.floor(xpToNextLevel * 1.5);
+        }
+        
+        return xp;
+    },
+    
+    /**
+     * Clear auto-save on game end
+     */
+    cleanup: function() {
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+            this.autoSaveInterval = null;
+        }
     }
 };
 
