@@ -4,20 +4,18 @@ import GameState from './managers/GameState.js';
 import LocationService from './services/LocationService.js';
 import DOMCache from './managers/DOMCache.js';
 
-// Map interaction functionality
-document.addEventListener('DOMContentLoaded', () => {
-  // Create a mapping between SVG elements and their locations
-  // This will be populated once the SVG loads
-  const elementToLocationMap = new Map();
-
-  // Initialize the map functionality
-  initMap();
-
+/**
+ * Map Module - Handles map interactivity
+ */
+const MapModule = (() => {
+  // Private module variables
+  const elementToLocationMap = new WeakMap(); // Using WeakMap for better garbage collection
+  let svgDocument = null;
+  
   /**
-   * Initialize map interactivity
-   * Uses event delegation for better performance
+   * Initialize map functionality
    */
-  function initMap() {
+  function init() {
     const cityMap = DOMCache.get('cityMap');
     
     if (!cityMap) {
@@ -25,248 +23,249 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     
+    // Handle SVG load
     cityMap.addEventListener('load', () => {
       try {
-        const svgDoc = cityMap.contentDocument;
-        if (!svgDoc) {
+        svgDocument = cityMap.contentDocument;
+        if (!svgDocument) {
           console.warn('Could not access SVG document');
           return;
         }
         
-        // Create mapping for locations
-        createLocationMapping(svgDoc);
+        // Create mapping and add styles - do this only once
+        createLocationMapping();
+        addSvgStyles();
         
-        // Add event delegation for the entire SVG
-        setupMapInteractivity(svgDoc);
+        // Set up event delegation on the SVG document
+        setupEventDelegation();
         
-        // If there's a current location in GameState, highlight it
-        if (GameState.currentLocation) {
-          highlightLocation(svgDoc, GameState.currentLocation);
-        }
+        // Subscribe to location changes for highlighting
+        subscribeToLocationChanges();
         
-        // Subscribe to GameState changes to update map highlights
-        GameState.subscribe((state) => {
-          if (state.currentLocation) {
-            highlightLocation(svgDoc, state.currentLocation);
-          }
-        });
+        // Initial highlight if there's a current location
+        highlightCurrentLocation();
       } catch (error) {
         console.error('Error initializing map:', error);
       }
     });
   }
-
+  
   /**
-   * Map SVG elements to their location names
-   * @param {Document} svgDoc - The SVG document
+   * Create mapping between SVG elements and location names
    */
-  function createLocationMapping(svgDoc) {
-    // Find all location elements
+  function createLocationMapping() {
+    // Centralized location definition data
     const locationMappings = [
-      { 
-        selector: 'rect[x="220"][y="170"]', // City Square
-        locationName: 'City Square'
+      {
+        name: 'City Square',
+        selectors: ['rect[x="220"][y="170"]']
       },
-      { 
-        selector: 'g[transform*="translate(170, 200)"]', // Market
-        locationName: 'Market' 
+      {
+        name: 'Market',
+        selectors: ['g[transform*="translate(170, 200)"]', 'g[transform*="translate(170, 200)"] > *']
       },
-      { 
-        selector: 'g[transform*="translate(450, 200)"]', // Forest
-        locationName: 'Forest' 
+      {
+        name: 'Forest',
+        selectors: ['g[transform*="translate(450, 200)"]', 'g[transform*="translate(450, 200)"] > *']
       },
-      // Inn has separate parts that need to be mapped individually
-      { 
-        selector: 'rect[x="280"][y="140"]', // Inn building
-        locationName: 'Inn' 
-      },
-      { 
-        selector: 'polygon[points*="280,140"]', // Inn roof
-        locationName: 'Inn' 
+      {
+        name: 'Inn',
+        selectors: ['rect[x="280"][y="140"]', 'polygon[points*="280,140"]', 'text:contains("Inn")']
       }
     ];
 
-    // Create the mapping
-    locationMappings.forEach(mapping => {
-      const elements = svgDoc.querySelectorAll(mapping.selector);
-      elements.forEach(element => {
-        elementToLocationMap.set(element, mapping.locationName);
-        
-        // For group elements, also map their children
-        if (element.tagName === 'g') {
-          Array.from(element.children).forEach(child => {
-            elementToLocationMap.set(child, mapping.locationName);
-          });
+    // Process each location mapping
+    locationMappings.forEach(location => {
+      location.selectors.forEach(selector => {
+        try {
+          // Special handling for :contains pseudoselector
+          if (selector.includes(':contains')) {
+            const [tag, content] = selector.split(':contains(');
+            const searchText = content.slice(1, -2); // Remove quotes and closing parenthesis
+            
+            Array.from(svgDocument.querySelectorAll(tag)).forEach(el => {
+              if (el.textContent.includes(searchText)) {
+                mapElementToLocation(el, location.name);
+              }
+            });
+          } else {
+            // Standard selector
+            const elements = svgDocument.querySelectorAll(selector);
+            elements.forEach(el => mapElementToLocation(el, location.name));
+          }
+        } catch (error) {
+          console.warn(`Error processing selector "${selector}":`, error);
         }
       });
     });
   }
-
+  
   /**
-   * Set up map interactivity using event delegation
-   * @param {Document} svgDoc - The SVG document object
+   * Map an element to a location name
+   * @param {Element} element - SVG element
+   * @param {string} locationName - Location name
    */
-  function setupMapInteractivity(svgDoc) {
-    // Add a single event listener to the entire SVG using event delegation
-    svgDoc.addEventListener('click', handleMapClick);
+  function mapElementToLocation(element, locationName) {
+    elementToLocationMap.set(element, locationName);
     
-    // Add CSS for hover effects
-    addHoverStylesTo(svgDoc);
+    // Add a data attribute for easier debugging and selection
+    element.dataset.location = locationName;
   }
-
+  
   /**
-   * Handle click events on the map
-   * @param {Event} event - The click event
+   * Set up event delegation for map interactions
+   */
+  function setupEventDelegation() {
+    // Use event delegation with a single listener
+    svgDocument.addEventListener('click', handleMapClick);
+  }
+  
+  /**
+   * Handle click events on the map using efficient lookups
+   * @param {Event} event - Click event
    */
   function handleMapClick(event) {
-    // Find the target element
-    const target = event.target;
-    
-    // Prevent handling clicks on the background
-    if (target.tagName === 'rect' && target.getAttribute('width') === '500') {
+    // Ignore clicks on the background rect
+    if (isBackgroundElement(event.target)) {
       return;
     }
     
-    // Find the location name using our mapping
-    let locationName = elementToLocationMap.get(target);
-    
-    // If we don't have a direct mapping, try parent elements
-    if (!locationName) {
-      // Try to find if any parent is mapped
-      let parentElement = target.parentElement;
-      while (parentElement && !locationName) {
-        locationName = elementToLocationMap.get(parentElement);
-        parentElement = parentElement.parentElement;
-      }
-      
-      // Fallback to the old method if mapping doesn't work
-      if (!locationName) {
-        locationName = findLocationName(target);
-      }
-    }
+    // Try to find location directly from WeakMap
+    let locationName = findLocationName(event.target);
     
     if (locationName) {
-      // Update the current location in GameState
+      // Update game state with the new location
       GameState.setLocation(locationName);
-      
-      // Update the location info in UI (redundant if UIManager subscribes to GameState)
-      const locationDetails = LocationService.getLocationDetails(locationName);
-      if (locationDetails) {
-        UIManager.updateLocationInfo(locationName, locationDetails);
-      }
     }
   }
-
+  
   /**
-   * Highlight the current location on the map
-   * @param {Document} svgDoc - The SVG document
-   * @param {string} locationName - The name of the location to highlight
+   * Check if an element is the background
+   * @param {Element} element - SVG element
+   * @returns {boolean} - True if it's the background
    */
-  function highlightLocation(svgDoc, locationName) {
-    // First remove any existing highlights
-    const allLocationElements = svgDoc.querySelectorAll('.location-highlight');
-    allLocationElements.forEach(element => {
-      element.classList.remove('location-highlight');
-    });
-    
-    // Find the element(s) for the current location
-    for (const [element, name] of elementToLocationMap.entries()) {
-      if (name === locationName) {
-        element.classList.add('location-highlight');
-      }
-    }
+  function isBackgroundElement(element) {
+    return (
+      element.tagName === 'rect' && 
+      element.getAttribute('width') === '500' &&
+      element.getAttribute('height') === '400'
+    );
   }
-
+  
   /**
-   * Fallback method to find the location name from a clicked element
-   * @param {Element} element - The clicked element
-   * @returns {string|null} - The location name or null if not found
+   * Find location name for an element using efficient lookup
+   * @param {Element} element - Clicked element
+   * @returns {string|null} - Location name or null
    */
   function findLocationName(element) {
-    // First check if element is inside a group
-    const group = element.closest('g');
+    // Direct lookup
+    let locationName = elementToLocationMap.get(element);
     
-    if (group) {
-      const textElement = group.querySelector('text');
-      if (textElement) {
-        return textElement.textContent;
+    // Try parent elements if needed (maximum of 3 levels up)
+    if (!locationName) {
+      let currentEl = element;
+      let level = 0;
+      
+      while (!locationName && currentEl && currentEl.parentElement && level < 3) {
+        currentEl = currentEl.parentElement;
+        locationName = elementToLocationMap.get(currentEl);
+        level++;
       }
     }
     
-    // For standalone elements, check for nearby text elements
-    const textElements = element.ownerDocument.querySelectorAll('text');
-    const elementRect = element.getBoundingClientRect();
-    
-    // Find the nearest text element
-    let nearestText = null;
-    let shortestDistance = Number.MAX_VALUE;
-    
-    textElements.forEach(textElement => {
-      const textRect = textElement.getBoundingClientRect();
-      
-      // Calculate center points
-      const elementCenterX = elementRect.left + elementRect.width / 2;
-      const elementCenterY = elementRect.top + elementRect.height / 2;
-      const textCenterX = textRect.left + textRect.width / 2;
-      const textCenterY = textRect.top + textRect.height / 2;
-      
-      // Calculate distance between centers
-      const distance = Math.sqrt(
-        Math.pow(elementCenterX - textCenterX, 2) + 
-        Math.pow(elementCenterY - textCenterY, 2)
-      );
-      
-      if (distance < shortestDistance) {
-        shortestDistance = distance;
-        nearestText = textElement;
+    return locationName;
+  }
+  
+  /**
+   * Subscribe to location changes in GameState
+   */
+  function subscribeToLocationChanges() {
+    GameState.subscribe('location', (state, data) => {
+      if (state.currentLocation) {
+        highlightLocation(state.currentLocation);
       }
     });
-    
-    if (nearestText && shortestDistance < 100) { // 100 is an arbitrary threshold
-      return nearestText.textContent;
-    }
-    
-    return null;
   }
-
+  
   /**
-   * Add CSS for hover effects instead of manipulating attributes
-   * @param {Document} svgDoc - The SVG document
+   * Highlight the current location from GameState
    */
-  function addHoverStylesTo(svgDoc) {
-    // Create a style element
-    const styleElement = svgDoc.createElementNS("http://www.w3.org/2000/svg", "style");
-    
-    // Define hover styles - updated to handle all clickable elements
-    styleElement.textContent = `
-      /* Make interactive elements have a pointer cursor */
-      rect:not([width="500"]):not([x="100"][y="80"]), 
-      polygon, 
-      g > rect, 
-      g > circle,
-      circle:not([r="40"]) {
-        cursor: pointer;
-      }
-      
-      /* Highlight elements on hover */
-      rect:hover:not([width="500"]):not([x="100"][y="80"]), 
-      polygon:hover, 
-      g > rect:hover, 
-      g > circle:hover,
-      circle:hover:not([r="40"]) {
-        fill: #ffcc66 !important;
-        transition: fill 0.3s ease;
-      }
-      
-      /* Current location highlight */
-      .location-highlight {
-        fill: #4fc3f7 !important;
-        stroke-width: 2px;
-        stroke: #0277bd;
-      }
-    `;
-    
-    // Add the style element to the SVG
-    svgDoc.querySelector('svg').appendChild(styleElement);
+  function highlightCurrentLocation() {
+    if (GameState.currentLocation) {
+      highlightLocation(GameState.currentLocation);
+    }
   }
-});
+  
+  /**
+   * Highlight a location on the map
+   * @param {string} locationName - Location name to highlight
+   */
+  function highlightLocation(locationName) {
+    // Use CSS classes for better performance than direct style manipulation
+    
+    // First remove existing highlights
+    const highlightedElements = svgDocument.querySelectorAll('.location-highlight');
+    highlightedElements.forEach(el => {
+      el.classList.remove('location-highlight');
+    });
+    
+    // Add highlight to new location (use data attribute for faster selection)
+    const elementsToHighlight = svgDocument.querySelectorAll(`[data-location="${locationName}"]`);
+    elementsToHighlight.forEach(el => {
+      el.classList.add('location-highlight');
+    });
+  }
+  
+  /**
+   * Add CSS styles to SVG document
+   */
+  function addSvgStyles() {
+    // Create a style element if it doesn't exist yet
+    let styleElement = svgDocument.querySelector('style#map-styles');
+    
+    if (!styleElement) {
+      styleElement = svgDocument.createElementNS("http://www.w3.org/2000/svg", "style");
+      styleElement.id = "map-styles";
+      
+      // Define styles
+      styleElement.textContent = `
+        /* Interactive elements */
+        rect:not([width="500"]):not([x="100"][y="80"]), 
+        polygon, 
+        g > rect, 
+        g > circle:not([r="40"]) {
+          cursor: pointer;
+          transition: fill 0.3s ease;
+        }
+        
+        /* Hover effect */
+        rect:hover:not([width="500"]):not([x="100"][y="80"]), 
+        polygon:hover, 
+        g > rect:hover, 
+        g > circle:hover:not([r="40"]) {
+          fill: #ffcc66 !important;
+        }
+        
+        /* Current location highlight */
+        .location-highlight {
+          fill: #4fc3f7 !important;
+          stroke-width: 2px;
+          stroke: #0277bd;
+        }
+      `;
+      
+      // Add style element to SVG
+      svgDocument.querySelector('svg').appendChild(styleElement);
+    }
+  }
+  
+  // Public API
+  return {
+    init
+  };
+})();
+
+// Initialize the map when DOM is ready
+document.addEventListener('DOMContentLoaded', MapModule.init);
+
+export default MapModule;
