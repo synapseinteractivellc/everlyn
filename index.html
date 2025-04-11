@@ -14,7 +14,7 @@
             <h1>Welcome to Everlyn: City of Wonder</h1>
             <p>Who comes to enter our city?</p>
             <input id="player-name" type="text" placeholder="Enter your name">
-            <button onclick="enterCity()">Enter the City</button>
+            <button id="enter-city-btn">Enter the City</button>
         </div>
     </div>
 
@@ -27,11 +27,11 @@
         </header>
         <nav>
             <div class="tabs">
-                <button class="tab-button" onclick="showTab('map')">Map</button>
-                <button class="tab-button" onclick="showTab('skills')">Skills</button>
-                <button class="tab-button" onclick="showTab('adventure')">Adventure</button>
-                <button class="tab-button" onclick="showTab('character')">Character</button>
-                <button class="tab-button" onclick="wipeSaveData()">Wipe</button>
+                <button class="tab-button" data-tab="map">Map</button>
+                <button class="tab-button" data-tab="skills">Skills</button>
+                <button class="tab-button" data-tab="adventure">Adventure</button>
+                <button class="tab-button" data-tab="character">Character</button>
+                <button class="tab-button" id="wipe-save-btn">Wipe</button>
             </div>
         </nav>
         <main>
@@ -136,9 +136,8 @@
             <p>&copy; 2025 Synapes Interactive LLC</p>
         </footer>
     </div>
-    <!-- Load scripts -->
-    <script src="./js/stats.js"></script>
-    <script src="./js/character-integration.js"></script>
-    <script src="./js/map.js"></script>
+    
+    <!-- Load scripts with type="module" to enable ES modules -->
+    <script type="module" src="./js/main.js"></script>
 </body>
 </html>

@@ -1,3 +1,6 @@
+// Import the UIManager
+import UIManager from './managers/ui-manager.js';
+
 // Map interaction functionality
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize the map functionality once DOM is fully loaded
@@ -58,30 +61,9 @@ function initMap() {
                             }
                         }
                         
-                        // Update location info
-                        if (locationName && locationDetails[locationName]) {
-                            const details = locationDetails[locationName];
-                            let questsHTML = '';
-                            
-                            if (details.quests && details.quests.length > 0) {
-                                questsHTML = '<h4>Available Quests:</h4><ul>';
-                                details.quests.forEach(quest => {
-                                    questsHTML += `<li>${quest}</li>`;
-                                });
-                                questsHTML += '</ul>';
-                            }
-                            
-                            locationInfo.innerHTML = `
-                                <h3>${locationName}</h3>
-                                <p>${details.description}</p>
-                                ${questsHTML}
-                            `;
-                        } else if (locationName) {
-                            // Fallback for locations without detailed info
-                            locationInfo.innerHTML = `
-                                <h3>${locationName}</h3>
-                                <p>You are now at the ${locationName}. Explore this area to discover quests and resources.</p>
-                            `;
+                        // Update location info using UIManager
+                        if (locationName) {
+                            UIManager.updateLocationInfo(locationName, locationDetails[locationName]);
                         }
                     });
                     
@@ -105,9 +87,5 @@ function initMap() {
     }
 }
 
-// Function to show/hide tabs
-function showTab(sectionId) {
-    document.querySelectorAll('main section').forEach(section => {
-        section.style.display = section.id === sectionId ? 'block' : 'none';
-    });
-}
+// Make function globally available
+window.initMap = initMap;
