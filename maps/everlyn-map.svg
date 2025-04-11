@@ -2,6 +2,18 @@
 <svg viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg">
   <!-- Map Styles -->
   <style>
+    /* Define the pulse animation */
+    @keyframes pulse {
+      0% { filter: brightness(0.8); }
+      50% { filter: brightness(1.2); }
+      100% { filter: brightness(0.8); }
+    }
+    
+    /* Active Location with pulsing effect */
+    .location.active {
+      animation: pulse 2s infinite ease-in-out;
+    }
+    
     /* Base Location Styling */
     .location {
       cursor: pointer;
@@ -11,13 +23,6 @@
     /* Hover Effect */
     .location:hover {
       filter: brightness(1.2);
-    }
-    
-    /* Active Location */
-    .location.active {
-      stroke: #0277bd;
-      stroke-width: 3px;
-      filter: brightness(1.3);
     }
     
     /* Location Text */
@@ -38,6 +43,30 @@
 
   <!-- Background -->
   <rect width="700" height="600" fill="#f8f9fa" />
+  
+  <!-- River -->
+  <path d="M0,400 
+           C25,398 50,396 75,398
+           C100,400 125,403 150,400 
+           C165,398 180,400 195,410
+           C210,420 220,430 230,442
+           C240,454 248,465 255,475
+           C262,485 270,490 280,495
+           C290,500 305,502 320,505
+           C330,507 335,515 338,525
+           C341,535 342,545 345,555
+           C348,565 352,575 355,580" 
+        fill="none" 
+        stroke="#1E90FF" 
+        stroke-width="10" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+        
+  <!-- River Port -->
+  <g class="location" id="location-river-port" data-location="River Port">
+    <rect x="160" y="400" width="80" height="60" fill="#CD853F" stroke="#8B4513" stroke-width="2" />    
+    <text x="200" y="473" class="location-text">River Port</text>
+  </g>
   
   <!-- City Wall -->
   <g class="location" id="location-city-wall" data-location="City Wall">
