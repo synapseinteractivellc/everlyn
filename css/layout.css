@@ -1,0 +1,96 @@
+/* layout.css - Layout containers and structural elements */
+
+/* Layout Containers */
+.container {
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 1em;
+}
+
+/* Header */
+header {
+  background: #333;
+  color: #fff;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+header h1, 
+header h2 {
+  color: #79b4f8;
+  margin: 0.5rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+header p {
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+/* Navigation */
+nav {
+  background: #444;
+  padding: 0.5rem 0;
+  text-align: center;
+}
+
+/* Main Content */
+main {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  height: 100%;
+  padding: 1rem;
+}
+
+main aside {
+  box-sizing: border-box;
+  padding: 10px;
+  width: 15%;
+}
+
+main div.content {
+  box-sizing: border-box;
+  flex: 1;
+  padding: 10px;
+}
+
+main section {
+  margin-bottom: 1rem;
+}
+
+/* Cards and Containers */
+.card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1em;
+  padding: 1em;
+}
+
+/* Map Section */
+.map-container {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  max-width: 600px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.map-container object {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.location-info {
+  background-color: #f0f0f0;
+  border-left: 4px solid #007bff;
+  border-radius: 5px;
+  margin-top: 15px;
+  padding: 10px;
+}
