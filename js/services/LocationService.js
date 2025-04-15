@@ -177,21 +177,10 @@ class LocationServiceClass {
     /**
      * Get formatted quest HTML for a location suitable for data-binding
      * @param {string} locationName - Location name
-     * @returns {string} - HTML string with quest information
      */
-    getQuestsHTML(locationName) {
+    setLocationQuests(locationName) {
         const quests = this.getLocationQuests(locationName);
-        
-        if (quests.length === 0) {
-            return '<p>No quests available in this area yet.</p>';
-        }
-        
-        return `
-            <h4>Available Quests:</h4>
-            <ul>
-                ${quests.map(quest => `<li>${quest}</li>`).join('')}
-            </ul>
-        `;
+        GameState.updateProperty('currentLocationQuests', quests);
     }
     
     /**

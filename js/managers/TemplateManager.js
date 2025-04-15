@@ -40,8 +40,8 @@ const TemplateManager = {
         `,
         
         // Character resource item template
-        resourceItem: (label, value, max) => `
-            <div class="resource-item">${label}: ${value}/${max}</div>
+        resourceItem: (label, bindPath) => `
+            <div class="resource-item" data-bind="${bindPath}">${label}: 0/0</div>
         `,
         
         // Location info template

@@ -8,7 +8,7 @@
 </head>
 <body>
     <!-- Landing Page Stub -->
-    <div id="landing-page" class="landing-page">
+    <div id="landing-page" data-bind-display="currentView === 'landing' ? 'flex' : 'none'">
         <div class="welcome-panel">
             <h1>Welcome to Everlyn: City of Wonder</h1>
             <p>Where all things are possible and all paths lead to the pinnacle.</p>
@@ -19,7 +19,7 @@
     </div>
 
     <!-- Main Content -->
-    <div id="main-content" style="display: none;">
+    <div id="main-content" data-bind-display="currentView === 'main' ? 'block' : 'none'">
         <header>
             <h1>Welcome to Everlyn, <span id="player-name-display" data-bind="character.name">Adventurer</span></h1>
         </header>
@@ -74,7 +74,10 @@
                     <div class="current-location-panel">
                         <h3>Current Location: <span data-bind="currentLocation">Unknown</span></h3>
                         <p>Adventures available in this area:</p>
-                        <div data-bind="locationQuests">No quests available in this area yet.</div>
+                        <div data-bind="currentLocationQuests.length === 0 ? 'No quests available in this area yet.' : ''">
+                            <h4 data-bind-display="currentLocationQuests.length > 0 ? 'block' : 'none'">Available Quests:</h4>
+                            <ul data-bind-list="currentLocationQuests"></ul>
+                        </div>
                     </div>
                 </section>
                 <section id="character" style="display: none;">

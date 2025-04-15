@@ -38,8 +38,7 @@ function enterCity() {
     const mainContent = DOMCache.get('mainContent');
     
     if (landingPage && mainContent) {
-        landingPage.style.display = 'none';
-        mainContent.style.display = 'block';
+        GameState.updateProperty('currentView', 'main');
         
         // Update all UI bindings to reflect the initial game state
         UIManager.updateBindings(GameState);

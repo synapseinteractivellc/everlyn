@@ -217,10 +217,8 @@ const MapModule = (() => {
             // Get location details
             const locationDetails = LocationService.getLocationDetails(locationName);
 
-            // Update the UI with the new location info
-            if (locationDetails) {
-                UIManager.updateLocationInfo(locationName, locationDetails);
-            }
+            GameState.setLocation(locationName);
+            GameState.updateProperty('locationDetails', locationDetails);
 
             // Highlight the new location on the map
             highlightLocation(locationName);
