@@ -94,10 +94,23 @@ function initEventListeners() {
             button.addEventListener('click', handleTabClick);
         });
         
-        // Add event listener for enter city button
+        // Add event listener for enter city button - with retry
         const enterCityBtn = document.getElementById('enter-city-btn');
         if (enterCityBtn) {
+            console.log('Found enter city button, adding event listener');
             enterCityBtn.addEventListener('click', enterCity);
+        } else {
+            console.warn('Enter city button not found in DOM yet');
+            // Try again after a short delay
+            console.log('Retrying to find enter city button...');
+            // Use setTimeout to retry finding the button
+            setTimeout(() => {
+                const retryBtn = document.getElementById('enter-city-btn');
+                if (retryBtn) {
+                    console.log('Found enter city button on retry');
+                    retryBtn.addEventListener('click', enterCity);
+                }
+            }, 100);
         }
         
         // Add event listener for wipe save button
