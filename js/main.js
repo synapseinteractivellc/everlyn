@@ -1,41 +1,39 @@
-// main.js - Application Entry Point
+// main.js - Application Entry Point using Component System
 // This file imports and initializes all the necessary modules
 
-// Import utilities
+// Import utilities and core modules
 import ErrorUtils from './utils/ErrorUtils.js';
 import PerformanceMonitor from './utils/PerformanceMonitor.js';
 import GameConfig from './config.js';
+import templateLoader from './core/TemplateLoader.js';
 
-// Import core managers
-import UIManager from './managers/ui-manager.js';
+// Import managers
 import GameState from './managers/GameState.js';
 import CharacterManager from './managers/character-manager.js';
-import DOMCache from './managers/DOMCache.js';
-import TemplateManager from './managers/TemplateManager.js';
 
-// Import services
-import LocationService from './services/LocationService.js';
+// Import components
+import CharacterComponent from './components/CharacterComponent.js';
+import MapComponent from './components/MapComponent.js';
+import ResourceBarComponent from './components/ResourceBarComponent.js';
+import StatBarComponent from './components/StatBarComponent.js';
 
-// Import integration modules
-import { enterCity, wipeSaveData } from './character-integration.js';
-import MapModule from './map.js';
+// Track active components
+const activeComponents = new Map();
 
 /**
  * Initialize the application
  */
-function initApp() {
+async function initApp() {
     const end = PerformanceMonitor.start('initApp');
     
-    ErrorUtils.tryCatch(() => {
+    try {
         console.log('Initializing Everlyn app...');
         
-        // Configure DOMCache
-        DOMCache.configure({
-            logErrors: true,
-            throwErrors: false,
-            cacheNullResults: true,
-            debugMode: isDevMode()
-        });
+        // Set template path
+        templateLoader.setTemplatePath('./templates/');
+        
+        // Preload all templates
+        await preloadTemplates();
         
         // Set up event listeners for tab navigation
         initEventListeners();
@@ -43,60 +41,157 @@ function initApp() {
         // Try to load saved game
         const gameLoaded = CharacterManager.loadGame();
         
-        // If no game data exists, apply initial state to bound elements
+        // If no game data exists, apply initial state
         if (!gameLoaded) {
             // Set a default location for bound elements
             if (!GameState.currentLocation) {
                 GameState.setLocation('City Square');
             }
-            
-            // Ensure UI bindings reflect initial state
-            UIManager.updateBindings(GameState);
         }
+        
+        // Initialize UI based on current view
+        initializeUI();
         
         // Show welcome message
         console.log(`Everlyn app initialized successfully${gameLoaded ? ' (Game loaded)' : ''}`);
         
         // Set default tab from config
-        UIManager.showTab(GameConfig.ui.defaultTab || 'map');
-    }, 'initApp');
+        showTab(GameConfig.ui.defaultTab || 'map');
+    } catch (error) {
+        ErrorUtils.logError(
+            error, 
+            'initApp', 
+            ErrorUtils.LogLevel.ERROR
+        );
+    }
     
     end();
+}
+
+/**
+ * Preload all HTML templates
+ */
+async function preloadTemplates() {
+    const templates = {
+        'character-profile': 'character/profile.html',
+        'city-map': 'map/map.html',
+        'resource-bar': 'components/resource-bar.html',
+        'stat-bar': 'components/stat-bar.html',
+        'landing-page': 'pages/landing.html',
+        'main-page': 'pages/main.html'
+    };
+    
+    return await templateLoader.loadTemplates(templates);
 }
 
 /**
  * Initialize event listeners
  */
 function initEventListeners() {
-    const end = PerformanceMonitor.start('initEventListeners');
-    
-    ErrorUtils.tryCatch(() => {
-        // Add click event listeners to tab buttons using DOMCache
-        const tabButtons = DOMCache.getAll('tabButtons');
-        tabButtons.forEach(button => {
+    try {
+        // Add click event listeners to tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', handleTabClick);
         });
         
         // Add event listener for enter city button
-        const enterCityBtn = DOMCache.get('enterCityBtn');
+        const enterCityBtn = document.getElementById('enter-city-btn');
         if (enterCityBtn) {
             enterCityBtn.addEventListener('click', enterCity);
         }
         
         // Add event listener for wipe save button
-        const wipeSaveBtn = DOMCache.get('wipeSaveBtn');
+        const wipeSaveBtn = document.getElementById('wipe-save-btn');
         if (wipeSaveBtn) {
             wipeSaveBtn.addEventListener('click', handleWipeSave);
         }
         
         // Handle Enter key press on the name input field
-        const playerNameInput = DOMCache.get('playerName');
+        const playerNameInput = document.getElementById('player-name');
         if (playerNameInput) {
             playerNameInput.addEventListener('keypress', handleNameInputKeypress);
         }
-    }, 'initEventListeners');
+    } catch (error) {
+        ErrorUtils.logError(
+            error, 
+            'initEventListeners', 
+            ErrorUtils.LogLevel.ERROR
+        );
+    }
+}
+
+/**
+ * Initialize UI components based on current view
+ */
+function initializeUI() {
+    const currentView = GameState.getProperty('currentView') || 'landing';
     
-    end();
+    if (currentView === 'landing') {
+        // Render landing page
+        templateLoader.render('landing-page', {}, '#app-container');
+    } else {
+        // Render main game UI
+        templateLoader.render('main-page', {
+            playerName: GameState.character ? GameState.character.name : 'Adventurer'
+        }, '#app-container');
+        
+        // Initialize components
+        initializeComponents();
+    }
+}
+
+/**
+ * Initialize components for the main game view
+ */
+function initializeComponents() {
+    // Clean up any existing components
+    activeComponents.forEach(component => component.destroy());
+    activeComponents.clear();
+    
+    // Create and store character component
+    const characterComponent = new CharacterComponent('#character-section');
+    activeComponents.set('character', characterComponent);
+    
+    // Create and store map component
+    const mapComponent = new MapComponent('#map-section');
+    activeComponents.set('map', mapComponent);
+    
+    // Create resource bar components
+    const goldBar = new ResourceBarComponent('#resources-container', {
+        resourceType: 'gold',
+        icon: 'coin',
+        color: '#ffd700'
+    });
+    activeComponents.set('resource-gold', goldBar);
+    
+    const researchBar = new ResourceBarComponent('#resources-container', {
+        resourceType: 'research',
+        icon: 'book',
+        color: '#9c27b0'
+    });
+    activeComponents.set('resource-research', researchBar);
+    
+    // Create stat bar components
+    const healthBar = new StatBarComponent('#stats-container', {
+        statType: 'health',
+        icon: 'heart',
+        color: '#dc3545'
+    });
+    activeComponents.set('stat-health', healthBar);
+    
+    const staminaBar = new StatBarComponent('#stats-container', {
+        statType: 'stamina',
+        icon: 'running',
+        color: '#28a745'
+    });
+    activeComponents.set('stat-stamina', staminaBar);
+    
+    const manaBar = new StatBarComponent('#stats-container', {
+        statType: 'mana',
+        icon: 'magic',
+        color: '#007bff'
+    });
+    activeComponents.set('stat-mana', manaBar);
 }
 
 /**
@@ -106,8 +201,71 @@ function initEventListeners() {
 function handleTabClick(event) {
     const tabId = event.currentTarget.getAttribute('data-tab');
     if (tabId) {
-        UIManager.showTab(tabId);
+        showTab(tabId);
     }
+}
+
+/**
+ * Show/hide tab content
+ * @param {string} sectionId - The ID of the section to show
+ */
+function showTab(sectionId) {
+    try {
+        const sections = document.querySelectorAll('main section');
+        sections.forEach(section => {
+            section.style.display = section.id === sectionId ? 'block' : 'none';
+        });
+        
+        // Update active tab button
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => {
+            const tabId = button.getAttribute('data-tab');
+            if (tabId === sectionId) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    } catch (error) {
+        ErrorUtils.logError(
+            error, 
+            'showTab', 
+            ErrorUtils.LogLevel.ERROR
+        );
+    }
+}
+
+/**
+ * Entry point function for the game
+ * Called when the player enters their name and starts the game
+ */
+function enterCity() {
+    const playerNameInput = document.getElementById('player-name');
+    if (!playerNameInput) {
+        console.error('Player name input not found');
+        return;
+    }
+    
+    const playerName = playerNameInput.value.trim();
+    if (!playerName) {
+        alert('Please enter your name to proceed.');
+        return;
+    }
+    
+    // Create a new character instance with the player's name
+    CharacterManager.createCharacter(playerName);
+    
+    // Set a default location
+    GameState.setLocation('City Square');
+    
+    // Store the character in localStorage for persistence between sessions
+    CharacterManager.saveGame();
+    
+    // Update view state
+    GameState.updateProperty('currentView', 'main');
+    
+    // Re-initialize UI for main view
+    initializeUI();
 }
 
 /**
@@ -116,12 +274,15 @@ function handleTabClick(event) {
 function handleWipeSave() {
     // Ask for confirmation before wiping save
     if (confirm('Are you sure you want to wipe all saved game data? This cannot be undone.')) {
-        wipeSaveData();
+        CharacterManager.wipeSaveData();
         
-        // Reload the page after wiping save
-        setTimeout(() => {
-            window.location.reload();
-        }, 500);
+        // Reset GameState
+        GameState.setCharacter(null);
+        GameState.setLocation(null);
+        GameState.updateProperty('currentView', 'landing');
+        
+        // Re-initialize UI for landing view
+        initializeUI();
     }
 }
 
@@ -154,12 +315,10 @@ if (isDevMode()) {
     window.EvelynDev = {
         GameState,
         CharacterManager,
-        UIManager,
-        DOMCache,
+        templateLoader,
         PerformanceMonitor,
-        LocationService,
-        MapModule,
-        ErrorUtils
+        ErrorUtils,
+        activeComponents
     };
     
     // Add global performance report command
@@ -171,5 +330,10 @@ if (isDevMode()) {
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', initApp);
 
-// Export initialization function for testing
-export { initApp };
+// Export for testing
+export { 
+    initApp, 
+    enterCity, 
+    handleWipeSave,
+    showTab
+};

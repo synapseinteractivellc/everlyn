@@ -1,0 +1,16 @@
+<div class="stat-item">
+    <div class="stat-info">
+        <span class="stat-icon">
+            <i class="icon-{{icon}}"></i>
+        </span>
+        <span class="stat-name">{{displayName}}</span>
+    </div>
+    <div class="progress-container">
+        <div class="progress-bar stat-bar-{{statType}}">
+            <span class="progress-bar-text">{{current}}/{{max}}</span>
+        </div>
+    </div>
+    <button class="small-button restore-button" data-event="click:handleRestoreStat" title="Restore {{displayName}}">
+        <i class="icon-refresh"></i>
+    </button>
+</div>

@@ -1,0 +1,80 @@
+<div id="main-content" class="main-content">
+    <header>
+        <h1>Welcome to Everlyn, <span id="player-name-display">{{playerName}}</span></h1>
+    </header>
+    <nav>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="map">Map</button>
+            <button class="tab-button" data-tab="actions">Actions</button>
+            <button class="tab-button" data-tab="skills">Skills</button>
+            <button class="tab-button" data-tab="adventure">Adventure</button>
+            <button class="tab-button" data-tab="character">Character</button>
+            <button class="tab-button" id="wipe-save-btn">Wipe</button>
+        </div>
+    </nav>
+    <main>
+        <aside class="sidebar">
+            <h3>Resources</h3>
+            <div id="resources-container">
+                <!-- Resource bars will be loaded as components -->
+            </div>
+        </aside>
+        <div class="content">
+            <!-- Tab sections -->
+            <section id="map" class="tab-section">
+                <div id="map-section">
+                    <!-- Map component will be loaded here -->
+                </div>
+            </section>
+            
+            <section id="actions" class="tab-section" style="display: none;">
+                <h2>Actions</h2>
+                <div id="actions-section">
+                    <div class="current-location-panel">
+                        <h3>Current Location: <span class="current-location-display"></span></h3>
+                        <p>Actions available in this area:</p>
+                        <div class="location-actions">No actions available in this area yet.</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="skills" class="tab-section" style="display: none;">
+                <h2>Skills</h2>
+                <div id="skills-section">
+                    <p>This is the skills section.</p>
+                    <div class="current-location-panel">
+                        <h3>Current Location: <span class="current-location-display"></span></h3>
+                        <p>You can enhance your skills while exploring.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="adventure" class="tab-section" style="display: none;">
+                <h2>Adventure</h2>
+                <div id="adventure-section">
+                    <div class="current-location-panel">
+                        <h3>Current Location: <span class="current-location-display"></span></h3>
+                        <p>Adventures available in this area:</p>
+                        <div class="location-quests">No quests available in this area yet.</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="character" class="tab-section" style="display: none;">
+                <h2>Character</h2>
+                <div id="character-section">
+                    <!-- Character component will be loaded here -->
+                </div>
+            </section>
+        </div>
+        <aside class="sidebar">
+            <h3>Stats</h3>
+            <div id="stats-container">
+                <!-- Stat bars will be loaded as components -->
+            </div>
+        </aside>
+    </main>
+    <footer>
+        <p>&copy; 2025 Synapse Interactive LLC</p>
+    </footer>
+</div>

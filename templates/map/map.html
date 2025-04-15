@@ -1,0 +1,36 @@
+<div class="map-section">
+    <h2>Everlyn Map</h2>
+    
+    <div class="map-container">
+        <object id="city-map-svg" data="./maps/everlyn-map.svg" type="image/svg+xml"></object>
+    </div>
+    
+    <div class="location-info">
+        <h3 data-if="currentLocation">{{currentLocation}}</h3>
+        <h3 data-if="!currentLocation">Current Location</h3>
+        
+        <p data-if="locationDetails">{{locationDetails.description}}</p>
+        <p data-if="!locationDetails">Click on a location to learn more about it.</p>
+        
+        <!-- Quests Section -->
+        <div data-if="locationDetails && locationDetails.quests && locationDetails.quests.length > 0">
+            <h4>Available Quests:</h4>
+            <ul class="quest-list">
+                {{#each locationDetails.quests}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Navigation Options -->
+    <div class="navigation-options" data-if="currentLocation">
+        <h4>Travel Options:</h4>
+        <div class="button-group">
+            <!-- Dynamic buttons would be populated here from connected locations -->
+            <button data-event="click:handleNavigate" data-location="City Square">City Square</button>
+            <button data-event="click:handleNavigate" data-location="Market">Market</button>
+            <button data-event="click:handleNavigate" data-location="Inn">Inn</button>
+        </div>
+    </div>
+</div>
