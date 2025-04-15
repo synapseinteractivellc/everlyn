@@ -8,46 +8,6 @@ import UIManager from './managers/ui-manager.js';
 import DOMCache from './managers/DOMCache.js';
 
 /**
- * Entry point function for the game
- * Called when the player enters their name and starts the game
- */
-function enterCity() {
-    const playerNameInput = DOMCache.get('playerName');
-    if (!playerNameInput) {
-        console.error('Player name input not found');
-        return;
-    }
-    
-    const playerName = playerNameInput.value.trim();
-    if (!playerName) {
-        alert('Please enter your name to proceed.');
-        return;
-    }
-    
-    // Create a new character instance with the player's name
-    CharacterManager.createCharacter(playerName);
-    
-    // Set a default location
-    GameState.setLocation('City Square');
-    
-    // Store the character in localStorage for persistence between sessions
-    CharacterManager.saveGame();
-    
-    // Switch from landing page to main game using DOMCache
-    const landingPage = DOMCache.get('landingPage');
-    const mainContent = DOMCache.get('mainContent');
-    
-    if (landingPage && mainContent) {
-        GameState.updateProperty('currentView', 'main');
-        
-        // Update all UI bindings to reflect the initial game state
-        UIManager.updateBindings(GameState);
-    } else {
-        console.error('Landing page or main content elements not found');
-    }
-}
-
-/**
  * Function to wipe saved game data
  */
 function wipeSaveData() {

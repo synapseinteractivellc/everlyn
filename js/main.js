@@ -240,6 +240,7 @@ function showTab(sectionId) {
  * Called when the player enters their name and starts the game
  */
 function enterCity() {
+    console.log("Enter City button clicked"); // Add this line
     const playerNameInput = document.getElementById('player-name');
     if (!playerNameInput) {
         console.error('Player name input not found');
