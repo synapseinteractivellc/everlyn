@@ -11,8 +11,9 @@
     <div id="landing-page" class="landing-page">
         <div class="welcome-panel">
             <h1>Welcome to Everlyn: City of Wonder</h1>
+            <p>Where all things are possible and all paths lead to the pinnacle.</p>
             <p>Who comes to enter our city?</p>
-            <input id="player-name" type="text" placeholder="Enter your name">
+            <input id="player-name" type="text" placeholder="Enter your name"><br><br>
             <button id="enter-city-btn">Enter the City</button>
         </div>
     </div>
@@ -21,13 +22,11 @@
     <div id="main-content" style="display: none;">
         <header>
             <h1>Welcome to Everlyn, <span id="player-name-display" data-bind="character.name">Adventurer</span></h1>
-            <h2>The City of Wonder</h2>
-            <p>Anything is possible and all paths lead to the Pinnacle.</p>
-            <p>Current Location: <span data-bind="currentLocation">Unknown</span></p>
         </header>
         <nav>
             <div class="tabs">
                 <button class="tab-button" data-tab="map">Map</button>
+                <button class="tab-button" data-tab="actions">Actions</button>
                 <button class="tab-button" data-tab="skills">Skills</button>
                 <button class="tab-button" data-tab="adventure">Adventure</button>
                 <button class="tab-button" data-tab="character">Character</button>
@@ -51,7 +50,16 @@
                         <h3>Current Location</h3>
                         <p>Click on a location to learn more about it.</p>
                     </div>
-                </section>        
+                </section>
+                <section id="actions" style="display: none;">
+                    <h2>Actions</h2>
+                    <p>This is the actions section.</p>
+                    <div class="current-location-panel">
+                        <h3>Current Location: <span data-bind="currentLocation">Unknown</span></h3>
+                        <p>Actions available in this area:</p>
+                        <div data-bind="locationActions">No actions available in this area yet.</div>
+                    </div>
+                </section>      
                 <section id="skills" style="display: none;">
                     <h2>Skills</h2>
                     <p>This is the skills section.</p>
