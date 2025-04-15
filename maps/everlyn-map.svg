@@ -68,7 +68,16 @@
   <!-- West Gate -->
   <g class="location" id="location-west-gate" data-location="West Gate">
     <rect x="140" y="290" width="20" height="30" class="gate" />
-    <text x="100" y="305" class="location-text">West Gate</text>
+    <text x="125" y="270" class="location-text" style="text-anchor: middle">
+      <tspan x="125" dy="0">W</tspan>
+      <tspan x="125" dy="14">E</tspan>
+      <tspan x="125" dy="14">S</tspan>
+      <tspan x="125" dy="14">T</tspan>
+      <tspan x="125" dy="20">G</tspan>
+      <tspan x="125" dy="14">A</tspan>
+      <tspan x="125" dy="14">T</tspan>
+      <tspan x="125" dy="14">E</tspan>
+    </text>
   </g>
   
   <!-- Forest (full length outside Eastern wall) -->
