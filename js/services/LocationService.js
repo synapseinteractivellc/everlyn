@@ -98,6 +98,9 @@ class LocationServiceClass {
         
         // Register with GameState for location change notifications
         GameState.subscribe('location', this._onLocationChanged.bind(this));
+        
+        // Add a timestamp for caching and data binding optimization
+        this._lastUpdated = Date.now();
     }
     
     /**
@@ -171,6 +174,33 @@ class LocationServiceClass {
         return location ? [...location.quests] : [];
     }
     
+    /**
+     * Get formatted quest HTML for a location suitable for data-binding
+     * @param {string} locationName - Location name
+     * @returns {string} - HTML string with quest information
+     */
+    getQuestsHTML(locationName) {
+        const quests = this.getLocationQuests(locationName);
+        
+        if (quests.length === 0) {
+            return '<p>No quests available in this area yet.</p>';
+        }
+        
+        return `
+            <h4>Available Quests:</h4>
+            <ul>
+                ${quests.map(quest => `<li>${quest}</li>`).join('')}
+            </ul>
+        `;
+    }
+    
+    /**
+     * Get the timestamp of the last update
+     * @returns {number} - Timestamp
+     */
+    getLastUpdated() {
+        return this._lastUpdated;
+    }
     
     /**
      * Handle location changes in the game state
@@ -190,6 +220,9 @@ class LocationServiceClass {
                 ErrorUtils.LogLevel.WARN
             );
         }
+        
+        // Update the last updated timestamp
+        this._lastUpdated = Date.now();
     }
     
     /**
@@ -202,6 +235,9 @@ class LocationServiceClass {
         } else {
             this._cache.clear();
         }
+        
+        // Update the last updated timestamp
+        this._lastUpdated = Date.now();
     }
     
     /**
@@ -230,6 +266,9 @@ class LocationServiceClass {
             // Clear cache for this location
             this.clearCache(locationName);
             
+            // Update the last updated timestamp
+            this._lastUpdated = Date.now();
+            
             return true;
         } catch (error) {
             ErrorUtils.logError(
@@ -241,6 +280,18 @@ class LocationServiceClass {
             );
             return false;
         }
+    }
+    
+    /**
+     * Get a location description suitable for data binding
+     * @param {string} locationName - Location name
+     * @returns {string} - Location description or default message
+     */
+    getLocationDescription(locationName) {
+        const location = this.getLocationDetails(locationName);
+        return location 
+            ? location.description 
+            : 'No information available for this location.';
     }
 }
 

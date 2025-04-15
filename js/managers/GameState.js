@@ -10,6 +10,13 @@ class GameStateManager {
         this.currentLocation = null;
         this.subscribers = new Map(); // Using Map to store categories of subscribers
         this.subscriptionId = 0; // For generating unique subscription IDs
+        
+        // Add property for tracking state changes to optimize binding updates
+        this._lastUpdated = {
+            character: 0,
+            location: 0,
+            all: 0
+        };
     }
     
     /**
@@ -106,6 +113,10 @@ class GameStateManager {
      * @param {Object} [data] - Additional data to pass to subscribers
      */
     notify(category, data) {
+        // Update the timestamp for this category
+        this._lastUpdated[category] = Date.now();
+        this._lastUpdated.all = Date.now();
+        
         // Store subscriptions to remove after notification
         const toRemove = [];
         
@@ -217,6 +228,43 @@ class GameStateManager {
             oldValue,
             newValue: value
         });
+    }
+    
+    /**
+     * Get the timestamp of the last update for a category
+     * @param {string} category - Category to check
+     * @returns {number} - Timestamp of last update
+     */
+    getLastUpdated(category = 'all') {
+        return this._lastUpdated[category] || 0;
+    }
+    
+    /**
+     * Check if a property exists in the state
+     * @param {string} property - Property path (dot notation)
+     * @returns {boolean} - Whether the property exists
+     */
+    hasProperty(property) {
+        const parts = property.split('.');
+        let current = this;
+        
+        for (let i = 0; i < parts.length; i++) {
+            if (current === undefined || current === null || !current.hasOwnProperty(parts[i])) {
+                return false;
+            }
+            current = current[parts[i]];
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Get a property value by path
+     * @param {string} property - Property path (dot notation)
+     * @returns {*} - Property value or undefined if not found
+     */
+    getProperty(property) {
+        return this._getNestedProperty(this, property);
     }
     
     /**

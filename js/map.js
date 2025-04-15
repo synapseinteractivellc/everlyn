@@ -211,6 +211,7 @@ const MapModule = (() => {
         // Check if the clicked location is different from the current location
         if (locationName !== GameState.currentLocation) {
             // Update the game state with the new location
+            // This will trigger data binding updates through GameState
             GameState.setLocation(locationName);
 
             // Get location details
@@ -223,6 +224,9 @@ const MapModule = (() => {
 
             // Highlight the new location on the map
             highlightLocation(locationName);
+            
+            // Ensure data bindings are updated with the new location
+            UIManager.updateBindings(GameState);
         }
     }, 'MapModule.handleLocationClick');
 
@@ -249,6 +253,9 @@ const MapModule = (() => {
       // Clear current location in GameState if set
       if (GameState.currentLocation) {
         GameState.setLocation(null);
+        
+        // Ensure data bindings are updated
+        UIManager.updateBindings(GameState);
       }
       
       // Clear active class from all location elements
@@ -274,6 +281,9 @@ const MapModule = (() => {
   function handleLocationChange(state, data) {
     if (state.currentLocation && svgDocument) {
       highlightLocation(state.currentLocation);
+      
+      // Ensure data-bound elements are updated
+      UIManager.updateBindings(state);
     } else if (!state.currentLocation && svgDocument) {
       // If location is set to null, clear all highlights
       svgDocument.querySelectorAll('.location').forEach(element => {

@@ -20,9 +20,10 @@
     <!-- Main Content -->
     <div id="main-content" style="display: none;">
         <header>
-            <h1>Welcome to Everlyn, <span id="player-name-display"></span></h1>
+            <h1>Welcome to Everlyn, <span id="player-name-display" data-bind="character.name">Adventurer</span></h1>
             <h2>The City of Wonder</h2>
             <p>Anything is possible and all paths lead to the Pinnacle.</p>
+            <p>Current Location: <span data-bind="currentLocation">Unknown</span></p>
         </header>
         <nav>
             <div class="tabs">
@@ -36,9 +37,9 @@
         <main>
             <aside class="sidebar">
                 <h3>Resources</h3>
-                <div class="resource-item" id="gold-display">Gold: 0/10</div>
-                <div class="resource-item" id="research-display">Research: 0/25</div>
-                <div class="resource-item" id="skins-display">Skins: 0/10</div>
+                <div class="resource-item" id="gold-display" data-bind="character.resources.gold">Gold: 0/10</div>
+                <div class="resource-item" id="research-display" data-bind="character.resources.research">Research: 0/25</div>
+                <div class="resource-item" id="skins-display" data-bind="character.resources.skins">Skins: 0/10</div>
             </aside>
             <div class="content">
                 <section id="map">
@@ -54,14 +55,29 @@
                 <section id="skills" style="display: none;">
                     <h2>Skills</h2>
                     <p>This is the skills section.</p>
+                    <div class="current-location-panel">
+                        <h3>Current Location: <span data-bind="currentLocation">Unknown</span></h3>
+                        <p>You can enhance your skills while exploring.</p>
+                    </div>
                 </section>
                 <section id="adventure" style="display: none;">
                     <h2>Adventure</h2>
                     <p>This is the adventure section.</p>
+                    <div class="current-location-panel">
+                        <h3>Current Location: <span data-bind="currentLocation">Unknown</span></h3>
+                        <p>Adventures available in this area:</p>
+                        <div data-bind="locationQuests">No quests available in this area yet.</div>
+                    </div>
                 </section>
                 <section id="character" style="display: none;">
                     <h2>Character</h2>
                     <p>Your character details will appear here.</p>
+                    <div class="character-status">
+                        <p>Name: <span data-bind="character.name">Unknown</span></p>
+                        <p>Class: <span data-bind="character.charClass">Waif</span></p>
+                        <p>Level: <span data-bind="character.level">1</span></p>
+                        <p>Current Location: <span data-bind="currentLocation">Unknown</span></p>
+                    </div>
                 </section>
             </div>
             <aside class="sidebar">
@@ -70,8 +86,8 @@
                 <!-- Health bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div id="health-bar-display" class="progress-bar health-bar" style="width: 100%;">
-                            <span class="progress-bar-text">Health: 10/10</span>
+                        <div id="health-bar-display" class="progress-bar health-bar" style="width: 100%;" data-bind-width="character.stats.health.percentage">
+                            <span class="progress-bar-text" data-bind="character.stats.health">Health: 10/10</span>
                         </div>                    
                     </div>
                 </div>
@@ -79,8 +95,8 @@
                 <!-- Stamina bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div id="stamina-bar-display" class="progress-bar stamina-bar" style="width: 100%;">
-                            <span class="progress-bar-text">Stamina: 10/10</span>
+                        <div id="stamina-bar-display" class="progress-bar stamina-bar" style="width: 100%;" data-bind-width="character.stats.stamina.percentage">
+                            <span class="progress-bar-text" data-bind="character.stats.stamina">Stamina: 10/10</span>
                         </div>
                     </div>
                 </div>
@@ -88,8 +104,8 @@
                 <!-- Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div id="mana-bar-display" class="progress-bar mana-bar" style="width: 100%;">
-                            <span class="progress-bar-text">Mana: 10/10</span>
+                        <div id="mana-bar-display" class="progress-bar mana-bar" style="width: 100%;" data-bind-width="character.stats.mana.percentage">
+                            <span class="progress-bar-text" data-bind="character.stats.mana">Mana: 10/10</span>
                         </div>
                     </div>
                 </div>
@@ -97,8 +113,8 @@
                 <!-- Earth Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div id="earth-mana-bar-display" class="progress-bar earth-mana-bar" style="width: 0%;">
-                            <span class="progress-bar-text">Earth Mana: 0/0</span>
+                        <div id="earth-mana-bar-display" class="progress-bar earth-mana-bar" style="width: 0%;" data-bind-width="character.elementalMana.earth.percentage">
+                            <span class="progress-bar-text" data-bind="character.elementalMana.earth">Earth Mana: 0/0</span>
                         </div>
                     </div>
                 </div>
@@ -106,8 +122,8 @@
                 <!-- Fire Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div id="fire-mana-bar-display" class="progress-bar fire-mana-bar" style="width: 0%;">
-                            <span class="progress-bar-text">Fire Mana: 0/0</span>
+                        <div id="fire-mana-bar-display" class="progress-bar fire-mana-bar" style="width: 0%;" data-bind-width="character.elementalMana.fire.percentage">
+                            <span class="progress-bar-text" data-bind="character.elementalMana.fire">Fire Mana: 0/0</span>
                         </div>
                     </div>
                 </div>
@@ -115,8 +131,8 @@
                 <!-- Air Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div id="air-mana-bar-display" class="progress-bar air-mana-bar" style="width: 0%;">
-                            <span class="progress-bar-text">Air Mana: 0/0</span>
+                        <div id="air-mana-bar-display" class="progress-bar air-mana-bar" style="width: 0%;" data-bind-width="character.elementalMana.air.percentage">
+                            <span class="progress-bar-text" data-bind="character.elementalMana.air">Air Mana: 0/0</span>
                         </div>
                     </div>
                 </div>
@@ -124,8 +140,8 @@
                 <!-- Water Mana bar -->
                 <div class="stat-item">
                     <div class="progress-container">
-                        <div id="water-mana-bar-display" class="progress-bar water-mana-bar" style="width: 0%;">
-                            <span class="progress-bar-text">Water Mana: 0/0</span>
+                        <div id="water-mana-bar-display" class="progress-bar water-mana-bar" style="width: 0%;" data-bind-width="character.elementalMana.water.percentage">
+                            <span class="progress-bar-text" data-bind="character.elementalMana.water">Water Mana: 0/0</span>
                         </div>
                     </div>
                 </div>

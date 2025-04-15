@@ -43,6 +43,17 @@ function initApp() {
         // Try to load saved game
         const gameLoaded = CharacterManager.loadGame();
         
+        // If no game data exists, apply initial state to bound elements
+        if (!gameLoaded) {
+            // Set a default location for bound elements
+            if (!GameState.currentLocation) {
+                GameState.setLocation('City Square');
+            }
+            
+            // Ensure UI bindings reflect initial state
+            UIManager.updateBindings(GameState);
+        }
+        
         // Show welcome message
         console.log(`Everlyn app initialized successfully${gameLoaded ? ' (Game loaded)' : ''}`);
         

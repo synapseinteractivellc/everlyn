@@ -17,7 +17,11 @@ const CharacterManager = {
      */
     createCharacter: function(name, charClass = "Waif", config = {}) {
         const character = new Character(name, charClass, config);
+        
+        // Update game state with new character
+        // This will trigger UI updates through the data binding system
         GameState.setCharacter(character);
+        
         return character;
     },
     
@@ -30,14 +34,21 @@ const CharacterManager = {
         try {
             // Use the static fromJSON method for proper deserialization
             const character = Character.fromJSON(savedData);
+            
+            // Update game state with loaded character
+            // This will trigger UI updates through the data binding system
             GameState.setCharacter(character);
+            
             return character;
         } catch (error) {
             console.error('Error loading character:', error);
             // Fallback to the old method if the new one fails
             const character = new Character(savedData.name, savedData.charClass);
             Object.assign(character, savedData);
+            
+            // Update game state with loaded character
             GameState.setCharacter(character);
+            
             return character;
         }
     },
@@ -131,6 +142,10 @@ const CharacterManager = {
             }
         } catch (error) {
             console.error('Error loading save data:', error);
+            
+            // Ensure default values are set even if load fails
+            GameState.setLocation('City Square');
+            
             return false;
         }
     },
@@ -143,6 +158,12 @@ const CharacterManager = {
         try {
             localStorage.removeItem('everlynSaveData');
             console.log('Save data wiped successfully');
+            
+            // Reset game state to ensure UI reflects wiped state
+            // This is important for data binding
+            GameState.setCharacter(null);
+            GameState.setLocation(null);
+            
             return true;
         } catch (error) {
             console.error('Error wiping save data:', error);
@@ -159,7 +180,11 @@ const CharacterManager = {
         if (!GameState.character) return false;
         
         GameState.character.gainXP(amount);
-        GameState.notify('character'); // Trigger UI update
+        
+        // Notify subscribers of character changes
+        // This will trigger UI updates through data binding
+        GameState.notify('character'); 
+        
         this.saveGame(); // Auto-save after XP gain
         return true;
     },
@@ -175,7 +200,9 @@ const CharacterManager = {
         
         const success = GameState.character.updateResource(resource, amount);
         if (success) {
-            GameState.notify('character'); // Trigger UI update
+            // Notify subscribers of character changes
+            // This will trigger UI updates through data binding
+            GameState.notify('character'); 
         }
         return success;
     },
@@ -191,7 +218,9 @@ const CharacterManager = {
         
         const success = GameState.character.updateStat(stat, amount);
         if (success) {
-            GameState.notify('character'); // Trigger UI update
+            // Notify subscribers of character changes
+            // This will trigger UI updates through data binding
+            GameState.notify('character'); 
         }
         return success;
     },
@@ -207,7 +236,9 @@ const CharacterManager = {
         
         const success = GameState.character.updateElementalMana(element, amount);
         if (success) {
-            GameState.notify('character'); // Trigger UI update
+            // Notify subscribers of character changes
+            // This will trigger UI updates through data binding
+            GameState.notify('character'); 
         }
         return success;
     },

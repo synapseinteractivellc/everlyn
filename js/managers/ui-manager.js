@@ -16,11 +16,20 @@ import GameConfig from '../config.js';
  */
 const UIManager = {
     /**
+     * Map of bindings (property -> elements)
+     * @private
+     */
+    _bindings: new Map(),
+
+    /**
      * Initialize the UI manager
      */
     init: function() {
         // Initialize progress bars on page load
         this.initProgressBars();
+        
+        // Set up data binding
+        this.initDataBinding();
         
         // Subscribe to GameState changes
         GameState.subscribe(this.handleStateChange.bind(this));
@@ -30,12 +39,53 @@ const UIManager = {
     },
     
     /**
+     * Initialize data binding between DOM and GameState
+     */
+    initDataBinding: function() {
+        ErrorUtils.tryCatch(() => {
+            // Find all elements with data-bind attribute
+            const bindElements = document.querySelectorAll('[data-bind]');
+            
+            // Group elements by their binding property
+            bindElements.forEach(element => {
+                const property = element.getAttribute('data-bind');
+                
+                if (!this._bindings.has(property)) {
+                    this._bindings.set(property, []);
+                }
+                
+                this._bindings.get(property).push(element);
+            });
+            
+            // Find all elements with data-bind-width attribute (for progress bars)
+            const widthBindElements = document.querySelectorAll('[data-bind-width]');
+            
+            widthBindElements.forEach(element => {
+                const property = element.getAttribute('data-bind-width');
+                const bindKey = `width:${property}`;
+                
+                if (!this._bindings.has(bindKey)) {
+                    this._bindings.set(bindKey, []);
+                }
+                
+                this._bindings.get(bindKey).push(element);
+            });
+            
+            console.log(`Data binding initialized with ${this._bindings.size} binding types`);
+        }, 'UIManager.initDataBinding');
+    },
+    
+    /**
      * Handle state changes from GameState
      * @param {Object} state - The current game state
      * @param {Object} data - Change event data
      */
     handleStateChange: function(state, data) {
         ErrorUtils.tryCatch(() => {
+            // Update bindings based on state changes
+            this.updateBindings(state);
+            
+            // Handle other state-dependent UI updates
             if (state.character) {
                 this.updateAllUI(state.character);
             }
@@ -48,6 +98,260 @@ const UIManager = {
                 }
             }
         }, 'UIManager.handleStateChange');
+    },
+    
+    /**
+     * Update data-bound elements based on state
+     * @param {Object} state - Current game state
+     */
+    updateBindings: function(state) {
+        ErrorUtils.tryCatch(() => {
+            // Update currentLocation bindings
+            if (this._bindings.has('currentLocation')) {
+                const locationValue = state.currentLocation || 'Unknown';
+                this._bindings.get('currentLocation').forEach(element => {
+                    element.textContent = locationValue;
+                });
+            }
+            
+            // Update character name bindings
+            if (state.character && this._bindings.has('character.name')) {
+                this._bindings.get('character.name').forEach(element => {
+                    element.textContent = state.character.name;
+                });
+            }
+            
+            // Update character class bindings
+            if (state.character && this._bindings.has('character.charClass')) {
+                this._bindings.get('character.charClass').forEach(element => {
+                    element.textContent = state.character.charClass;
+                });
+            }
+            
+            // Update character level bindings
+            if (state.character && this._bindings.has('character.level')) {
+                this._bindings.get('character.level').forEach(element => {
+                    element.textContent = state.character.level;
+                });
+            }
+            
+            // Update stats bindings
+            if (state.character) {
+                this.updateStatsBindings(state.character);
+            }
+            
+            // Update resources bindings
+            if (state.character) {
+                this.updateResourceBindings(state.character);
+            }
+            
+            // Update location quests if location is set
+            if (state.currentLocation && this._bindings.has('locationQuests')) {
+                const quests = LocationService.getLocationQuests(state.currentLocation);
+                this._bindings.get('locationQuests').forEach(element => {
+                    if (quests.length > 0) {
+                        element.innerHTML = '<ul>' + 
+                            quests.map(quest => `<li>${quest}</li>`).join('') + 
+                            '</ul>';
+                    } else {
+                        element.textContent = 'No quests available in this area yet.';
+                    }
+                });
+            }
+        }, 'UIManager.updateBindings');
+    },
+    
+    /**
+     * Update stats-related bindings
+     * @param {Object} character - Character object
+     */
+    updateStatsBindings: function(character) {
+        ErrorUtils.tryCatch(() => {
+            // Update health bindings
+            if (this._bindings.has('character.stats.health')) {
+                const health = character.stats.health;
+                this._bindings.get('character.stats.health').forEach(element => {
+                    element.textContent = `Health: ${health.current}/${health.max}`;
+                });
+            }
+            
+            // Update stamina bindings
+            if (this._bindings.has('character.stats.stamina')) {
+                const stamina = character.stats.stamina;
+                this._bindings.get('character.stats.stamina').forEach(element => {
+                    element.textContent = `Stamina: ${stamina.current}/${stamina.max}`;
+                });
+            }
+            
+            // Update mana bindings
+            if (this._bindings.has('character.stats.mana')) {
+                const mana = character.stats.mana;
+                this._bindings.get('character.stats.mana').forEach(element => {
+                    element.textContent = `Mana: ${mana.current}/${mana.max}`;
+                });
+            }
+            
+            // Update elemental mana bindings
+            this.updateElementalManaBindings(character);
+            
+            // Update width bindings for progress bars
+            this.updateProgressBarWidths(character);
+        }, 'UIManager.updateStatsBindings');
+    },
+    
+    /**
+     * Update elemental mana bindings
+     * @param {Object} character - Character object
+     */
+    updateElementalManaBindings: function(character) {
+        ErrorUtils.tryCatch(() => {
+            // Update earth mana bindings
+            if (this._bindings.has('character.elementalMana.earth')) {
+                const earthMana = character.elementalMana.earth;
+                this._bindings.get('character.elementalMana.earth').forEach(element => {
+                    element.textContent = `Earth Mana: ${earthMana.current}/${earthMana.max}`;
+                });
+            }
+            
+            // Update fire mana bindings
+            if (this._bindings.has('character.elementalMana.fire')) {
+                const fireMana = character.elementalMana.fire;
+                this._bindings.get('character.elementalMana.fire').forEach(element => {
+                    element.textContent = `Fire Mana: ${fireMana.current}/${fireMana.max}`;
+                });
+            }
+            
+            // Update air mana bindings
+            if (this._bindings.has('character.elementalMana.air')) {
+                const airMana = character.elementalMana.air;
+                this._bindings.get('character.elementalMana.air').forEach(element => {
+                    element.textContent = `Air Mana: ${airMana.current}/${airMana.max}`;
+                });
+            }
+            
+            // Update water mana bindings
+            if (this._bindings.has('character.elementalMana.water')) {
+                const waterMana = character.elementalMana.water;
+                this._bindings.get('character.elementalMana.water').forEach(element => {
+                    element.textContent = `Water Mana: ${waterMana.current}/${waterMana.max}`;
+                });
+            }
+        }, 'UIManager.updateElementalManaBindings');
+    },
+    
+    /**
+     * Update resource bindings
+     * @param {Object} character - Character object
+     */
+    updateResourceBindings: function(character) {
+        ErrorUtils.tryCatch(() => {
+            // Update gold bindings
+            if (this._bindings.has('character.resources.gold')) {
+                const gold = character.resources.gold;
+                this._bindings.get('character.resources.gold').forEach(element => {
+                    element.textContent = `Gold: ${gold.current}/${gold.max}`;
+                });
+            }
+            
+            // Update research bindings
+            if (this._bindings.has('character.resources.research')) {
+                const research = character.resources.research;
+                this._bindings.get('character.resources.research').forEach(element => {
+                    element.textContent = `Research: ${research.current}/${research.max}`;
+                });
+            }
+            
+            // Update skins bindings
+            if (this._bindings.has('character.resources.skins')) {
+                const skins = character.resources.skins;
+                this._bindings.get('character.resources.skins').forEach(element => {
+                    element.textContent = `Skins: ${skins.current}/${skins.max}`;
+                });
+            }
+        }, 'UIManager.updateResourceBindings');
+    },
+    
+    /**
+     * Update progress bar widths based on percentages
+     * @param {Object} character - Character object
+     */
+    updateProgressBarWidths: function(character) {
+        ErrorUtils.tryCatch(() => {
+            // Health bar
+            if (this._bindings.has('width:character.stats.health.percentage')) {
+                const percentage = character.stats.health.getPercentage();
+                this._bindings.get('width:character.stats.health.percentage').forEach(element => {
+                    this.animateProgressBar(element, percentage);
+                });
+            }
+            
+            // Stamina bar
+            if (this._bindings.has('width:character.stats.stamina.percentage')) {
+                const percentage = character.stats.stamina.getPercentage();
+                this._bindings.get('width:character.stats.stamina.percentage').forEach(element => {
+                    this.animateProgressBar(element, percentage);
+                });
+            }
+            
+            // Mana bar
+            if (this._bindings.has('width:character.stats.mana.percentage')) {
+                const percentage = character.stats.mana.getPercentage();
+                this._bindings.get('width:character.stats.mana.percentage').forEach(element => {
+                    this.animateProgressBar(element, percentage);
+                });
+            }
+            
+            // Earth mana bar
+            if (this._bindings.has('width:character.elementalMana.earth.percentage')) {
+                const percentage = character.elementalMana.earth.getPercentage();
+                this._bindings.get('width:character.elementalMana.earth.percentage').forEach(element => {
+                    this.animateProgressBar(element, percentage);
+                });
+            }
+            
+            // Fire mana bar
+            if (this._bindings.has('width:character.elementalMana.fire.percentage')) {
+                const percentage = character.elementalMana.fire.getPercentage();
+                this._bindings.get('width:character.elementalMana.fire.percentage').forEach(element => {
+                    this.animateProgressBar(element, percentage);
+                });
+            }
+            
+            // Air mana bar
+            if (this._bindings.has('width:character.elementalMana.air.percentage')) {
+                const percentage = character.elementalMana.air.getPercentage();
+                this._bindings.get('width:character.elementalMana.air.percentage').forEach(element => {
+                    this.animateProgressBar(element, percentage);
+                });
+            }
+            
+            // Water mana bar
+            if (this._bindings.has('width:character.elementalMana.water.percentage')) {
+                const percentage = character.elementalMana.water.getPercentage();
+                this._bindings.get('width:character.elementalMana.water.percentage').forEach(element => {
+                    this.animateProgressBar(element, percentage);
+                });
+            }
+        }, 'UIManager.updateProgressBarWidths');
+    },
+    
+    /**
+     * Animate a progress bar to a specific percentage
+     * @param {Element} element - Progress bar element
+     * @param {number} percentage - Target percentage
+     */
+    animateProgressBar: function(element, percentage) {
+        const currentWidth = parseFloat(element.style.width) || 0;
+        
+        // Only animate if the difference is significant
+        if (Math.abs(percentage - currentWidth) > 1) {
+            // Set transition if needed
+            if (this.animationSpeed > 0 && element.style.transition === '') {
+                element.style.transition = `width ${this.animationSpeed}ms ease-in-out`;
+            }
+            
+            element.style.width = `${percentage}%`;
+        }
     },
 
     /**
@@ -286,6 +590,10 @@ const UIManager = {
     updateAllUI: function(character) {
         if (!character) return;
 
+        // Update bindings from character data
+        this.updateBindings(GameState);
+        
+        // Legacy updates for backward compatibility
         this.updatePlayerNameDisplay(character.name);
         this.updateStatBars(character);
         this.updateResources(character);

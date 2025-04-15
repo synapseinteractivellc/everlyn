@@ -40,6 +40,9 @@ function enterCity() {
     if (landingPage && mainContent) {
         landingPage.style.display = 'none';
         mainContent.style.display = 'block';
+        
+        // Update all UI bindings to reflect the initial game state
+        UIManager.updateBindings(GameState);
     } else {
         console.error('Landing page or main content elements not found');
     }
@@ -51,6 +54,13 @@ function enterCity() {
 function wipeSaveData() {
     const success = CharacterManager.wipeSaveData();
     if (success) {
+        // Reset GameState to ensure bound elements display default values
+        GameState.setCharacter(null);
+        GameState.setLocation(null);
+        
+        // Update UI to reflect empty state
+        UIManager.updateBindings(GameState);
+        
         alert('All saved data has been wiped.');
     } else {
         alert('Failed to wipe saved data. Please try again.');
@@ -72,7 +82,13 @@ function checkAndLoadSavedGame() {
         if (landingPage && mainContent) {
             landingPage.style.display = 'none';
             mainContent.style.display = 'block';
+            
+            // Ensure all bound elements reflect the loaded game state
+            UIManager.updateBindings(GameState);
         }
+    } else {
+        // If no saved game, ensure bound elements display default values
+        UIManager.updateBindings(GameState);
     }
     
     return loaded;
@@ -85,6 +101,7 @@ function initCharacterSystem() {
     // Subscribe to state changes for UI updates
     GameState.subscribe('character', () => {
         if (GameState.character) {
+            // This will trigger the data binding system
             UIManager.updateAllUI(GameState.character);
         }
     });
