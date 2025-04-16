@@ -64,13 +64,13 @@
     // Show welcome screen
     function showWelcomeScreen() {
         // Render welcome template
-        templateLoader.renderTo('welcome-template', {}, '#app');
+        templateLoader.renderTo('welcome', {}, '#app');
     }
     
     // Show game screen
     function showGameScreen() {
         // Render main game template
-        templateLoader.renderTo('game', {}, '#app');
+        templateLoader.renderTo('game', gameEngine.serialize(), '#app');
         
         // Start game engine
         gameEngine.start();

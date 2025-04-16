@@ -24,27 +24,49 @@
     
     <!-- Templates -->
     <script id="welcome-template" type="text/x-handlebars-template">
-        <div class="welcome-container">
+        <div class="welcome-container fade-in">
             <div class="welcome-header">
                 <h1>Everlyn: City of Wonder</h1>
-                <p class="tagline">Your journey awaits in the legendary city...</p>
+                <p class="tagline">Begin your journey in the legendary city...</p>
             </div>
-            <div class="character-creation">
-                <h2>Create Your Character</h2>
-                <form id="character-form">
-                    <div class="form-group">
-                        <label for="character-name">Character Name:</label>
-                        <input type="text" id="character-name" name="character-name" required>
+            
+            <div class="welcome-content">
+                <div class="welcome-description">
+                    <p>Welcome to Everlyn, a city of ancient magic and endless opportunity. As a newcomer to these storied streets, your destiny awaits. What path will you choose in this city of wonder?</p>
+                </div>
+                
+                <div class="character-creation card">
+                    <div class="card-header">
+                        <h2>Create Your Character</h2>
                     </div>
-                    <div class="character-info">
-                        <p>You will begin as a humble <span class="highlight">Waif</span>, alone but determined in the grand city of Everlyn.</p>
+                    <div class="card-body">
+                        <form id="character-form">
+                            <div class="form-group">
+                                <label for="character-name">Character Name:</label>
+                                <input type="text" id="character-name" name="character-name" required 
+                                       placeholder="Enter your character's name" 
+                                       minlength="2" maxlength="20">
+                            </div>
+                            
+                            <div class="character-info">
+                                <p>You will begin as a humble <span class="highlight">Waif</span>, alone but determined in the grand city of Everlyn.</p>
+                                <p>Your story begins with nothing but the clothes on your back and your wits. Through persistence and clever choices, you'll rise through the ranks of society, mastering skills and uncovering the city's many secrets.</p>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" id="start-game" class="btn-primary">Enter the City</button>
+                            </div>
+                        </form>
                     </div>
-                    <button type="submit" id="start-game" class="btn-primary">Enter the City</button>
-                </form>
+                </div>
             </div>
-            <footer>
-                &copy; 2025 Synapse Interactive LLC. MIT License.
-            </footer>
+            
+            <div class="welcome-footer">
+                <div class="city-silhouette"></div>
+                <footer>
+                    &copy; 2025 Synapse Interactive LLC. MIT License.
+                </footer>
+            </div>
         </div>
     </script>
 

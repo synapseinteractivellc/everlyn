@@ -73,7 +73,18 @@ class TemplateLoader {
      * @param {boolean} replace - Whether to replace container content or append
      */
     renderTo(name, data = {}, container, replace = true) {
-        const html = this.render(name, data);
+        // Try the name as-is first, then append '-template'
+        let template = this.getTemplate(name);
+        if (!template) {
+            template = this.getTemplate(`${name}-template`);
+        }
+        
+        if (!template) {
+            console.error(`Template "${name}" not found`);
+            return;
+        }
+        
+        const html = template(data);
         const targetElement = typeof container === 'string' 
             ? document.querySelector(container) 
             : container;
