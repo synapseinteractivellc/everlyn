@@ -16,15 +16,16 @@ function initGame() {
     templateLoader.loadExternalTemplate('./templates/game.html', 'game')
         .then(() => {
             // Check for existing character after templates are loaded
-            if (storageManager.hasSaveGame()) {
-                // Attempt to load saved game
-                if (gameEngine.loadGame()) {
-                    // Show game screen
-                    showGameScreen();
-                } else {
-                    // Show welcome screen if load failed
-                    showWelcomeScreen();
-                }
+            const savedGameData = storageManager.loadGame();
+            
+            if (savedGameData) {
+                // Restore character and game state
+                const playerComponent = new CharacterComponent('player', savedGameData.components?.player?.state || {});
+                gameEngine.registerComponent(playerComponent);
+                gameEngine.deserialize(savedGameData);
+                
+                // Show game screen
+                showGameScreen();
             } else {
                 // No save data, show welcome screen
                 showWelcomeScreen();
@@ -87,6 +88,11 @@ function initGame() {
             
             const percentage = (value / total) * 100;
             return percentage.toFixed(decimals || 0) + '%';
+        });
+
+        // Capitalize the first letter of a string
+        templateLoader.registerHelper('capitalize', function(string) {
+            return Helpers.capitalize(string);
         });
         
         // Format time

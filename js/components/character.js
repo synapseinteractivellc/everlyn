@@ -19,41 +19,42 @@ class CharacterComponent extends Component {
             experience: options.experience || 0,
             experienceToLevel: this.calculateExperienceToLevel(options.level || 1),
             resources: {
-                health: {
-                    current: options.resources?.health?.current || 10,
-                    max: options.resources?.health?.max || 10
-                },
-                stamina: {
-                    current: options.resources?.stamina?.current || 10,
-                    max: options.resources?.stamina?.max || 10
-                },
-                mana: {
-                    current: 0,
-                    max: 0,
-                    unlocked: false
-                }
+            health: {
+                current: options.resources?.health?.current || 10,
+                max: options.resources?.health?.max || 10
+            },
+            stamina: {
+                current: options.resources?.stamina?.current || 10,
+                max: options.resources?.stamina?.max || 10
+            },
+            mana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            }
             },
             inventory: options.inventory || [],
             skills: options.skills || [],
             gold: options.gold || 0,
+            maxGold: options.maxGold || 10, // Added maxGold property
             
             // Class progression path
             progression: {
-                current: 'Waif',
-                path: ['Waif', 'Novice', 'Apprentice', 'Journeyman', 'Expert', 'Master'],
-                requirements: {
-                    'Novice': { level: 5 },
-                    'Apprentice': { level: 10 },
-                    'Journeyman': { level: 15 },
-                    'Expert': { level: 20 },
-                    'Master': { level: 25 }
-                }
+            current: 'Waif',
+            path: ['Waif', 'Novice', 'Apprentice', 'Journeyman', 'Expert', 'Master'],
+            requirements: {
+                'Novice': { level: 5 },
+                'Apprentice': { level: 10 },
+                'Journeyman': { level: 15 },
+                'Expert': { level: 20 },
+                'Master': { level: 25 }
+            }
             },
             
             // Storage capacity
             storage: {
-                capacity: 20,
-                used: 0
+            capacity: 20,
+            used: 0
             }
         }, false);
         
@@ -284,11 +285,14 @@ class CharacterComponent extends Component {
     addGold(amount) {
         if (amount <= 0) return this;
         
-        const gold = this.state.gold + amount;
-        this.setState({ gold });
+        const currentGold = this.state.gold;
+        const maxGold = this.state.maxGold;
+        const newGold = Math.min(currentGold + amount, maxGold);
+        
+        this.setState({ gold: newGold });
         
         // Trigger event
-        this.trigger('gold:added', { amount, total: gold });
+        this.trigger('gold:added', { amount: newGold - currentGold, total: newGold });
         
         return this;
     }
@@ -314,6 +318,23 @@ class CharacterComponent extends Component {
         this.trigger('gold:removed', { amount, total: gold });
         
         return true;
+    }
+
+    /**
+     * Increase the maximum gold capacity
+     * @param {number} amount - Amount to increase max gold by
+     * @returns {CharacterComponent} - This component instance for chaining
+     */
+    increaseMaxGold(amount) {
+        if (amount <= 0) return this;
+
+        const maxGold = this.state.maxGold + amount;
+        this.setState({ maxGold });
+
+        // Trigger event
+        this.trigger('gold:maxIncreased', { amount, maxGold });
+
+        return this;
     }
     
     /**

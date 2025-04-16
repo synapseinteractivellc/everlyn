@@ -2,7 +2,7 @@
 
 /* Welcome container */
 .welcome-container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: var(--spacing-xl);
     text-align: center;
@@ -17,7 +17,7 @@
     border-radius: var(--border-radius-lg);
     padding: var(--spacing-lg);
     box-shadow: var(--shadow-md);
-    max-width: 500px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 

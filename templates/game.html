@@ -3,6 +3,7 @@
     <header class="game-header">
         <div class="game-title">
             <h1>Everlyn: City of Wonder</h1>
+            <h3>{{name}}</h3> <span class="badge badge-primary">{{class}}</span>
         </div>
         <div class="game-controls">
             <button id="btn-settings" class="btn-secondary" aria-label="Open Settings">Settings</button>
@@ -12,113 +13,18 @@
     </header>
 
     <!-- Game Main Content -->
-    <main class="game-main">
+    <class="game-main">
         <!-- Game Sidebar -->
-        <aside class="game-sidebar">
+        <aside class="game-sidebar-resources">
             <!-- Character Panel -->
-            <div class="panel" data-component-id="character-panel">
-                <div class="panel-header">
-                    <h3>{{name}}</h3>
-                    <span class="badge badge-primary">{{class}}</span>
-                </div>
-                <div class="panel-body">
-                    <!-- Character Stats -->
-                    <div class="character-stats">
-                        <div class="stat-row">
-                            <span class="stat-label">Level:</span>
-                            <span class="stat-value">{{level}}</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Experience:</span>
-                            <div class="progress-bar">
-                                <div class="progress-bar-fill" style="width: {{formatPercentage experience experienceToLevel}}%;"></div>
-                                <span class="progress-bar-text">
-                                    {{formatNumber experience}} / {{formatNumber experienceToLevel}}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Resource Bars -->
-                    <div class="resource-bars">
-                        {{#each resources}}
-                        <div class="resource-bar-container">
-                            <span class="resource-label">{{@key}}:</span>
-                            <div class="resource-bar">
-                                <div class="resource-bar-fill {{@key}}-bar-fill" style="width: {{formatPercentage current max}}%;"></div>
-                                <span class="resource-bar-text">{{current}} / {{max}}</span>
-                            </div>
-                        </div>
-                        {{else}}
-                        <div class="empty-resources">No resources available.</div>
-                        {{/each}}
-                    </div>
-
+            <div class="panel" data-component-id="character-panel">                
+                <div class="panel-body"> 
                     <!-- Gold Counter -->
                     <div class="resource-counter gold-counter">
-                        <span class="resource-counter-label">Gold:</span>
-                        <span class="resource-counter-value">{{formatNumber gold}}</span>
+                        <span class="resource-counter-label">Gold:</span>&nbsp;
+                        <span class="resource-counter-value">{{formatNumber gold}} / {{maxGold}}</span>
                     </div>
 
-                </div>
-            </div>
-            
-            <!-- Inventory Panel -->
-            <div class="panel" data-component-id="inventory-panel">
-                <div class="panel-header">
-                    <h3>Inventory</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="inventory-grid">
-                        {{#if inventory.length}}
-                            {{#each inventory}}
-                            <div class="inventory-item tooltip" data-item-id="{{id}}">
-                                <div class="inventory-item-icon">{{icon}}</div>
-                                <div class="inventory-item-name">{{name}}</div>
-                                <div class="tooltip-text">
-                                    <div class="item-tooltip-header">{{name}}</div>
-                                    <div class="item-tooltip-description">{{description}}</div>
-                                    {{#if quantity}}
-                                    <div class="item-tooltip-quantity">Quantity: {{quantity}}</div>
-                                    {{/if}}
-                                </div>
-                            </div>
-                            {{/each}}
-                        {{else}}
-                            <div class="empty-inventory">Your inventory is empty.</div>
-                        {{/if}}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Skills Panel -->
-            <div class="panel" data-component-id="skills-panel">
-                <div class="panel-header">
-                    <h3>Skills</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="skills-list">
-                        {{#if skills.length}}
-                            {{#each skills}}
-                            <div class="skill-item tooltip" data-skill-id="{{id}}">
-                                <div class="skill-item-name">{{name}}</div>
-                                <div class="skill-item-level">Lvl {{level}}</div>
-                                <div class="tooltip-text">
-                                    <div class="skill-tooltip-header">{{name}}</div>
-                                    <div class="skill-tooltip-description">{{description}}</div>
-                                    <div class="skill-tooltip-level">Level: {{level}}</div>
-                                    {{#if experience}}
-                                    <div class="skill-tooltip-exp">
-                                        Experience: {{experience}} / {{experienceToLevel}}
-                                    </div>
-                                    {{/if}}
-                                </div>
-                            </div>
-                            {{/each}}
-                        {{else}}
-                            <div class="empty-skills">You haven't learned any skills yet.</div>
-                        {{/if}}
-                    </div>
                 </div>
             </div>
         </aside>
@@ -169,7 +75,29 @@
                     </div>
                 </div>
             </div>
-            
+        </div>
+        <aside class="game-sidebar-stats">
+            <!-- Character Panel -->
+            <div class="panel" data-component-id="character-panel">                
+                <div class="panel-body">
+                    <!-- Resource Bars -->
+                    <div class="resource-bars">
+                        {{#each resources}}
+                        <div class="resource-bar-container">
+                            <span class="resource-label">{{capitalize @key}}:</span>
+                            <div class="resource-bar">
+                                <div class="resource-bar-fill {{@key}}-bar-fill" style="width: {{formatPercentage current max}}%;"></div>
+                                <span class="resource-bar-text">{{current}} / {{max}}</span>
+                            </div>
+                        </div>
+                        {{else}}
+                        <div class="empty-resources">No resources available.</div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <aside class="game-sidebar-activity-log">
             <!-- Activity Log -->
             <div class="panel" data-component-id="activity-log">
                 <div class="panel-header">
@@ -189,7 +117,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
     </main>
 
     <!-- Game Footer -->
