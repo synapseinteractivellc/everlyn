@@ -4,6 +4,9 @@
 (function() {
     'use strict';
     
+// Initialize game after page load
+document.addEventListener('DOMContentLoaded', initGame);
+
     // Game initialization
     // Main.js - Update the initGame function
 function initGame() {
@@ -36,6 +39,14 @@ function initGame() {
             showWelcomeScreen();
         });
     
+    // Set default view to "Map" on game start
+    gameEngine.on('started', () => {
+        const mapNavBtn = document.querySelector('.nav-btn[data-view="map"]');
+        if (mapNavBtn) {
+            mapNavBtn.click(); // Simulate a click to activate the map view
+        }
+    });
+
     // Add save game event listener
     document.addEventListener('click', function(event) {
         if (event.target.id === 'btn-save') {
@@ -122,63 +133,8 @@ function initGame() {
         }
     });  
     
-    // Add wipe game event listener
-    document.addEventListener('click', function(event) {
-        if (event.target.id === 'btn-wipe') {
-            // Confirm wipe action
-            if (confirm('Are you sure you want to wipe your current save? This cannot be undone.')) {
-                // Delete save game
-                storageManager.deleteSaveGame();
-                
-                // Stop game engine
-                gameEngine.stop();
-                
-                // Show welcome screen
-                showWelcomeScreen();
-            }
-        }
-    });
-
-    // Add navigation button event listener
-    document.addEventListener('click', function(event) {
-        const navBtn = event.target.closest('.nav-btn');
-        if (navBtn) {
-            // Remove active class from all buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Add active class to clicked button
-            navBtn.classList.add('active');
-            
-            // Get the view to show
-            const view = navBtn.getAttribute('data-view');
-            
-            // TODO: Implement view switching logic
-            console.log(`Switching to ${view} view`);
-            
-            // Trigger event for potential component-specific handling
-            eventSystem.trigger('navigation:view:changed', { view });
-        }
-    });
-
     // Listen for character creation
     document.addEventListener('submit', handleFormSubmit);
-
-    // Load map component
-    gameEngine.on('started', () => {
-        // Create and register map component
-        const mapComponent = new MapComponent('city-map', {
-            container: '[data-component-id="location-panel"] .panel-body'
-        });
-        gameEngine.registerComponent(mapComponent);
-        
-        // Make map the default view
-        const mapNavBtn = document.querySelector('.nav-btn[data-view="map"]');
-        if (mapNavBtn) {
-            mapNavBtn.click();
-        }
-    });
 }
     
     // Register custom Handlebars helpers

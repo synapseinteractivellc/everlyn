@@ -13,48 +13,61 @@ class MapComponent extends UIComponent {
             template: 'map',
             ...options
         });
-        
+
         console.log('MapComponent constructed');
         this.mapLoaded = false;
         this.activeLocation = null;
-        
+
         // Explicitly bind and log render event
         this.on('render', () => {
             console.log('MapComponent render event triggered');
-            this.loadMap();
+            this.ensureMapContainerExists(() => this.loadMap());
         });
     }
-    
-    loadMap() {
-        // Prevent multiple load attempts
-        if (this.mapLoaded) {
-            // If already loaded, just re-highlight the active location
-            const activeLocation = gameEngine.getActiveLocation();
-            if (activeLocation) {
-                this.highlightLocation(activeLocation);
-            }
-            return;
-        }
-    
+
+    /**
+     * Ensure the map container exists before calling a callback
+     * @param {Function} callback - Callback to execute when the container exists
+     */
+    ensureMapContainerExists(callback) {
         const mapContainer = this.find('.map-container');
+        if (mapContainer) {
+            callback();
+        } else {
+            console.error('Map container not found. Retrying...');
+            setTimeout(() => this.ensureMapContainerExists(callback), 100); // Retry after 100ms
+        }
+    }
+
+    /**
+     * Load the map SVG into the map container
+     */
+    loadMap() {
+        console.log('loadMap method called', this.mapLoaded);
+
+        const mapContainer = this.find('.map-container');
+        console.log('Map container:', mapContainer);
+
         if (!mapContainer) {
             console.error('Map container not found');
             return;
         }
-    
+
+        console.log('Attempting to fetch map SVG');
         fetch('./assets/maps/everlyn-map.svg')
             .then(response => {
+                console.log('Fetch response:', response);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.text();
             })
             .then(svgContent => {
+                console.log('SVG content loaded, length:', svgContent.length);
                 mapContainer.innerHTML = svgContent;
-                this.mapLoaded = true;
-                
+
                 this.setupLocationInteractions();
-                
+
                 const activeLocation = gameEngine.getActiveLocation();
                 if (activeLocation) {
                     this.highlightLocation(activeLocation);
@@ -65,40 +78,40 @@ class MapComponent extends UIComponent {
                 mapContainer.innerHTML = `<p>Error loading map: ${error.message}. Please try again.</p>`;
             });
     }
-    
+
     /**
      * Setup location interaction handlers
      */
     setupLocationInteractions() {
         const locations = this.findAll('.location');
-        
+
         locations.forEach(location => {
             // Add hover effect
             location.addEventListener('mouseenter', () => {
                 this.showLocationTooltip(location);
             });
-            
+
             location.addEventListener('mouseleave', () => {
                 this.hideLocationTooltip();
             });
-            
+
             // Add click handler
             location.addEventListener('click', () => {
                 const locationId = location.id;
                 const locationName = location.getAttribute('data-location');
-                
+
                 // Trigger location selection event
-                this.trigger('location:selected', { 
-                    id: locationId, 
-                    name: locationName 
+                this.trigger('location:selected', {
+                    id: locationId,
+                    name: locationName
                 });
-                
+
                 // Update game engine active location
                 gameEngine.setActiveLocation(locationId);
             });
         });
     }
-    
+
     /**
      * Highlight a location on the map
      * @param {string} locationId - ID of location to highlight
@@ -110,7 +123,7 @@ class MapComponent extends UIComponent {
             el.classList.remove('location-active');
             el.classList.remove('map-location-pulse');
         });
-        
+
         // Add highlight to new location
         const location = this.find(`#${locationId}`);
         if (location) {
@@ -119,14 +132,14 @@ class MapComponent extends UIComponent {
             this.activeLocation = locationId;
         }
     }
-    
+
     /**
      * Show tooltip for a location
      * @param {HTMLElement} location - Location element
      */
     showLocationTooltip(location) {
         const locationName = location.getAttribute('data-location');
-        
+
         // Create tooltip if it doesn't exist
         let tooltip = this.find('.map-tooltip');
         if (!tooltip) {
@@ -134,15 +147,15 @@ class MapComponent extends UIComponent {
             tooltip.className = 'map-tooltip';
             this.find('.map-container').appendChild(tooltip);
         }
-        
+
         // Set tooltip content and position
         tooltip.textContent = locationName;
         tooltip.style.display = 'block';
-        
+
         // Position tooltip near mouse position
         document.addEventListener('mousemove', this.moveTooltip);
     }
-    
+
     /**
      * Hide location tooltip
      */
@@ -151,11 +164,11 @@ class MapComponent extends UIComponent {
         if (tooltip) {
             tooltip.style.display = 'none';
         }
-        
+
         // Remove mousemove listener
         document.removeEventListener('mousemove', this.moveTooltip);
     }
-    
+
     /**
      * Move tooltip with mouse
      * @param {MouseEvent} event - Mouse event
