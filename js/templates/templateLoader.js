@@ -118,7 +118,7 @@ class TemplateLoader {
             this.templates[name] = Handlebars.compile(templateText);
             return this.templates[name];
         } catch (error) {
-            console.error('Error loading template:', error);
+            console.error(`Error loading template "${name}" from ${url}:`, error);
             throw error;
         }
     }

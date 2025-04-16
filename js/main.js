@@ -5,30 +5,39 @@
     'use strict';
     
     // Game initialization
-    function initGame() {
-        console.log('Initializing Everlyn: City of Wonder...');
-        
-        // Register Handlebars helpers
-        registerHandlebarsHelpers();
-        
-        // Check for existing character
-        if (storageManager.hasSaveGame()) {
-            // Attempt to load saved game
-            if (gameEngine.loadGame()) {
-                // Show game screen
-                showGameScreen();
+    // Main.js - Update the initGame function
+function initGame() {
+    console.log('Initializing Everlyn: City of Wonder...');
+    
+    // Register Handlebars helpers
+    registerHandlebarsHelpers();
+    
+    // Load game templates first
+    templateLoader.loadExternalTemplate('./templates/game.html', 'game')
+        .then(() => {
+            // Check for existing character after templates are loaded
+            if (storageManager.hasSaveGame()) {
+                // Attempt to load saved game
+                if (gameEngine.loadGame()) {
+                    // Show game screen
+                    showGameScreen();
+                } else {
+                    // Show welcome screen if load failed
+                    showWelcomeScreen();
+                }
             } else {
-                // Show welcome screen if load failed
+                // No save data, show welcome screen
                 showWelcomeScreen();
             }
-        } else {
-            // No save data, show welcome screen
+        })
+        .catch(error => {
+            console.error('Failed to load game template:', error);
             showWelcomeScreen();
-        }
-        
-        // Listen for character creation
-        document.addEventListener('submit', handleFormSubmit);
-    }
+        });
+    
+    // Listen for character creation
+    document.addEventListener('submit', handleFormSubmit);
+}
     
     // Register custom Handlebars helpers
     function registerHandlebarsHelpers() {
