@@ -5,7 +5,7 @@
 import GameState from './GameState.js';
 import LocationService from '../services/LocationService.js';
 import DOMCache from './DOMCache.js';
-import TemplateManager from './TemplateManager.js';
+import TemplateLoader from '../core/TemplateLoader.js'; // Updated import
 import ErrorUtils from '../utils/ErrorUtils.js';
 import { ErrorCodes } from '../utils/ErrorUtils.js';
 import GameConfig from '../config.js';
@@ -470,48 +470,53 @@ const UIManager = {
      * Updates the character profile section with detailed information
      * @param {Object} character - The player character object
      */
-    updateCharacterProfile: function(character) {
+    updateCharacterProfile: async function(character) {
         if (!character) return;
 
-        ErrorUtils.tryCatch(() => {
+        ErrorUtils.tryCatch(async () => {
             const characterSection = DOMCache.get('character');
             if (!characterSection) return;
-            
+
             // Check if the character profile already exists
             let characterProfile = characterSection.querySelector('.character-profile');
-            
+
             if (!characterProfile) {
-                // Use TemplateManager to create the profile structure
-                characterSection.innerHTML = '<h2>Character Profile</h2>';
-                
-                // Create and append the character profile
-                const profileElement = TemplateManager.createElement('characterProfile');
-                characterSection.appendChild(profileElement);
-                
+                // Use TemplateLoader to load and render the profile structure
+                const templateLoaded = await TemplateLoader.render(
+                    'characterProfile', // Template ID
+                    character.displayStats(), // Data for the template
+                    characterSection // Container element
+                );
+
+                if (!templateLoaded) {
+                    console.error('Failed to load character profile template.');
+                    return;
+                }
+
                 // Update DOMCache with the new elements
                 DOMCache.clearCache(['characterProfile', 'characterName', 'characterSubtitle', 'xpBar', 'xpInfo']);
             }
-            
+
             // Get character stats for display
             const stats = character.displayStats();
-            
+
             // Update name and level
             const nameElement = DOMCache.get('characterName') || characterSection.querySelector('.character-name');
             if (nameElement) nameElement.textContent = stats.name;
-            
+
             const subtitleElement = DOMCache.get('characterSubtitle') || characterSection.querySelector('.character-subtitle');
             if (subtitleElement) subtitleElement.textContent = `Level ${stats.level} ${stats.class}`;
-            
+
             // Update XP bar
             const progressBar = DOMCache.get('xpBar') || characterSection.querySelector('.xp-bar');
             if (progressBar) {
                 const xpPercentage = (stats.xp / stats.xpToNextLevel) * 100;
                 progressBar.style.width = `${xpPercentage}%`;
-                
+
                 const progressText = progressBar.querySelector('.progress-bar-text');
                 if (progressText) progressText.textContent = `XP: ${stats.xp}/${stats.xpToNextLevel}`;
             }
-            
+
             // Update XP info
             const xpInfo = DOMCache.get('xpInfo') || characterSection.querySelector('.xp-info');
             if (xpInfo) xpInfo.textContent = `Next level in: ${stats.xpToNextLevel - stats.xp} XP`;
@@ -523,31 +528,43 @@ const UIManager = {
      * @param {string} locationName - The name of the clicked location
      * @param {Object} details - The details of the location
      */
-    updateLocationInfo: function(locationName, details) {
+    updateLocationInfo: async function(locationName, details) {
         const locationInfo = DOMCache.get('locationInfo');
         if (!locationInfo) return;
 
-        ErrorUtils.tryCatch(() => {
+        ErrorUtils.tryCatch(async () => {
             if (details) {
-                // Use TemplateManager to render location info
-                TemplateManager.render(
-                    locationInfo,
-                    'locationInfo',
-                    locationName,
-                    details.description,
-                    details.quests || []
+                // Use TemplateLoader to render location info
+                const templateLoaded = await TemplateLoader.render(
+                    'locationInfo', // Template ID
+                    {
+                        locationName,
+                        description: details.description,
+                        quests: details.quests || []
+                    },
+                    locationInfo // Container element
                 );
+
+                if (!templateLoaded) {
+                    console.error('Failed to load location info template.');
+                }
             } else {
                 // Get details from LocationService if not provided
                 const locationDetails = LocationService.getLocationDetails(locationName);
                 if (locationDetails) {
-                    TemplateManager.render(
-                        locationInfo,
-                        'locationInfo',
-                        locationName,
-                        locationDetails.description,
-                        locationDetails.quests || []
+                    const templateLoaded = await TemplateLoader.render(
+                        'locationInfo', // Template ID
+                        {
+                            locationName,
+                            description: locationDetails.description,
+                            quests: locationDetails.quests || []
+                        },
+                        locationInfo // Container element
                     );
+
+                    if (!templateLoaded) {
+                        console.error('Failed to load location info template.');
+                    }
                 } else {
                     // Fallback for locations without details
                     locationInfo.innerHTML = `
@@ -569,7 +586,7 @@ const UIManager = {
             sections.forEach(section => {
                 section.style.display = section.id === sectionId ? 'block' : 'none';
             });
-            
+
             // Update active tab button
             const tabButtons = DOMCache.getAll('tabButtons');
             tabButtons.forEach(button => {
