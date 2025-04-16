@@ -209,144 +209,144 @@ class ActionComponent extends Component {
         }
     }
     /**
- * Handle action button click
- * @param {Event} event - Click event
- */
-handleActionClick(event) {
-    console.log('Action button clicked:', event.currentTarget.dataset.actionId);
-    
-    const actionButton = event.currentTarget;
-    const actionId = actionButton.dataset.actionId;
-    
-    // If action is already in progress, do nothing
-    if (this.state.actionsInProgress[actionId]) {
-        console.log('Action already in progress, ignoring click');
-        return;
-    }
-    
-    // Execute the appropriate action
-    if (actionId === 'beg-for-coins') {
-        console.log('Executing beg for coins action');
-        this.begForCoins(actionButton);
-    } else if (actionId === 'rest') {
-        console.log('Executing rest action');
-        this.rest(actionButton);
-    }
-}
-
-/**
- * Execute the "Rest" action
- * @param {HTMLElement} actionButton - Action button element
- */
-rest(actionButton) {
-    // Get character component
-    const characterComponent = gameEngine.getComponent('player');
-    if (!characterComponent) return;
-    
-    // Mark action as in progress
-    this.state.actionsInProgress['rest'] = true;
-    actionButton.classList.add('action-in-progress');
-    
-    // Start timer for 3 seconds
-    const startTime = Date.now();
-    const duration = 3000; // 3 seconds
-    
-    // Set action timer
-    this.state.actionTimers['rest'] = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
+     * Handle action button click
+     * @param {Event} event - Click event
+     */
+    handleActionClick(event) {
+        console.log('Action button clicked:', event.currentTarget.dataset.actionId);
         
-        if (progress >= 1) {
-            // Action completed
-            clearInterval(this.state.actionTimers['rest']);
-            this.state.actionTimers['rest'] = null;
-            this.state.actionsInProgress['rest'] = false;
+        const actionButton = event.currentTarget;
+        const actionId = actionButton.dataset.actionId;
+        
+        // If action is already in progress, do nothing
+        if (this.state.actionsInProgress[actionId]) {
+            console.log('Action already in progress, ignoring click');
+            return;
+        }
+        
+        // Execute the appropriate action
+        if (actionId === 'beg-for-coins') {
+            console.log('Executing beg for coins action');
+            this.begForCoins(actionButton);
+        } else if (actionId === 'rest') {
+            console.log('Executing rest action');
+            this.rest(actionButton);
+        }
+    }
+
+    /**
+     * Execute the "Rest" action
+     * @param {HTMLElement} actionButton - Action button element
+     */
+    rest(actionButton) {
+        // Get character component
+        const characterComponent = gameEngine.getComponent('player');
+        if (!characterComponent) return;
+        
+        // Mark action as in progress
+        this.state.actionsInProgress['rest'] = true;
+        actionButton.classList.add('action-in-progress');
+        
+        // Start timer for 3 seconds
+        const startTime = Date.now();
+        const duration = 3000; // 3 seconds
+        
+        // Set action timer
+        this.state.actionTimers['rest'] = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
             
-            // Update UI
-            actionButton.classList.remove('action-in-progress');
-            actionButton.classList.add('action-complete');
-            setTimeout(() => actionButton.classList.remove('action-complete'), 1000);
-            
-            // Restore health to full
-            const healthMax = characterComponent.state.resources.health.max;
-            const healthCurrent = characterComponent.state.resources.health.current;
-            const healthDiff = healthMax - healthCurrent;
-            if (healthDiff > 0) {
-                characterComponent.modifyResource('health', healthDiff);
+            if (progress >= 1) {
+                // Action completed
+                clearInterval(this.state.actionTimers['rest']);
+                this.state.actionTimers['rest'] = null;
+                this.state.actionsInProgress['rest'] = false;
                 
-                // Update health bar
-                const healthBar = document.querySelector('.health-bar-fill');
-                const healthText = document.querySelector('.resource-bar:nth-child(1) .resource-bar-text');
-                if (healthBar) {
-                    healthBar.classList.add('resource-gain');
-                    setTimeout(() => healthBar.classList.remove('resource-gain'), 1000);
-                    healthBar.style.width = '100%';
-                    if (healthText) {
-                        healthText.textContent = `${healthMax} / ${healthMax}`;
-                    }
-                }
+                // Update UI
+                actionButton.classList.remove('action-in-progress');
+                actionButton.classList.add('action-complete');
+                setTimeout(() => actionButton.classList.remove('action-complete'), 1000);
                 
-                // Log health restoration
-                this.addActivityLog(`You restored ${healthDiff} health by resting.`);
-            }
-            
-            // Restore stamina to full
-            const staminaMax = characterComponent.state.resources.stamina.max;
-            const staminaCurrent = characterComponent.state.resources.stamina.current;
-            const staminaDiff = staminaMax - staminaCurrent;
-            if (staminaDiff > 0) {
-                characterComponent.modifyResource('stamina', staminaDiff);
-                
-                // Update stamina bar
-                const staminaBar = document.querySelector('.stamina-bar-fill');
-                const staminaText = document.querySelector('.resource-bar:nth-child(2) .resource-bar-text');
-                if (staminaBar) {
-                    staminaBar.classList.add('resource-gain');
-                    setTimeout(() => staminaBar.classList.remove('resource-gain'), 1000);
-                    staminaBar.style.width = '100%';
-                    if (staminaText) {
-                        staminaText.textContent = `${staminaMax} / ${staminaMax}`;
-                    }
-                }
-                
-                // Log stamina restoration
-                this.addActivityLog(`You restored ${staminaDiff} stamina by resting.`);
-            }
-            
-            // Check if mana is unlocked and restore it
-            if (characterComponent.state.resources.mana && 
-                characterComponent.state.resources.mana.unlocked) {
-                const manaMax = characterComponent.state.resources.mana.max;
-                const manaCurrent = characterComponent.state.resources.mana.current;
-                const manaDiff = manaMax - manaCurrent;
-                
-                if (manaDiff > 0) {
-                    characterComponent.modifyResource('mana', manaDiff);
+                // Restore health to full
+                const healthMax = characterComponent.state.resources.health.max;
+                const healthCurrent = characterComponent.state.resources.health.current;
+                const healthDiff = healthMax - healthCurrent;
+                if (healthDiff > 0) {
+                    characterComponent.modifyResource('health', healthDiff);
                     
-                    // Update mana bar
-                    const manaBar = document.querySelector('.mana-bar-fill');
-                    const manaText = document.querySelector('.resource-bar:nth-child(3) .resource-bar-text');
-                    if (manaBar) {
-                        manaBar.classList.add('resource-gain');
-                        setTimeout(() => manaBar.classList.remove('resource-gain'), 1000);
-                        manaBar.style.width = '100%';
-                        if (manaText) {
-                            manaText.textContent = `${manaMax} / ${manaMax}`;
+                    // Update health bar
+                    const healthBar = document.querySelector('.health-bar-fill');
+                    const healthText = document.querySelector('.health-bar-text');
+                    if (healthBar) {
+                        healthBar.classList.add('resource-gain');
+                        setTimeout(() => healthBar.classList.remove('resource-gain'), 1000);
+                        healthBar.style.width = '100%';
+                        if (healthText) {
+                            healthText.textContent = `${healthMax} / ${healthMax}`;
                         }
                     }
                     
-                    // Log mana restoration
-                    this.addActivityLog(`You restored ${manaDiff} mana by resting.`);
+                    // Log health restoration
+                    this.addActivityLog(`You restored ${healthDiff} health by resting.`);
+                }
+                
+                // Restore stamina to full
+                const staminaMax = characterComponent.state.resources.stamina.max;
+                const staminaCurrent = characterComponent.state.resources.stamina.current;
+                const staminaDiff = staminaMax - staminaCurrent;
+                if (staminaDiff > 0) {
+                    characterComponent.modifyResource('stamina', staminaDiff);
+                    
+                    // Update stamina bar
+                    const staminaBar = document.querySelector('.stamina-bar-fill');
+                    const staminaText = document.querySelector('.stamina-bar-text');
+                    if (staminaBar) {
+                        staminaBar.classList.add('resource-gain');
+                        setTimeout(() => staminaBar.classList.remove('resource-gain'), 1000);
+                        staminaBar.style.width = '100%';
+                        if (staminaText) {
+                            staminaText.textContent = `${staminaMax} / ${staminaMax}`;
+                        }
+                    }
+                    
+                    // Log stamina restoration
+                    this.addActivityLog(`You restored ${staminaDiff} stamina by resting.`);
+                }
+                
+                // Check if mana is unlocked and restore it
+                if (characterComponent.state.resources.mana && 
+                    characterComponent.state.resources.mana.unlocked) {
+                    const manaMax = characterComponent.state.resources.mana.max;
+                    const manaCurrent = characterComponent.state.resources.mana.current;
+                    const manaDiff = manaMax - manaCurrent;
+                    
+                    if (manaDiff > 0) {
+                        characterComponent.modifyResource('mana', manaDiff);
+                        
+                        // Update mana bar
+                        const manaBar = document.querySelector('.mana-bar-fill');
+                        const manaText = document.querySelector('.mana-bar-text');
+                        if (manaBar) {
+                            manaBar.classList.add('resource-gain');
+                            setTimeout(() => manaBar.classList.remove('resource-gain'), 1000);
+                            manaBar.style.width = '100%';
+                            if (manaText) {
+                                manaText.textContent = `${manaMax} / ${manaMax}`;
+                            }
+                        }
+                        
+                        // Log mana restoration
+                        this.addActivityLog(`You restored ${manaDiff} mana by resting.`);
+                    }
+                }
+                
+                // Add overall log message if multiple resources were restored
+                if ((healthDiff > 0 && staminaDiff > 0) || 
+                    (healthDiff > 0 && characterComponent.state.resources.mana?.unlocked) ||
+                    (staminaDiff > 0 && characterComponent.state.resources.mana?.unlocked)) {
+                    this.addActivityLog('You feel refreshed and rejuvenated after your rest.');
                 }
             }
-            
-            // Add overall log message if multiple resources were restored
-            if ((healthDiff > 0 && staminaDiff > 0) || 
-                (healthDiff > 0 && characterComponent.state.resources.mana?.unlocked) ||
-                (staminaDiff > 0 && characterComponent.state.resources.mana?.unlocked)) {
-                this.addActivityLog('You feel refreshed and rejuvenated after your rest.');
-            }
-        }
-    }, 50); // Update every 50ms for smooth progress
-}
+        }, 50); // Update every 50ms for smooth progress
+    }
 }
