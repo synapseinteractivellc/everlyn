@@ -10,6 +10,27 @@
     </div>
     <div class="actions-container">
         {{#if currentLocation.id}}
+            {{#ifEquals currentLocation.id "location-market"}}
+                {{#unless specialItems.coinPurse}}
+                    <button class="action-button" data-action-id="purchase-coin-purse">
+                        <div class="action-header">
+                            <span class="action-name">Purchase Coin Purse</span>
+                        </div>
+                        <div class="action-description">A sturdy leather purse that can hold more gold coins. Increases maximum gold by 15.</div>
+                        <div class="action-requirements">
+                            <div class="requirement gold-requirement">
+                                <span class="requirement-icon">⦿</span>
+                                <span class="requirement-value">10</span>
+                            </div>
+                        </div>
+                        <div class="action-time">
+                            <span class="time-icon">⏱</span>
+                            <span class="time-value">2s</span>
+                        </div>
+                    </button>
+                {{/unless}}
+            {{/ifEquals}}
+            
             {{#ifEquals currentLocation.id "location-city-square"}}
                 <button class="action-button" data-action-id="beg-for-coins">
                     <div class="action-header">
@@ -27,27 +48,37 @@
                         <span class="time-value">1s</span>
                     </div>
                 </button>
-            {{else}}
-                {{#ifEquals currentLocation.id "location-inn"}}
-                    <button class="action-button" data-action-id="rest">
-                        <div class="action-header">
-                            <span class="action-name">Rest</span>
-                        </div>
-                        <div class="action-description">Take a moment to rest and recover your strength.</div>
-                        <div class="action-requirements">
-                            <!-- No requirements -->
-                        </div>
-                        <div class="action-time">
-                            <span class="time-icon">⏱</span>
-                            <span class="time-value">3s</span>
-                        </div>
-                    </button>
-                {{else}}
+            {{/ifEquals}}
+            
+            {{#ifEquals currentLocation.id "location-inn"}}
+                <button class="action-button" data-action-id="rest">
+                    <div class="action-header">
+                        <span class="action-name">Rest</span>
+                    </div>
+                    <div class="action-description">Take a moment to rest and recover your strength.</div>
+                    <div class="action-requirements">
+                        <!-- No requirements -->
+                    </div>
+                    <div class="action-time">
+                        <span class="time-icon">⏱</span>
+                        <span class="time-value">3s</span>
+                    </div>
+                </button>
+            {{/ifEquals}}
+            
+            {{#unless currentLocation.id}}
+                <div class="no-actions-placeholder">
+                    <p>No location selected. Explore the city to find opportunities for action.</p>
+                </div>
+            {{/unless}}
+            
+            {{#if currentLocation.id}}
+                {{#unless currentLocation.hasActions}}
                     <div class="no-actions-placeholder">
                         <p>No actions available in {{currentLocation.name}}. Explore the city to find more opportunities.</p>
                     </div>
-                {{/ifEquals}}
-            {{/ifEquals}}
+                {{/unless}}
+            {{/if}}
         {{else}}
             <div class="no-actions-placeholder">
                 <p>No location selected. Explore the city to find opportunities for action.</p>

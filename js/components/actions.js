@@ -190,24 +190,19 @@ class ActionComponent extends Component {
      * @param {Event} event - Click event
      */
     handleActionClick(event) {
-        console.log('Action button clicked:', event.currentTarget.dataset.actionId);
-        
         const actionButton = event.currentTarget;
         const actionId = actionButton.dataset.actionId;
         
         // If action is already in progress, do nothing
-        if (this.state.actionsInProgress[actionId]) {
-            console.log('Action already in progress, ignoring click');
-            return;
-        }
+        if (this.state.actionsInProgress[actionId]) return;
         
         // Execute the appropriate action
         if (actionId === 'beg-for-coins') {
-            console.log('Executing beg for coins action');
             this.begForCoins(actionButton);
         } else if (actionId === 'rest') {
-            console.log('Executing rest action');
             this.rest(actionButton);
+        } else if (actionId === 'purchase-coin-purse') {
+            this.purchaseCoinPurse(actionButton);
         }
     }
 
@@ -297,6 +292,81 @@ class ActionComponent extends Component {
             
             if (resourceText) {
                 resourceText.textContent = `${value} / ${value}`;
+            }
+        }
+    }
+
+    /**
+     * Execute the "Purchase Coin Purse" action
+     * @param {HTMLElement} actionButton - Action button element
+     */
+    purchaseCoinPurse(actionButton) {
+        // Get character component to check/modify resources
+        const characterComponent = gameEngine.getComponent('player');
+        if (!characterComponent) return;
+        
+        // Check if player has enough gold
+        const currentGold = characterComponent.state.currencies.gold.current;
+        if (currentGold < 10) {
+            // Show error message
+            actionButton.classList.add('shake');
+            setTimeout(() => actionButton.classList.remove('shake'), 500);
+            this.addActivityLog('You don\'t have enough gold to purchase a Coin Purse.');
+            return;
+        }
+        
+        // Check if this has already been purchased using the specialItems flag
+        if (characterComponent.state.specialItems && characterComponent.state.specialItems.coinPurse) {
+            actionButton.classList.add('shake');
+            setTimeout(() => actionButton.classList.remove('shake'), 500);
+            this.addActivityLog('You already own a Coin Purse.');
+            return;
+        }
+        
+        // Start the purchase action
+        this.startAction('purchase-coin-purse', actionButton, 2000, () => {
+            // Deduct gold
+            const currencies = {...characterComponent.state.currencies};
+            currencies.gold.current = currencies.gold.current - 10;
+            
+            // Increase max gold capacity
+            currencies.gold.max = currencies.gold.max + 15;
+            
+            // Mark the item as purchased
+            const specialItems = {...characterComponent.state.specialItems};
+            specialItems.coinPurse = true;
+            
+            // Update character state
+            characterComponent.setState({ 
+                currencies,
+                specialItems
+            });
+            
+            // Update UI
+            this.updateCurrencyUI('gold');
+            
+            // Complete the action animation
+            actionButton.classList.add('action-complete');
+            setTimeout(() => actionButton.classList.remove('action-complete'), 1000);
+            
+            // Add to activity log
+            this.addActivityLog('You purchased a Coin Purse! Your maximum gold has increased by 15.');
+            
+            // Disable the button (since it's a one-time purchase)
+            actionButton.classList.add('action-disabled');
+            actionButton.disabled = true;
+        });
+    }
+
+    // Add a helper method to update currency UI
+    updateCurrencyUI(currency) {
+        const currencyCounter = document.querySelector(`.${currency}-counter .resource-counter-value`);
+        if (currencyCounter) {
+            const characterComponent = gameEngine.getComponent('player');
+            if (characterComponent) {
+                const current = characterComponent.state.currencies[currency].current;
+                const max = characterComponent.state.currencies[currency].max;
+                currencyCounter.textContent = `${current}/${max}`;
             }
         }
     }
