@@ -54,6 +54,40 @@
     padding: var(--spacing-md);
 }
 
+.game-navigation {
+    margin-bottom: var(--spacing-md);
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-xs);
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.nav-btn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--color-background-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-primary);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-light);
+}
+
+.nav-btn.active {
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-light);
+}
+
 /* Sidebar: Stats (Right of Content) */
 .game-sidebar-stats {
     flex: 0 0 13%; /* Fixed width: 13% */

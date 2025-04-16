@@ -67,6 +67,86 @@ function initGame() {
         }
     });
 
+    // Load game view templates
+    Promise.all([
+        templateLoader.loadExternalTemplate('./templates/map.html', 'map'),
+        templateLoader.loadExternalTemplate('./templates/actions.html', 'actions'),
+        templateLoader.loadExternalTemplate('./templates/skills.html', 'skills'),
+        templateLoader.loadExternalTemplate('./templates/house.html', 'house'),
+        templateLoader.loadExternalTemplate('./templates/character.html', 'character'),
+        templateLoader.loadExternalTemplate('./templates/adventure.html', 'adventure')
+    ]).catch(error => {
+        console.error('Failed to load game view templates:', error);
+    });
+
+    // Add navigation button event listener
+    document.addEventListener('click', function(event) {
+        const navBtn = event.target.closest('.nav-btn');
+        if (navBtn) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            navBtn.classList.add('active');
+            
+            // Get the view to show
+            const view = navBtn.getAttribute('data-view');
+            
+            // Render the corresponding view template
+            const locationPanel = document.querySelector('[data-component-id="location-panel"]');
+            const panelBody = locationPanel.querySelector('.panel-body');
+            
+            // Render view template with current character data
+            const characterComponent = gameEngine.getComponent('player');
+            const characterData = characterComponent ? characterComponent.getState() : {};
+            
+            templateLoader.renderTo(view, characterData, panelBody, true);
+            
+            // Trigger event for potential component-specific handling
+            eventSystem.trigger('navigation:view:changed', { view });
+        }
+    });    // Add wipe game event listener
+    document.addEventListener('click', function(event) {
+        if (event.target.id === 'btn-wipe') {
+            // Confirm wipe action
+            if (confirm('Are you sure you want to wipe your current save? This cannot be undone.')) {
+                // Delete save game
+                storageManager.deleteSaveGame();
+                
+                // Stop game engine
+                gameEngine.stop();
+                
+                // Show welcome screen
+                showWelcomeScreen();
+            }
+        }
+    });
+
+    // Add navigation button event listener
+    document.addEventListener('click', function(event) {
+        const navBtn = event.target.closest('.nav-btn');
+        if (navBtn) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            navBtn.classList.add('active');
+            
+            // Get the view to show
+            const view = navBtn.getAttribute('data-view');
+            
+            // TODO: Implement view switching logic
+            console.log(`Switching to ${view} view`);
+            
+            // Trigger event for potential component-specific handling
+            eventSystem.trigger('navigation:view:changed', { view });
+        }
+    });
+
     // Listen for character creation
     document.addEventListener('submit', handleFormSubmit);
 }
