@@ -31,11 +31,15 @@
     display: flex;
     flex-direction: row; /* Arrange sections horizontally */
     height: 100%;
+    width: 100%;
+    max-height: calc(100vh - 100px); /* Subtract header and footer height */
+    overflow: hidden;
 }
 
 /* Sidebar: Resources (Left) */
 .game-sidebar-resources {
-    flex: 0 0 10%; /* Fixed width: 10% */
+    flex: 0 0 13%; /* Fixed width: 13% */
+    min-width: 100px; /* Minimum width to prevent extreme compression */
     padding: var(--spacing-md);
     background-color: var(--color-background-secondary);
     border-right: 1px solid var(--color-border-medium);
@@ -45,13 +49,15 @@
 /* Main Content (Center) */
 .game-content {
     flex: 1 1 70%; /* Flexible width: 70% */
+    min-width: 300px; /* Minimum width to prevent extreme compression */
     overflow-y: auto;
     padding: var(--spacing-md);
 }
 
 /* Sidebar: Stats (Right of Content) */
 .game-sidebar-stats {
-    flex: 0 0 10%; /* Fixed width: 10% */
+    flex: 0 0 13%; /* Fixed width: 13% */
+    min-width: 100px; /* Minimum width to prevent extreme compression */
     padding: var(--spacing-md);
     background-color: var(--color-background-secondary);
     border-left: 1px solid var(--color-border-medium);
@@ -60,7 +66,8 @@
 
 /* Sidebar: Activity Log (Far Right) */
 .game-sidebar-activity-log {
-    flex: 0 0 10%; /* Fixed width: 10% */
+    flex: 0 0 13%; /* Fixed width: 13% */
+    min-width: 100px; /* Minimum width to prevent extreme compression */
     padding: var(--spacing-md);
     background-color: var(--color-background-secondary);
     border-left: 1px solid var(--color-border-medium);

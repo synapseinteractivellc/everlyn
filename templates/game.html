@@ -2,8 +2,7 @@
     <!-- Game Header -->
     <header class="game-header">
         <div class="game-title">
-            <h1>Everlyn: City of Wonder</h1>
-            <h3>{{name}}</h3> <span class="badge badge-primary">{{class}}</span>
+            <h3>Welcome to Everlyn {{name}} the {{class}} - Level {{level}}</h3>
         </div>
         <div class="game-controls">
             <button id="btn-settings" class="btn-secondary" aria-label="Open Settings">Settings</button>
@@ -13,7 +12,7 @@
     </header>
 
     <!-- Game Main Content -->
-    <class="game-main">
+    <div class="game-main">
         <!-- Game Sidebar -->
         <aside class="game-sidebar-resources">
             <!-- Character Panel -->
@@ -22,9 +21,8 @@
                     <!-- Gold Counter -->
                     <div class="resource-counter gold-counter">
                         <span class="resource-counter-label">Gold:</span>&nbsp;
-                        <span class="resource-counter-value">{{formatNumber gold}} / {{maxGold}}</span>
+                        <span class="resource-counter-value">0 / 10</span>
                     </div>
-
                 </div>
             </div>
         </aside>
@@ -34,35 +32,17 @@
             <!-- Location Panel -->
             <div class="panel" data-component-id="location-panel">
                 <div class="panel-header">
-                    <h3>{{location.name}}</h3>
+                    <h3></h3>
                 </div>
                 <div class="panel-body">
                     <div class="location-description">
-                        {{location.description}}
+                        
                     </div>
                     
                     <!-- Available Actions -->
                     <div class="location-actions">
                         <h4>Available Actions</h4>
                         <div class="actions-grid">
-                            {{#each location.actions}}
-                            <button class="action-button" data-action-id="{{id}}" aria-label="{{name}}">
-                                <div class="action-name">{{name}}</div>
-                                <div class="action-description">{{description}}</div>
-                                {{#if cost}}
-                                <div class="action-cost">
-                                    <span class="cost-label">Cost:</span>
-                                    <span class="cost-value">{{cost.amount}} {{cost.resource}}</span>
-                                </div>
-                                {{/if}}
-                                {{#if time}}
-                                <div class="action-time">
-                                    <span class="time-label">Time:</span>
-                                    <span class="time-value">{{formatTime time}}</span>
-                                </div>
-                                {{/if}}
-                            </button>
-                            {{/each}}
                         </div>
                     </div>
                     
@@ -82,17 +62,27 @@
                 <div class="panel-body">
                     <!-- Resource Bars -->
                     <div class="resource-bars">
-                        {{#each resources}}
                         <div class="resource-bar-container">
-                            <span class="resource-label">{{capitalize @key}}:</span>
+                            <span class="resource-label">Health:</span>
                             <div class="resource-bar">
-                                <div class="resource-bar-fill {{@key}}-bar-fill" style="width: {{formatPercentage current max}}%;"></div>
-                                <span class="resource-bar-text">{{current}} / {{max}}</span>
+                                <div class="resource-bar-fill health-bar-fill" style="width: 100%"></div>
+                                <span class="resource-bar-text">10 / 10</span>
                             </div>
                         </div>
-                        {{else}}
-                        <div class="empty-resources">No resources available.</div>
-                        {{/each}}
+                        <div class="resource-bar-container">
+                            <span class="resource-label">Stamina:</span>
+                            <div class="resource-bar">
+                                <div class="resource-bar-fill stamina-bar-fill" style="width: 100%"></div>
+                                <span class="resource-bar-text">10 / 10</span>
+                            </div>
+                        </div>
+                        <div class="resource-bar-container">
+                            <span class="resource-label">Mana:</span>
+                            <div class="resource-bar">
+                                <div class="resource-bar-fill mana-bar-fill" style="width: 0%"></div>
+                                <span class="resource-bar-text">0 / 0</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,26 +97,20 @@
                 <div class="panel-body">
                     <div class="activity-log-content">
                         <ul class="log-entries">
-                            {{#each logEntries}}
-                            <li class="log-entry {{type}}">
-                                <span class="log-time">{{time}}</span>
-                                <span class="log-message">{{{message}}}</span>
-                            </li>
-                            {{/each}}
                         </ul>
                     </div>
                 </div>
             </div>
         </aside>
-    </main>
+    </div>
 
     <!-- Game Footer -->
     <footer class="game-footer">
         <div class="game-credits">
-            &copy; 2025 Synapse Interactive LLC. MIT License.
+            © 2025 Synapse Interactive LLC. MIT License.
         </div>
         <div class="game-version">
-            Version {{gameVersion}}
+            Version 
         </div>
     </footer>
 </div>
