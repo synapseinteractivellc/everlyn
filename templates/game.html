@@ -1,0 +1,248 @@
+<div class="game-container" data-component-id="game-container">
+    <!-- Game Header -->
+    <header class="game-header">
+        <div class="game-title">
+            <h1>Everlyn: City of Wonder</h1>
+        </div>
+        <div class="game-controls">
+            <button id="btn-settings" class="btn-secondary">Settings</button>
+            <button id="btn-save" class="btn-secondary">Save</button>
+        </div>
+    </header>
+
+    <!-- Game Main Content -->
+    <main class="game-main">
+        <!-- Game Sidebar -->
+        <aside class="game-sidebar">
+            <!-- Character Panel -->
+            <div class="panel" data-component-id="character-panel">
+                <div class="panel-header">
+                    <h3>{{name}}</h3>
+                    <span class="badge badge-primary">{{class}}</span>
+                </div>
+                <div class="panel-body">
+                    <!-- Character Stats -->
+                    <div class="character-stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Level:</span>
+                            <span class="stat-value">{{level}}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Experience:</span>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: {{formatPercentage experience experienceToLevel}}"></div>
+                                <span class="progress-bar-text">{{formatNumber experience}}/{{formatNumber experienceToLevel}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Resource Bars -->
+                    <div class="resource-bars">
+                        <div class="resource-bar-container">
+                            <span class="resource-label">Health:</span>
+                            <div class="resource-bar">
+                                <div class="resource-bar-fill health-bar-fill" style="width: {{formatPercentage resources.health.current resources.health.max}}"></div>
+                                <span class="resource-bar-text">{{resources.health.current}}/{{resources.health.max}}</span>
+                            </div>
+                        </div>
+                        <div class="resource-bar-container">
+                            <span class="resource-label">Stamina:</span>
+                            <div class="resource-bar">
+                                <div class="resource-bar-fill stamina-bar-fill" style="width: {{formatPercentage resources.stamina.current resources.stamina.max}}"></div>
+                                <span class="resource-bar-text">{{resources.stamina.current}}/{{resources.stamina.max}}</span>
+                            </div>
+                        </div>
+                        {{#if resources.mana.unlocked}}
+                        <div class="resource-bar-container">
+                            <span class="resource-label">Mana:</span>
+                            <div class="resource-bar">
+                                <div class="resource-bar-fill mana-bar-fill" style="width: {{formatPercentage resources.mana.current resources.mana.max}}"></div>
+                                <span class="resource-bar-text">{{resources.mana.current}}/{{resources.mana.max}}</span>
+                            </div>
+                        </div>
+                        {{/if}}
+                    </div>
+                    
+                    <!-- Basic Attributes -->
+                    <div class="character-attributes">
+                        <h4>Attributes</h4>
+                        <div class="attributes-grid">
+                            <div class="attribute-item">
+                                <span class="attribute-label">STR</span>
+                                <span class="attribute-value">{{stats.strength}}</span>
+                            </div>
+                            <div class="attribute-item">
+                                <span class="attribute-label">DEX</span>
+                                <span class="attribute-value">{{stats.dexterity}}</span>
+                            </div>
+                            <div class="attribute-item">
+                                <span class="attribute-label">INT</span>
+                                <span class="attribute-value">{{stats.intelligence}}</span>
+                            </div>
+                            <div class="attribute-item">
+                                <span class="attribute-label">WIS</span>
+                                <span class="attribute-value">{{stats.wisdom}}</span>
+                            </div>
+                            <div class="attribute-item">
+                                <span class="attribute-label">CHA</span>
+                                <span class="attribute-value">{{stats.charisma}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gold Counter -->
+                    <div class="resource-counter gold-counter">
+                        <div class="resource-counter-icon">
+                            <span class="gold-icon">⦿</span>
+                        </div>
+                        <span class="resource-counter-value">{{formatNumber gold}}</span>
+                    </div>
+                    
+                    <!-- Storage Capacity -->
+                    <div class="storage-capacity">
+                        <span class="storage-label">Storage:</span>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" style="width: {{formatPercentage storage.used storage.capacity}}"></div>
+                            <span class="progress-bar-text">{{storage.used}}/{{storage.capacity}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Inventory Panel -->
+            <div class="panel" data-component-id="inventory-panel">
+                <div class="panel-header">
+                    <h3>Inventory</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="inventory-grid">
+                        {{#if inventory.length}}
+                            {{#each inventory}}
+                            <div class="inventory-item tooltip" data-item-id="{{id}}">
+                                <div class="inventory-item-icon">{{icon}}</div>
+                                <div class="inventory-item-name">{{name}}</div>
+                                <div class="tooltip-text">
+                                    <div class="item-tooltip-header">{{name}}</div>
+                                    <div class="item-tooltip-description">{{description}}</div>
+                                    {{#if quantity}}
+                                    <div class="item-tooltip-quantity">Quantity: {{quantity}}</div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            {{/each}}
+                        {{else}}
+                            <div class="empty-inventory">Your inventory is empty.</div>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Skills Panel -->
+            <div class="panel" data-component-id="skills-panel">
+                <div class="panel-header">
+                    <h3>Skills</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="skills-list">
+                        {{#if skills.length}}
+                            {{#each skills}}
+                            <div class="skill-item tooltip" data-skill-id="{{id}}">
+                                <div class="skill-item-name">{{name}}</div>
+                                <div class="skill-item-level">Lvl {{level}}</div>
+                                <div class="tooltip-text">
+                                    <div class="skill-tooltip-header">{{name}}</div>
+                                    <div class="skill-tooltip-description">{{description}}</div>
+                                    <div class="skill-tooltip-level">Level: {{level}}</div>
+                                    {{#if experience}}
+                                    <div class="skill-tooltip-exp">Experience: {{experience}}/{{experienceToLevel}}</div>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            {{/each}}
+                        {{else}}
+                            <div class="empty-skills">You haven't learned any skills yet.</div>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Game Content -->
+        <div class="game-content">
+            <!-- Location Panel -->
+            <div class="panel" data-component-id="location-panel">
+                <div class="panel-header">
+                    <h3>{{location.name}}</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="location-description">
+                        {{location.description}}
+                    </div>
+                    
+                    <!-- Available Actions -->
+                    <div class="location-actions">
+                        <h4>Available Actions</h4>
+                        <div class="actions-grid">
+                            {{#each location.actions}}
+                            <button class="action-button" data-action-id="{{id}}">
+                                <div class="action-name">{{name}}</div>
+                                <div class="action-description">{{description}}</div>
+                                {{#if cost}}
+                                <div class="action-cost">
+                                    <span class="cost-label">Cost:</span>
+                                    <span class="cost-value">{{cost.amount}} {{cost.resource}}</span>
+                                </div>
+                                {{/if}}
+                                {{#if time}}
+                                <div class="action-time">
+                                    <span class="time-label">Time:</span>
+                                    <span class="time-value">{{formatTime time}}</span>
+                                </div>
+                                {{/if}}
+                            </button>
+                            {{/each}}
+                        </div>
+                    </div>
+                    
+                    <!-- Location Map -->
+                    <div class="location-map">
+                        <h4>Map</h4>
+                        <div class="map-container">
+                            <!-- SVG Map will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Log -->
+            <div class="panel" data-component-id="activity-log">
+                <div class="panel-header">
+                    <h3>Activity Log</h3>
+                    <button id="btn-clear-log" class="btn-small">Clear</button>
+                </div>
+                <div class="panel-body">
+                    <div class="activity-log-content">
+                        <ul class="log-entries">
+                            {{#each logEntries}}
+                            <li class="log-entry {{type}}">
+                                <span class="log-time">{{time}}</span>
+                                <span class="log-message">{{{message}}}</span>
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Game Footer -->
+    <footer class="game-footer">
+        <div class="game-credits">
+            &copy; 2025 Synapse Interactive LLC. MIT License.
+        </div>
+        <div class="game-version">
+            Version {{gameVersion}}
+        </div>
+    </footer>
+</div>

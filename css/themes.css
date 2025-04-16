@@ -1,0 +1,67 @@
+/* CSS Variables for theming */
+:root {
+    /* Color Palette */
+    --color-black: #0f0f0f;
+    --color-dark-gray: #1e1e1e;
+    --color-gray: #353535;
+    --color-medium-gray: #636363;
+    --color-light-gray: #9a9a9a;
+    --color-lighter-gray: #e1e1e1;
+    --color-white: #f7f7f7;
+    
+    /* Subtle Blues */
+    --color-blue-dark: #0d2b45;
+    --color-blue-medium: #2a4c76;
+    --color-blue-light: #4176a3;
+    --color-blue-lighter: #86b4d9;
+    --color-blue-accent: #c2e2ff;
+    
+    /* Functional Colors */
+    --color-text-primary: var(--color-black);
+    --color-text-secondary: var(--color-gray);
+    --color-text-tertiary: var(--color-medium-gray);
+    --color-text-light: var(--color-white);
+    
+    --color-background-primary: var(--color-white);
+    --color-background-secondary: var(--color-lighter-gray);
+    --color-background-tertiary: var(--color-light-gray);
+    --color-background-dark: var(--color-dark-gray);
+    
+    --color-border-light: var(--color-lighter-gray);
+    --color-border-medium: var(--color-medium-gray);
+    --color-border-dark: var(--color-gray);
+    
+    --color-accent-primary: var(--color-blue-medium);
+    --color-accent-secondary: var(--color-blue-light);
+    --color-accent-tertiary: var(--color-blue-lighter);
+    --color-accent-highlight: var(--color-blue-accent);
+    
+    /* Spacing */
+    --spacing-xxs: 0.25rem;
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+    
+    /* Borders */
+    --border-radius-sm: 3px;
+    --border-radius-md: 5px;
+    --border-radius-lg: 8px;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-medium: 300ms ease;
+    --transition-slow: 500ms ease;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+    
+    /* Fonts */
+    --font-family-primary: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-family-secondary: 'Lora', Georgia, 'Times New Roman', serif;
+    --font-family-mono: 'Roboto Mono', 'Courier New', monospace;
+}

@@ -1,0 +1,149 @@
+<div class="location-container" data-component-id="location-{{id}}">
+    <div class="location-header">
+        <h2 class="location-name">{{name}}</h2>
+        <div class="location-status">
+            {{#if unlocked}}
+                <span class="badge badge-success">Unlocked</span>
+            {{else}}
+                <span class="badge badge-danger">Locked</span>
+            {{/if}}
+        </div>
+    </div>
+    
+    <div class="location-body">
+        <div class="location-description">
+            {{description}}
+        </div>
+        
+        {{#if image}}
+        <div class="location-image">
+            <img src="{{image}}" alt="{{name}}" />
+        </div>
+        {{/if}}
+        
+        {{#if unlocked}}
+            <!-- Available Actions -->
+            <div class="location-actions">
+                <h3>Available Actions</h3>
+                <div class="actions-grid">
+                    {{#each actions}}
+                    <button class="action-button {{#unless available}}action-disabled{{/unless}}" 
+                            data-action-id="{{id}}" 
+                            {{#unless available}}disabled{{/unless}}>
+                        <div class="action-header">
+                            <span class="action-name">{{name}}</span>
+                            {{#if cooldown}}
+                            <span class="action-cooldown">{{formatTime cooldown}}</span>
+                            {{/if}}
+                        </div>
+                        <div class="action-description">{{description}}</div>
+                        <div class="action-requirements">
+                            {{#if stamina}}
+                            <div class="requirement stamina-requirement {{#unless staminaMet}}requirement-not-met{{/unless}}">
+                                <span class="requirement-icon">⚡</span>
+                                <span class="requirement-value">{{stamina}}</span>
+                            </div>
+                            {{/if}}
+                            
+                            {{#if health}}
+                            <div class="requirement health-requirement {{#unless healthMet}}requirement-not-met{{/unless}}">
+                                <span class="requirement-icon">❤</span>
+                                <span class="requirement-value">{{health}}</span>
+                            </div>
+                            {{/if}}
+                            
+                            {{#if mana}}
+                            <div class="requirement mana-requirement {{#unless manaMet}}requirement-not-met{{/unless}}">
+                                <span class="requirement-icon">✨</span>
+                                <span class="requirement-value">{{mana}}</span>
+                            </div>
+                            {{/if}}
+                            
+                            {{#if gold}}
+                            <div class="requirement gold-requirement {{#unless goldMet}}requirement-not-met{{/unless}}">
+                                <span class="requirement-icon">⦿</span>
+                                <span class="requirement-value">{{gold}}</span>
+                            </div>
+                            {{/if}}
+                            
+                            {{#if requiredItems}}
+                            <div class="requirement items-requirement {{#unless itemsMet}}requirement-not-met{{/unless}}">
+                                <span class="requirement-icon">🎒</span>
+                                <span class="requirement-value">{{requiredItemsText}}</span>
+                            </div>
+                            {{/if}}
+                            
+                            {{#if requiredSkills}}
+                            <div class="requirement skills-requirement {{#unless skillsMet}}requirement-not-met{{/unless}}">
+                                <span class="requirement-icon">📖</span>
+                                <span class="requirement-value">{{requiredSkillsText}}</span>
+                            </div>
+                            {{/if}}
+                        </div>
+                        
+                        {{#if time}}
+                        <div class="action-time">
+                            <span class="time-icon">⏱</span>
+                            <span class="time-value">{{formatTime time}}</span>
+                        </div>
+                        {{/if}}
+                    </button>
+                    {{/each}}
+                </div>
+            </div>
+            
+            <!-- Connected Locations -->
+            {{#if connectedLocations}}
+            <div class="connected-locations">
+                <h3>Connected Locations</h3>
+                <div class="locations-grid">
+                    {{#each connectedLocations}}
+                    <div class="location-link {{#unless unlocked}}location-locked{{/unless}}" data-location-id="{{id}}">
+                        <div class="location-link-name">{{name}}</div>
+                        {{#unless unlocked}}
+                        <div class="location-lock-icon">🔒</div>
+                        {{/unless}}
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+            
+            <!-- Location Rewards -->
+            {{#if rewards}}
+            <div class="location-rewards">
+                <h3>Potential Rewards</h3>
+                <div class="rewards-list">
+                    {{#each rewards}}
+                    <div class="reward-item">
+                        <span class="reward-name">{{name}}</span>
+                        {{#if chance}}
+                        <span class="reward-chance">({{chance}}%)</span>
+                        {{/if}}
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+        {{else}}
+            <!-- Location Locked Message -->
+            <div class="location-locked-message">
+                <div class="lock-icon">🔒</div>
+                <p>This location is currently locked.</p>
+                
+                {{#if unlockRequirements}}
+                <div class="unlock-requirements">
+                    <h3>Requirements to Unlock</h3>
+                    <ul class="requirements-list">
+                        {{#each unlockRequirements}}
+                        <li class="requirement-item {{#if met}}requirement-met{{else}}requirement-not-met{{/if}}">
+                            {{description}}
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                {{/if}}
+            </div>
+        {{/if}}
+    </div>
+</div>

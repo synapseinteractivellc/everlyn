@@ -1,0 +1,207 @@
+/* Components styles */
+
+/* Welcome container */
+.welcome-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.welcome-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.character-creation {
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.character-info {
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-md);
+    background-color: var(--color-background-primary);
+    border-radius: var(--border-radius-md);
+    border-left: 4px solid var(--color-accent-primary);
+    text-align: left;
+}
+
+/* Resource bars */
+.resource-bar {
+    height: 20px;
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-xs);
+    overflow: hidden;
+    position: relative;
+}
+
+.resource-bar-fill {
+    height: 100%;
+    transition: width var(--transition-medium);
+}
+
+.resource-bar-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-light);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.7);
+}
+
+.health-bar-fill {
+    background-color: #e74c3c;
+}
+
+.stamina-bar-fill {
+    background-color: #27ae60;
+}
+
+.mana-bar-fill {
+    background-color: #3498db;
+}
+
+/* Resource counter */
+.resource-counter {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-xs);
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.resource-counter-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-background-tertiary);
+    border-radius: 50%;
+}
+
+.resource-counter-value {
+    font-weight: 600;
+}
+
+/* Card */
+.card {
+    background-color: var(--color-background-primary);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    padding: var(--spacing-md);
+    background-color: var(--color-background-secondary);
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.card-body {
+    padding: var(--spacing-md);
+}
+
+.card-footer {
+    padding: var(--spacing-md);
+    background-color: var(--color-background-secondary);
+    border-top: 1px solid var(--color-border-light);
+}
+
+/* Tooltip */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: var(--color-background-dark);
+    color: var(--color-text-light);
+    text-align: center;
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    font-size: 0.875rem;
+}
+
+.tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--color-background-dark) transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Badge */
+.badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10px;
+    background-color: var(--color-background-tertiary);
+}
+
+.badge-primary {
+    background-color: var(--color-accent-primary);
+    color: var(--color-text-light);
+}
+
+.badge-secondary {
+    background-color: var(--color-background-tertiary);
+    color: var(--color-text-primary);
+}
+
+.badge-success {
+    background-color: #27ae60;
+    color: var(--color-text-light);
+}
+
+.badge-warning {
+    background-color: #f39c12;
+    color: var(--color-text-light);
+}
+
+.badge-danger {
+    background-color: #e74c3c;
+    color: var(--color-text-light);
+}
