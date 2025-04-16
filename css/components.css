@@ -363,9 +363,9 @@
     top: 0;
     left: 0;
     height: 100%;
-    width: 0;
+    width: var(--progress-width, 0%);
     background-color: rgba(46, 204, 113, 0.1);
-    animation: actionProgress 1s linear forwards;
+    transition: width 50ms linear;
 }
 
 .action-complete {
