@@ -13,15 +13,30 @@ class MapComponent extends UIComponent {
             template: 'map',
             ...options
         });
-
+    
         console.log('MapComponent constructed');
         this.mapLoaded = false;
         this.activeLocation = null;
-
-        // Explicitly bind and log render event
+    
+        // Listen for render events
         this.on('render', () => {
             console.log('MapComponent render event triggered');
             this.ensureMapContainerExists(() => this.loadMap());
+        });
+        
+        // Listen for location changes
+        eventSystem.on('location:changed', (locationData) => {
+            if (this.element) {
+                // Update the location info in the map view
+                const infoPanel = this.find('.location-info');
+                if (infoPanel) {
+                    const nameElement = infoPanel.querySelector('.panel-header h3');
+                    const descElement = infoPanel.querySelector('.panel-body p');
+                    
+                    if (nameElement) nameElement.textContent = locationData.name;
+                    if (descElement) descElement.textContent = locationData.description;
+                }
+            }
         });
     }
 
@@ -101,15 +116,31 @@ class MapComponent extends UIComponent {
                 const locationName = location.getAttribute('data-location');
 
                 // Trigger location selection event
-                this.trigger('location:selected', {
+                eventSystem.trigger('location:selected', {
                     id: locationId,
                     name: locationName
                 });
 
                 // Update game engine active location
                 gameEngine.setActiveLocation(locationId);
+                
+                // Highlight the location on the map
+                this.highlightLocation(locationId);
             });
         });
+
+        // After setup is complete, check for saved location
+        const savedLocation = gameEngine.getActiveLocation();
+        if (savedLocation) {
+            this.highlightLocation(savedLocation);
+            
+            // Update location component through the event system
+            const locationName = document.querySelector(`#${savedLocation}`)?.getAttribute('data-location') || '';
+            eventSystem.trigger('location:selected', {
+                id: savedLocation,
+                name: locationName
+            });
+        }
     }
 
     /**

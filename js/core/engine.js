@@ -286,6 +286,12 @@ class GameEngine {
      * @returns {boolean} - Whether the save was successful
      */
     saveGame() {
+        // Ensure active location is set in state before serializing
+        const locationComponent = this.getComponent('city-locations');
+        if (locationComponent && locationComponent.state.currentLocation.id) {
+            this.state.activeLocation = locationComponent.state.currentLocation.id;
+        }
+        
         // Serialize game state
         const saveData = this.serialize();
         
@@ -333,6 +339,16 @@ class GameEngine {
      * @returns {Object} - Serialized game state
      */
     serialize() {
+        // Ensure active location is included in serialized state
+        if (this.state.activeLocation) {
+            // It's already included
+        } else {
+            const locationComponent = this.getComponent('city-locations');
+            if (locationComponent && locationComponent.state.currentLocation.id) {
+                this.state.activeLocation = locationComponent.state.currentLocation.id;
+            }
+        }
+
         // Serialize game state
         const saveData = {
             state: { ...this.state },
@@ -380,6 +396,23 @@ class GameEngine {
      */
     setActiveLocation(locationId) {
         this.state.activeLocation = locationId;
+        
+        // Get location component and update its current location
+        const locationComponent = this.getComponent('city-locations');
+        if (locationComponent) {
+            // Use a different method that doesn't call back to setActiveLocation
+            const location = locationComponent.getLocation(locationId);
+            if (location) {
+                locationComponent.setState({
+                    currentLocation: {
+                        id: locationId,
+                        name: location.name,
+                        description: location.description
+                    }
+                });
+            }
+        }
+        
         this.trigger('location:changed', locationId);
         return this;
     }

@@ -105,15 +105,25 @@ function initGame() {
             // Get the view to show
             const view = navBtn.getAttribute('data-view');
             
-            // Render the corresponding view template
+            // Find the target panel
             const locationPanel = document.querySelector('[data-component-id="location-panel"]');
             const panelBody = locationPanel.querySelector('.panel-body');
             
-            // Render view template with current character data
+            // Get data from components
             const characterComponent = gameEngine.getComponent('player');
-            const characterData = characterComponent ? characterComponent.getState() : {};
+            const locationComponent = gameEngine.getComponent('city-locations');
             
-            templateLoader.renderTo(view, characterData, panelBody, true);
+            // Create render data with both character and location info
+            const renderData = {
+                ...(characterComponent ? characterComponent.getState() : {}),
+                currentLocation: locationComponent ? locationComponent.state.currentLocation : {
+                    name: "No Location Selected",
+                    description: "Navigate to a location on the map."
+                }
+            };
+            
+            // Render view with combined data
+            templateLoader.renderTo(view, renderData, panelBody, true);
             
             // If the view is map, create or reuse the MapComponent
             if (view === 'map') {
@@ -190,6 +200,10 @@ function initGame() {
     function showGameScreen() {
         // Get the character component from the game engine
         const characterComponent = gameEngine.getComponent('player');
+
+        // Create and register location component
+        const locationComponent = new LocationComponent('city-locations');
+        gameEngine.registerComponent(locationComponent);
         
         // If character component exists, use its state for rendering
         const renderData = characterComponent 
@@ -201,9 +215,20 @@ function initGame() {
     
         // Render main game template with full character data
         templateLoader.renderTo('game', renderData, '#app');
+
+        // Restore active location if it exists
+        const activeLocation = gameEngine.getActiveLocation();
+        if (activeLocation) {
+            const locationComponent = gameEngine.getComponent('city-locations');
+            if (locationComponent) {
+                locationComponent.setActiveLocation(activeLocation);
+            }
+        }
         
         // Start game engine
         gameEngine.start();
+
+        
     }
     
     // Handle form submit
