@@ -149,6 +149,21 @@ function initGame() {
 
     // Listen for character creation
     document.addEventListener('submit', handleFormSubmit);
+
+    // Load map component
+    gameEngine.on('started', () => {
+        // Create and register map component
+        const mapComponent = new MapComponent('city-map', {
+            container: '[data-component-id="location-panel"] .panel-body'
+        });
+        gameEngine.registerComponent(mapComponent);
+        
+        // Make map the default view
+        const mapNavBtn = document.querySelector('.nav-btn[data-view="map"]');
+        if (mapNavBtn) {
+            mapNavBtn.click();
+        }
+    });
 }
     
     // Register custom Handlebars helpers
