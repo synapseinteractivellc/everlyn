@@ -5,8 +5,9 @@
             <h1>Everlyn: City of Wonder</h1>
         </div>
         <div class="game-controls">
-            <button id="btn-settings" class="btn-secondary">Settings</button>
-            <button id="btn-save" class="btn-secondary">Save</button>
+            <button id="btn-settings" class="btn-secondary" aria-label="Open Settings">Settings</button>
+            <button id="btn-save" class="btn-secondary" aria-label="Save Game">Save</button>
+            <button id="btn-wipe" class="btn-secondary" aria-label="Wipe Game Data">Wipe</button>
         </div>
     </header>
 
@@ -30,82 +31,35 @@
                         <div class="stat-row">
                             <span class="stat-label">Experience:</span>
                             <div class="progress-bar">
-                                <div class="progress-bar-fill" style="width: {{formatPercentage experience experienceToLevel}}"></div>
-                                <span class="progress-bar-text">{{formatNumber experience}}/{{formatNumber experienceToLevel}}</span>
+                                <div class="progress-bar-fill" style="width: {{formatPercentage experience experienceToLevel}}%;"></div>
+                                <span class="progress-bar-text">
+                                    {{formatNumber experience}} / {{formatNumber experienceToLevel}}
+                                </span>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Resource Bars -->
                     <div class="resource-bars">
+                        {{#each resources}}
                         <div class="resource-bar-container">
-                            <span class="resource-label">Health:</span>
+                            <span class="resource-label">{{@key}}:</span>
                             <div class="resource-bar">
-                                <div class="resource-bar-fill health-bar-fill" style="width: {{formatPercentage resources.health.current resources.health.max}}"></div>
-                                <span class="resource-bar-text">{{resources.health.current}}/{{resources.health.max}}</span>
+                                <div class="resource-bar-fill {{@key}}-bar-fill" style="width: {{formatPercentage current max}}%;"></div>
+                                <span class="resource-bar-text">{{current}} / {{max}}</span>
                             </div>
                         </div>
-                        <div class="resource-bar-container">
-                            <span class="resource-label">Stamina:</span>
-                            <div class="resource-bar">
-                                <div class="resource-bar-fill stamina-bar-fill" style="width: {{formatPercentage resources.stamina.current resources.stamina.max}}"></div>
-                                <span class="resource-bar-text">{{resources.stamina.current}}/{{resources.stamina.max}}</span>
-                            </div>
-                        </div>
-                        {{#if resources.mana.unlocked}}
-                        <div class="resource-bar-container">
-                            <span class="resource-label">Mana:</span>
-                            <div class="resource-bar">
-                                <div class="resource-bar-fill mana-bar-fill" style="width: {{formatPercentage resources.mana.current resources.mana.max}}"></div>
-                                <span class="resource-bar-text">{{resources.mana.current}}/{{resources.mana.max}}</span>
-                            </div>
-                        </div>
-                        {{/if}}
+                        {{else}}
+                        <div class="empty-resources">No resources available.</div>
+                        {{/each}}
                     </div>
-                    
-                    <!-- Basic Attributes -->
-                    <div class="character-attributes">
-                        <h4>Attributes</h4>
-                        <div class="attributes-grid">
-                            <div class="attribute-item">
-                                <span class="attribute-label">STR</span>
-                                <span class="attribute-value">{{stats.strength}}</span>
-                            </div>
-                            <div class="attribute-item">
-                                <span class="attribute-label">DEX</span>
-                                <span class="attribute-value">{{stats.dexterity}}</span>
-                            </div>
-                            <div class="attribute-item">
-                                <span class="attribute-label">INT</span>
-                                <span class="attribute-value">{{stats.intelligence}}</span>
-                            </div>
-                            <div class="attribute-item">
-                                <span class="attribute-label">WIS</span>
-                                <span class="attribute-value">{{stats.wisdom}}</span>
-                            </div>
-                            <div class="attribute-item">
-                                <span class="attribute-label">CHA</span>
-                                <span class="attribute-value">{{stats.charisma}}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
+
                     <!-- Gold Counter -->
                     <div class="resource-counter gold-counter">
-                        <div class="resource-counter-icon">
-                            <span class="gold-icon">⦿</span>
-                        </div>
+                        <span class="resource-counter-label">Gold:</span>
                         <span class="resource-counter-value">{{formatNumber gold}}</span>
                     </div>
-                    
-                    <!-- Storage Capacity -->
-                    <div class="storage-capacity">
-                        <span class="storage-label">Storage:</span>
-                        <div class="progress-bar">
-                            <div class="progress-bar-fill" style="width: {{formatPercentage storage.used storage.capacity}}"></div>
-                            <span class="progress-bar-text">{{storage.used}}/{{storage.capacity}}</span>
-                        </div>
-                    </div>
+
                 </div>
             </div>
             
@@ -154,7 +108,9 @@
                                     <div class="skill-tooltip-description">{{description}}</div>
                                     <div class="skill-tooltip-level">Level: {{level}}</div>
                                     {{#if experience}}
-                                    <div class="skill-tooltip-exp">Experience: {{experience}}/{{experienceToLevel}}</div>
+                                    <div class="skill-tooltip-exp">
+                                        Experience: {{experience}} / {{experienceToLevel}}
+                                    </div>
                                     {{/if}}
                                 </div>
                             </div>
@@ -184,7 +140,7 @@
                         <h4>Available Actions</h4>
                         <div class="actions-grid">
                             {{#each location.actions}}
-                            <button class="action-button" data-action-id="{{id}}">
+                            <button class="action-button" data-action-id="{{id}}" aria-label="{{name}}">
                                 <div class="action-name">{{name}}</div>
                                 <div class="action-description">{{description}}</div>
                                 {{#if cost}}
@@ -218,7 +174,7 @@
             <div class="panel" data-component-id="activity-log">
                 <div class="panel-header">
                     <h3>Activity Log</h3>
-                    <button id="btn-clear-log" class="btn-small">Clear</button>
+                    <button id="btn-clear-log" class="btn-small" aria-label="Clear Activity Log">Clear</button>
                 </div>
                 <div class="panel-body">
                     <div class="activity-log-content">

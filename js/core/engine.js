@@ -310,7 +310,16 @@ class GameEngine {
         const saveData = storageManager.loadGame();
         
         if (saveData) {
+            // Ensure proper deserialization of all components
             this.deserialize(saveData);
+            
+            // Force an additional state check for components
+            this.components.forEach((component) => {
+                if (saveData.components && saveData.components[component.id]) {
+                    component.deserialize(saveData.components[component.id]);
+                }
+            });
+            
             this.trigger('game:loaded', saveData);
             return true;
         } else {

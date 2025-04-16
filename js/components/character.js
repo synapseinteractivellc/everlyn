@@ -1,6 +1,6 @@
 /**
  * Character Component
- * Manages character data, stats, and progression
+ * Manages character data, and progression
  */
 class CharacterComponent extends Component {
     /**
@@ -18,13 +18,6 @@ class CharacterComponent extends Component {
             level: options.level || 1,
             experience: options.experience || 0,
             experienceToLevel: this.calculateExperienceToLevel(options.level || 1),
-            stats: {
-                strength: options.stats?.strength || 1,
-                dexterity: options.stats?.dexterity || 1,
-                intelligence: options.stats?.intelligence || 1,
-                wisdom: options.stats?.wisdom || 1,
-                charisma: options.stats?.charisma || 1
-            },
             resources: {
                 health: {
                     current: options.resources?.health?.current || 10,
@@ -368,26 +361,6 @@ class CharacterComponent extends Component {
     }
     
     /**
-     * Increase a stat
-     * @param {string} stat - Stat name
-     * @param {number} amount - Amount to increase by
-     * @returns {CharacterComponent} - This component instance for chaining
-     */
-    increaseStat(stat, amount) {
-        if (amount <= 0 || !this.state.stats[stat]) return this;
-        
-        const stats = { ...this.state.stats };
-        stats[stat] += amount;
-        
-        this.setState({ stats });
-        
-        // Trigger event
-        this.trigger('stat:increased', { stat, amount, value: stats[stat] });
-        
-        return this;
-    }
-    
-    /**
      * Unlock a resource (e.g., mana)
      * @param {string} resource - Resource name
      * @param {number} initialMax - Initial maximum value
@@ -473,5 +446,26 @@ class CharacterComponent extends Component {
             className: nextClass,
             requirements: progression.requirements[nextClass]
         };
+    }
+
+    deserialize(data) {
+        // Ensure all default initialization happens first
+        this.setState({
+            ...this.state,
+            ...data,
+            resources: {
+                ...this.state.resources,
+                ...data.resources
+            },
+            stats: {
+                ...this.state.stats,
+                ...data.stats
+            }
+        }, false);
+        
+        // Recalculate storage usage
+        this.updateStorageUsage();
+        
+        return this;
     }
 }

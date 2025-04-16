@@ -17,7 +17,16 @@ const Helpers = {
      * @returns {string} - Formatted number
      */
     formatNumber: (num) => {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        // Handle undefined, null, or non-numeric inputs
+        if (num === undefined || num === null) return '0';
+        
+        // Convert to number if it's not already a number
+        const numValue = Number(num);
+        
+        // Check if it's a valid number
+        if (isNaN(numValue)) return '0';
+        
+        return numValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     },
     
     /**
