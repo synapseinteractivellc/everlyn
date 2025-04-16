@@ -90,12 +90,6 @@ Everlyn: City of Wonder is an incremental game where players start as a "Waif" a
 - [ ] Add achievements
 - [ ] Polish UI and animations
 
-## Getting Started
-
-1. Clone the repository
-2. Open `index.html` in a web browser
-3. Create your character and begin your adventure in Everlyn!
-
 ## Development
 
 The game uses plain JavaScript with a custom component system. Templates are handled via Handlebars for clean separation of concerns.
