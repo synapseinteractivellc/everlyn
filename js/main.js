@@ -69,7 +69,7 @@ function initGame() {
 
     // Load game view templates
     Promise.all([
-        templateLoader.loadExternalTemplate('./templates/map.html', 'map-template'),
+        templateLoader.loadExternalTemplate('./templates/map.html', 'map'),
         templateLoader.loadExternalTemplate('./templates/actions.html', 'actions'),
         templateLoader.loadExternalTemplate('./templates/skills.html', 'skills'),
         templateLoader.loadExternalTemplate('./templates/house.html', 'house'),
@@ -103,6 +103,14 @@ function initGame() {
             const characterData = characterComponent ? characterComponent.getState() : {};
             
             templateLoader.renderTo(view, characterData, panelBody, true);
+            
+            // If the view is map, create the MapComponent
+            if (view === 'map') {
+                const mapComponent = new MapComponent('city-map', {
+                    container: '[data-component-id="location-panel"] .panel-body'
+                });
+                gameEngine.registerComponent(mapComponent);
+            }
             
             // Trigger event for potential component-specific handling
             eventSystem.trigger('navigation:view:changed', { view });

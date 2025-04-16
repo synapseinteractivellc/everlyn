@@ -14,42 +14,46 @@ class MapComponent extends UIComponent {
             ...options
         });
         
+        console.log('MapComponent constructed');
         this.mapLoaded = false;
         this.activeLocation = null;
         
-        // Bind event handlers
-        this.on('render', this.loadMap.bind(this));
-        
-        // Listen for location changes from the game engine
-        eventSystem.on('location:changed', (locationId) => {
-            this.highlightLocation(locationId);
+        // Explicitly bind and log render event
+        this.on('render', () => {
+            console.log('MapComponent render event triggered');
+            this.loadMap();
         });
     }
     
-    /**
-     * Load the map SVG
-     */
     loadMap() {
+        console.log('loadMap method called', this.mapLoaded);
+        
         if (this.mapLoaded) return;
         
         const mapContainer = this.find('.map-container');
-        if (!mapContainer) return;
+        console.log('Map container:', mapContainer);
         
-        // Clear placeholder
-        mapContainer.innerHTML = '';
+        if (!mapContainer) {
+            console.error('Map container not found');
+            return;
+        }
         
-        // Load SVG file
+        console.log('Attempting to fetch map SVG');
         fetch('./assets/maps/everlyn-map.svg')
-            .then(response => response.text())
+            .then(response => {
+                console.log('Fetch response:', response);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
             .then(svgContent => {
-                // Insert SVG content
+                console.log('SVG content loaded, length:', svgContent.length);
                 mapContainer.innerHTML = svgContent;
                 this.mapLoaded = true;
                 
-                // Add click handlers to locations
                 this.setupLocationInteractions();
                 
-                // Highlight active location if set
                 const activeLocation = gameEngine.getActiveLocation();
                 if (activeLocation) {
                     this.highlightLocation(activeLocation);
@@ -57,7 +61,7 @@ class MapComponent extends UIComponent {
             })
             .catch(error => {
                 console.error('Error loading map:', error);
-                mapContainer.innerHTML = '<p>Error loading map. Please try again.</p>';
+                mapContainer.innerHTML = `<p>Error loading map: ${error.message}. Please try again.</p>`;
             });
     }
     
