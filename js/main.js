@@ -69,7 +69,7 @@ function initGame() {
 
     // Load game view templates
     Promise.all([
-        templateLoader.loadExternalTemplate('./templates/map.html', 'map'),
+        templateLoader.loadExternalTemplate('./templates/map.html', 'map-template'),
         templateLoader.loadExternalTemplate('./templates/actions.html', 'actions'),
         templateLoader.loadExternalTemplate('./templates/skills.html', 'skills'),
         templateLoader.loadExternalTemplate('./templates/house.html', 'house'),
@@ -107,7 +107,9 @@ function initGame() {
             // Trigger event for potential component-specific handling
             eventSystem.trigger('navigation:view:changed', { view });
         }
-    });    // Add wipe game event listener
+    });    
+    
+    // Add wipe game event listener
     document.addEventListener('click', function(event) {
         if (event.target.id === 'btn-wipe') {
             // Confirm wipe action
