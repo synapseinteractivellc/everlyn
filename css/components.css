@@ -291,3 +291,93 @@
     height: 16px;
     border-radius: 4px;
 }
+
+/* Action button styles */
+.action-button {
+    display: block;
+    width: 100%;
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background-color: var(--color-background-primary);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    text-align: left;
+    transition: all var(--transition-fast);
+}
+
+.action-button:hover {
+    background-color: var(--color-background-secondary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.action-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.action-name {
+    font-weight: 600;
+    color: var(--color-accent-primary);
+}
+
+.action-description {
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+.action-requirements {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-xs);
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    background-color: var(--color-background-secondary);
+    border-radius: var(--border-radius-sm);
+}
+
+.action-time {
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+}
+
+.action-in-progress {
+    position: relative;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.action-in-progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background-color: rgba(46, 204, 113, 0.1);
+    animation: actionProgress 1s linear forwards;
+}
+
+.action-complete {
+    animation: actionComplete 1.2s ease forwards;
+}
+
+.action-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@keyframes actionProgress {
+    0% { width: 0; }
+    100% { width: 100%; }
+}

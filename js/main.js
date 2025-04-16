@@ -188,6 +188,16 @@ function initGame() {
             }
             return array.includes(item) ? options.fn(this) : options.inverse(this);
         });
+
+        // Or helper
+        templateLoader.registerHelper('or', function() {
+            for (let i = 0; i < arguments.length - 1; i++) {
+                if (arguments[i]) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
     
     // Show welcome screen
@@ -204,6 +214,16 @@ function initGame() {
         // Create and register location component
         const locationComponent = new LocationComponent('city-locations');
         gameEngine.registerComponent(locationComponent);
+
+        const actionComponent = new ActionComponent('actions');
+        gameEngine.registerComponent(actionComponent);
+
+        // Check for action buttons immediately
+        setTimeout(() => {
+            if (document.querySelector('.actions-view')) {
+                actionComponent.setupActionListeners();
+            }
+        }, 500);
         
         // If character component exists, use its state for rendering
         const renderData = characterComponent 

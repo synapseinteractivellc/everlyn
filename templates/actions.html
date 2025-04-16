@@ -9,8 +9,49 @@
         </div>
     </div>
     <div class="actions-container">
-        <div class="no-actions-placeholder">
-            <p>No actions available at the moment. Explore the city to unlock more actions.</p>
-        </div>
+        {{#if currentLocation.id}}
+            {{#ifEquals currentLocation.id "location-city-square"}}
+                <button class="action-button" data-action-id="beg-for-coins">
+                    <div class="action-header">
+                        <span class="action-name">Beg for Coins</span>
+                    </div>
+                    <div class="action-description">Ask passersby for spare change.</div>
+                    <div class="action-requirements">
+                        <div class="requirement stamina-requirement">
+                            <span class="requirement-icon">⚡</span>
+                            <span class="requirement-value">1</span>
+                        </div>
+                    </div>
+                    <div class="action-time">
+                        <span class="time-icon">⏱</span>
+                        <span class="time-value">1s</span>
+                    </div>
+                </button>
+            {{else}}
+                {{#ifEquals currentLocation.id "location-inn"}}
+                    <button class="action-button" data-action-id="rest">
+                        <div class="action-header">
+                            <span class="action-name">Rest</span>
+                        </div>
+                        <div class="action-description">Take a moment to rest and recover your strength.</div>
+                        <div class="action-requirements">
+                            <!-- No requirements -->
+                        </div>
+                        <div class="action-time">
+                            <span class="time-icon">⏱</span>
+                            <span class="time-value">3s</span>
+                        </div>
+                    </button>
+                {{else}}
+                    <div class="no-actions-placeholder">
+                        <p>No actions available in {{currentLocation.name}}. Explore the city to find more opportunities.</p>
+                    </div>
+                {{/ifEquals}}
+            {{/ifEquals}}
+        {{else}}
+            <div class="no-actions-placeholder">
+                <p>No location selected. Explore the city to find opportunities for action.</p>
+            </div>
+        {{/if}}
     </div>
 </div>

@@ -60,13 +60,17 @@ class MapComponent extends UIComponent {
     loadMap() {
         console.log('loadMap method called', this.mapLoaded);
 
-        const mapContainer = this.find('.map-container');
-        console.log('Map container:', mapContainer);
-
+        // Check if map container exists, if not wait and try again
+        const mapContainer = document.querySelector('.map-container');
         if (!mapContainer) {
-            console.error('Map container not found');
+            console.log('Map container not found, waiting...');
+            gameEngine.setActiveLocation('location-inn');
+            // Try again in 500ms
+            setTimeout(() => this.loadMap(), 500);
             return;
         }
+
+        console.log('Map container found, loading map');
 
         console.log('Attempting to fetch map SVG');
         fetch('./assets/maps/everlyn-map.svg')
