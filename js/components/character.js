@@ -31,12 +31,297 @@ class CharacterComponent extends Component {
                 current: 0,
                 max: 0,
                 unlocked: false
+            },
+            waterMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            fireMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            earthMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            airMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            lightMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            darkMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            temporalMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            voidMana: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            rage: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            focus: {
+                current: 0,
+                max: 0,
+                unlocked: false
+            },
+            },
+            currencies: {
+            gold: {
+                current: options.currencies?.gold?.current || 0,
+                max: options.currencies?.gold?.max || 10,
+            },
+            arcana: {
+                current: options.currencies?.arcana?.current || 0,
+                max: options.currencies?.arcana?.max || 10,
+                unlocked: false
+            },
+            research: {
+                current: options.currencies?.research?.current || 0,
+                max: options.currencies?.research?.max || 10,
+                unlocked: false
+            },
+            scrolls: {
+                current: options.currencies?.scrolls?.current || 0,
+                max: options.currencies?.scrolls?.max || 10,
+                unlocked: false
+            },
+            codices: {
+                current: options.currencies?.codices?.current || 0,
+                max: options.currencies?.codices?.max || 10,
+                unlocked: false
+            },
+            tomes: {
+                current: options.currencies?.tomes?.current || 0,
+                max: options.currencies?.tomes?.max || 10,
+                unlocked: false
+            },
+            runes: {
+                current: options.currencies?.runes?.current || 0,
+                max: options.currencies?.runes?.max || 10,
+                unlocked: false
+            },
+            waterRunes: {
+                current: options.currencies?.waterRunes?.current || 0,
+                max: options.currencies?.waterRunes?.max || 10,
+                unlocked: false
+            },
+            fireRunes: {
+                current: options.currencies?.fireRunes?.current || 0,
+                max: options.currencies?.fireRunes?.max || 10,
+                unlocked: false
+            },
+            earthRunes: {
+                current: options.currencies?.earthRunes?.current || 0,
+                max: options.currencies?.earthRunes?.max || 10,
+                unlocked: false
+            },
+            airRunes: {
+                current: options.currencies?.airRunes?.current || 0,
+                max: options.currencies?.airRunes?.max || 10,
+                unlocked: false
+            },
+            sigils: {
+                current: options.currencies?.sigils?.current || 0,
+                max: options.currencies?.sigils?.max || 10,
+                unlocked: false
+            },            
+            gemstones: {
+                current: options.currencies?.gemstones?.current || 0,
+                max: options.currencies?.gemstones?.max || 10,
+                unlocked: false
+            },
+            bloodGems: {
+                current: options.currencies?.bloodGems?.current || 0,
+                max: options.currencies?.bloodGems?.max || 10,
+                unlocked: false
+            },
+            arcaneGems: {
+                current: options.currencies?.arcaneGems?.current || 0,
+                max: options.currencies?.arcaneGems?.max || 10,
+                unlocked: false
+            },
+            waterGems: {
+                current: options.currencies?.waterGems?.current || 0,
+                max: options.currencies?.waterGems?.max || 10,
+                unlocked: false
+            },
+            fireGems: {
+                current: options.currencies?.fireGems?.current || 0,
+                max: options.currencies?.fireGems?.max || 10,
+                unlocked: false
+            },
+            earthGems: {
+                current: options.currencies?.earthGems?.current || 0,
+                max: options.currencies?.earthGems?.max || 10,
+                unlocked: false
+            },
+            airGems: {
+                current: options.currencies?.airGems?.current || 0,
+                max: options.currencies?.airGems?.max || 10,
+                unlocked: false
+            },
+            lightGems: {
+                current: options.currencies?.lightGems?.current || 0,
+                max: options.currencies?.lightGems?.max || 10,
+                unlocked: false
+            },
+            darkGems: {
+                current: options.currencies?.darkGems?.current || 0,
+                max: options.currencies?.darkGems?.max || 10,
+                unlocked: false
+            },
+            herbs: {
+                current: options.currencies?.herbs?.current || 0,
+                max: options.currencies?.herbs?.max || 10,
+                unlocked: false
+            },
+            potionBase: {
+                current: options.currencies?.potionBase?.current || 0,
+                max: options.currencies?.potionBase?.max || 10,
+                unlocked: false
+            },
+            ichor: {
+                current: options.currencies?.ichor?.current || 0,
+                max: options.currencies?.ichor?.max || 10,
+                unlocked: false
+            },
+            bodies: {
+                current: options.currencies?.bodies?.current || 0,
+                max: options.currencies?.bodies?.max || 10,
+                unlocked: false
+            },
+            bones: {
+                current: options.currencies?.bones?.current || 0,
+                max: options.currencies?.bones?.max || 10,
+                unlocked: false
+            },
+            skulls: {
+                current: options.currencies?.skulls?.current || 0,
+                max: options.currencies?.skulls?.max || 10,
+                unlocked: false
+            },
+            boneDust: {
+                current: options.currencies?.boneDust?.current || 0,
+                max: options.currencies?.boneDust?.max || 10,
+                unlocked: false
+            },
+            souls: {
+                current: options.currencies?.souls?.current || 0,
+                max: options.currencies?.souls?.max || 10,
+                unlocked: false
+            },
+            leather: {
+                current: options.currencies?.leather?.current || 0,
+                max: options.currencies?.leather?.max || 10,
+                unlocked: false
+            },
+            cloth: {
+                current: options.currencies?.cloth?.current || 0,
+                max: options.currencies?.cloth?.max || 10,
+                unlocked: false
+            },
+            stone: {
+                current: options.currencies?.stone?.current || 0,
+                max: options.currencies?.stone?.max || 10,
+                unlocked: false
+            },
+            wood: {
+                current: options.currencies?.wood?.current || 0,
+                max: options.currencies?.wood?.max || 10,
+                unlocked: false
+            },
+            copper: {
+                current: options.currencies?.copper?.current || 0,
+                max: options.currencies?.copper?.max || 10,
+                unlocked: false
+            },
+            bronze: {
+                current: options.currencies?.bronze?.current || 0,
+                max: options.currencies?.bronze?.max || 10,
+                unlocked: false
+            },
+            iron: {
+                current: options.currencies?.iron?.current || 0,
+                max: options.currencies?.iron?.max || 10,
+                unlocked: false
+            },
+            steel: {
+                current: options.currencies?.steel?.current || 0,
+                max: options.currencies?.steel?.max || 10,
+                unlocked: false
+            },
+            mithril: {
+                current: options.currencies?.mithril?.current || 0,
+                max: options.currencies?.mithril?.max || 10,
+                unlocked: false
+            },
+            adamantium: {
+                current: options.currencies?.adamantium?.current || 0,
+                max: options.currencies?.adamantium?.max || 10,
+                unlocked: false
+            },
+            obsidian: {
+                current: options.currencies?.obsidian?.current || 0,
+                max: options.currencies?.obsidian?.max || 10,
+                unlocked: false
+            },
+            glass: {
+                current: options.currencies?.glass?.current || 0,
+                max: options.currencies?.glass?.max || 10,
+                unlocked: false
+            },
+            orichalcum: {
+                current: options.currencies?.orichalcum?.current || 0,
+                max: options.currencies?.orichalcum?.max || 10,
+                unlocked: false
+            },
+            silver: {
+                current: options.currencies?.silver?.current || 0,
+                max: options.currencies?.silver?.max || 10,
+                unlocked: false
+            },
+            gold: {
+                current: options.currencies?.gold?.current || 0,
+                max: options.currencies?.gold?.max || 10,
+                unlocked: false
+            },
+            platinum: {
+                current: options.currencies?.platinum?.current || 0,
+                max: options.currencies?.platinum?.max || 10,
+                unlocked: false
+            },
+            quicksilver: {
+                current: options.currencies?.quicksilver?.current || 0,
+                max: options.currencies?.quicksilver?.max || 10,
+                unlocked: false
+            },
+            moonstone: {
+                current: options.currencies?.moonstone?.current || 0,
+                max: options.currencies?.moonstone?.max || 10,
+                unlocked: false
             }
             },
             inventory: options.inventory || [],
             skills: options.skills || [],
-            gold: options.gold || 0,
-            maxGold: options.maxGold || 10, // Added maxGold property
+            
             
             // Class progression path
             progression: {
