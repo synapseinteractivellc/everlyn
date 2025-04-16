@@ -26,29 +26,30 @@ class MapComponent extends UIComponent {
     }
     
     loadMap() {
-        console.log('loadMap method called', this.mapLoaded);
-        
-        if (this.mapLoaded) return;
-        
+        // Prevent multiple load attempts
+        if (this.mapLoaded) {
+            // If already loaded, just re-highlight the active location
+            const activeLocation = gameEngine.getActiveLocation();
+            if (activeLocation) {
+                this.highlightLocation(activeLocation);
+            }
+            return;
+        }
+    
         const mapContainer = this.find('.map-container');
-        console.log('Map container:', mapContainer);
-        
         if (!mapContainer) {
             console.error('Map container not found');
             return;
         }
-        
-        console.log('Attempting to fetch map SVG');
+    
         fetch('./assets/maps/everlyn-map.svg')
             .then(response => {
-                console.log('Fetch response:', response);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.text();
             })
             .then(svgContent => {
-                console.log('SVG content loaded, length:', svgContent.length);
                 mapContainer.innerHTML = svgContent;
                 this.mapLoaded = true;
                 

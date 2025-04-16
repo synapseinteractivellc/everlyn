@@ -104,18 +104,23 @@ function initGame() {
             
             templateLoader.renderTo(view, characterData, panelBody, true);
             
-            // If the view is map, create the MapComponent
+            // If the view is map, create or reuse the MapComponent
             if (view === 'map') {
-                const mapComponent = new MapComponent('city-map', {
-                    container: '[data-component-id="location-panel"] .panel-body'
-                });
-                gameEngine.registerComponent(mapComponent);
+                let mapComponent = gameEngine.getComponent('city-map');
+                if (!mapComponent) {
+                    mapComponent = new MapComponent('city-map', {
+                        container: '[data-component-id="location-panel"] .panel-body'
+                    });
+                    gameEngine.registerComponent(mapComponent);
+                }
+                // Force map reload
+                mapComponent.loadMap();
             }
             
             // Trigger event for potential component-specific handling
             eventSystem.trigger('navigation:view:changed', { view });
         }
-    });    
+    });  
     
     // Add wipe game event listener
     document.addEventListener('click', function(event) {
