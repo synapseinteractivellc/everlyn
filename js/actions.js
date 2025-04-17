@@ -128,30 +128,18 @@ class Action {
         const character = this.game.character;
         
         // Apply gains to each resource
-        for (const resourceType in this.gainPerSecond) {
-            const gain = this.gainPerSecond[resourceType] * deltaTime;
+        for (const resourceId in this.gainPerSecond) {
+            const gain = this.gainPerSecond[resourceId] * deltaTime;
             
-            // Check if we have this resource
-            if (!character.stats[resourceType] && !character.resources[resourceType]) {
-                console.error(`Resource not found: ${resourceType}`);
+            // Get resource
+            const resource = character.getResource(resourceId);
+            if (!resource) {
+                console.error(`Resource not found: ${resourceId}`);
                 continue;
             }
             
-            // Check if it's a stat or resource
-            let resource;
-            if (character.stats[resourceType]) {
-                resource = character.stats[resourceType];
-            } else {
-                resource = character.resources[resourceType];
-            }
-            
             // Apply gain
-            resource.current += gain;
-            
-            // Cap at maximum value
-            if (resource.current > resource.max) {
-                resource.current = resource.max;
-            }
+            resource.add(gain);
         }
         
         // Update UI to show the resource changes in real-time
@@ -178,21 +166,14 @@ class Action {
         const character = this.game.character;
         
         // Check if we have enough resources
-        for (const resourceType in this.costPerSecond) {
-            const cost = this.costPerSecond[resourceType] * deltaTime;
+        for (const resourceId in this.costPerSecond) {
+            const cost = this.costPerSecond[resourceId] * deltaTime;
             
-            // Check if we have this resource
-            if (!character.stats[resourceType] && !character.resources[resourceType]) {
-                console.error(`Resource not found: ${resourceType}`);
+            // Get resource
+            const resource = character.getResource(resourceId);
+            if (!resource) {
+                console.error(`Resource not found: ${resourceId}`);
                 return false;
-            }
-            
-            // Check if it's a stat or resource
-            let resource;
-            if (character.stats[resourceType]) {
-                resource = character.stats[resourceType];
-            } else {
-                resource = character.resources[resourceType];
             }
             
             // Check if we have enough
@@ -201,12 +182,7 @@ class Action {
             }
             
             // Apply cost
-            resource.current -= cost;
-            
-            // Ensure we don't go below zero
-            if (resource.current < 0) {
-                resource.current = 0;
-            }
+            resource.remove(cost);
         }
         
         // Update UI to show the resource changes in real-time
@@ -227,7 +203,10 @@ class Action {
         this.game.character.actions[this.id].completionCount = this.completionCount;
         
         // Log to adventure log
-        this.logCompletion();        
+        this.logCompletion();
+        
+        // Save game
+        this.game.saveGame();
     }
     
     /**
@@ -309,14 +288,22 @@ class Action {
         descElement.className = 'action-description';
         descElement.textContent = this.description;
         
+        // Create progress container
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'action-progress-container';
+        
         // Create progress bar
         const progressBar = document.createElement('div');
         progressBar.className = 'action-progress';
+        progressBar.style.width = '0%';
+        
+        // Add progress bar to container
+        progressContainer.appendChild(progressBar);
         
         // Add elements to button
         button.appendChild(nameElement);
         button.appendChild(descElement);
-        button.appendChild(progressBar);
+        button.appendChild(progressContainer);
         
         // Add event listener
         button.addEventListener('click', () => {
@@ -380,25 +367,16 @@ class BegForCoins extends Action {
             this.lastRewardMessage = this.successMessages[2];
         }
         
-        // Add gold
+        // Add gold to character
         if (gold > 0) {
-            character.resources.gold.current += gold;
-            
-            // Cap gold at max
-            if (character.resources.gold.current > character.resources.gold.max) {
-                character.resources.gold.current = character.resources.gold.max;
+            const goldResource = character.getResource('gold');
+            if (goldResource) {
+                goldResource.add(gold);
             }
         }
         
         // Update UI
-        this.updateResourceUI();
-    }
-    
-    /**
-     * Update UI with current resource amounts
-     */
-    updateResourceUI() {
-        this.game.ui.updateResourceDisplays(this.game.character);
+        this.game.ui.updateResourceDisplays(character);
     }
     
     /**
@@ -450,22 +428,55 @@ class Rest extends Action {
      */
     checkAutoStop() {
         const character = this.game.character;
+        const health = character.getResource('health');
+        const stamina = character.getResource('stamina');
         
-        if (character.stats.health.current >= character.stats.health.max && 
-            character.stats.stamina.current >= character.stats.stamina.max) {
+        if (health && stamina && health.isFull() && stamina.isFull()) {
             this.stop();
         }
     }
+}
+
+/**
+ * Cheat action - Instantly fills all resources to maximum
+ */
+class Cheat extends Action {
+    constructor(game) {
+        super(game, {
+            id: 'cheat',
+            name: 'Cheat',
+            description: 'Instantly fill all resources to maximum (for testing)',
+            costPerSecond: {}, // No cost
+            duration: 0.1, // Very quick
+            autoRepeat: false,
+            tooltipText: "Developer tool: Fill all resources to maximum instantly."
+        });
+    }
     
     /**
-     * Apply rewards when action completes (additional bonuses for completion)
-     * This is in addition to the continuous gains from gainPerSecond
+     * Apply effects when action completes
      */
     applyRewards() {
-        // No additional rewards on completion - gains are handled by gainPerSecond
+        const character = this.game.character;
+        
+        // Set all resources to maximum
+        for (const resourceId of ['gold', 'health', 'stamina']) {
+            const resource = character.getResource(resourceId);
+            if (resource) {
+                resource.add(resource.max);
+            }
+        }
         
         // Update UI
-        this.game.ui.updateResourceDisplays(this.game.character);
+        this.game.ui.updateResourceDisplays(character);
+        
+        // Log to adventure log
+        const logContent = document.querySelector('.log-content');
+        if (logContent) {
+            const logEntry = document.createElement('p');
+            logEntry.textContent = "You used developer cheats to fill all resources!";
+            logContent.insertBefore(logEntry, logContent.firstChild);
+        }
     }
 }
 
@@ -486,6 +497,7 @@ class ActionsManager {
         // Register default actions
         this.registerAction(new BegForCoins(this.game));
         this.registerAction(new Rest(this.game));
+        this.registerAction(new Cheat(this.game));
         
         // Setup event listeners
         this.setupEventListeners();
@@ -544,6 +556,19 @@ class ActionsManager {
     
     /**
      * Stop all active actions
+     */
+    stopAllActions() {
+        for (const id in this.actions) {
+            const action = this.actions[id];
+            if (action.isActive) {
+                action.stop();
+            }
+        }
+    }
+    
+    /**
+     * Static method to stop all actions in a game instance
+     * @param {Object} game - The game instance
      * @param {Object} exceptAction - Optional action to exclude from stopping
      */
     static stopAllActions(game, exceptAction = null) {

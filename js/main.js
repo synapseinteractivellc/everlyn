@@ -3,6 +3,7 @@ import Character from './character.js';
 import UI from './ui.js';
 import Storage from './storage.js';
 import { ActionsManager } from './actions.js';
+import { UpgradesManager } from './upgrades.js';
 
 class Game {
     constructor() {
@@ -11,6 +12,48 @@ class Game {
         this.ui = null;
         this.storage = new Storage();
         this.actionsManager = null;
+        this.upgradesManager = null;
+    }
+
+    /**
+     * Main game update loop
+     * @param {number} timestamp - Current timestamp
+     */
+    update(timestamp) {
+        // Calculate delta time (in seconds)
+        const now = timestamp || performance.now();
+        const deltaTime = (now - (this.lastUpdate || now)) / 1000;
+        this.lastUpdate = now;
+        
+        // Update character resources
+        if (this.character) {
+            this.character.update(deltaTime);
+            
+            // Update UI periodically (not every frame to avoid performance issues)
+            this.resourceUpdateCounter = (this.resourceUpdateCounter || 0) + deltaTime;
+            if (this.resourceUpdateCounter >= 0.1) { // Update UI 10 times per second
+                this.ui.updateResourceDisplays(this.character);
+                this.resourceUpdateCounter = 0;
+            }
+        }
+
+        // Update UI periodically
+        this.resourceUpdateCounter = (this.resourceUpdateCounter || 0) + deltaTime;
+        if (this.resourceUpdateCounter >= 0.1) { // Update UI 10 times per second
+            this.ui.updateResourceDisplays(this.character);
+            
+            // Update purchase buttons less frequently
+            this.purchaseUpdateCounter = (this.purchaseUpdateCounter || 0) + 1;
+            if (this.purchaseUpdateCounter >= 10) { // Once per second
+                this.ui.updatePurchaseButtons(this.character);
+                this.purchaseUpdateCounter = 0;
+            }
+            
+            this.resourceUpdateCounter = 0;
+        }
+        
+        // Request next frame
+        this.animationFrameId = requestAnimationFrame(this.update.bind(this));
     }
 
     init() {
@@ -28,6 +71,7 @@ class Game {
         // Initialize actions manager (if character exists)
         if (this.character) {
             this.actionsManager = new ActionsManager(this);
+            this.upgradesManager = new UpgradesManager(this);
         }
 
         // Set up auto-save interval (every 5 minutes)
@@ -35,6 +79,10 @@ class Game {
         
         this.initialized = true;
         console.log('Game initialized');
+
+        // Start update loop
+        this.lastUpdate = performance.now();
+        this.update();
         
         // If we have a character, start the game directly
         if (this.character) {
@@ -96,6 +144,11 @@ class Game {
         // Initialize actions manager if not already initialized
         if (!this.actionsManager) {
             this.actionsManager = new ActionsManager(this);
+        }
+
+        // Initialize upgrades manager if not already initialized
+        if (!this.upgradesManager) {
+            this.upgradesManager = new UpgradesManager(this);
         }
         
         // Update UI with character info

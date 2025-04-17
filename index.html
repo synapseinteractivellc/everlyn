@@ -76,7 +76,7 @@
         <!-- Navigation menu will go here -->
         <nav class="game-nav">
             <ul>
-                <li><button class="nav-button active" data-section="actions">Actions</button></li>
+                <li><button class="nav-button active" data-section="main">Main</button></li>
                 <li><button class="nav-button" data-section="skills">Skills</button></li>
                 <li><button class="nav-button" data-section="house">House</button></li>
                 <li><button class="nav-button" data-section="status">Status</button></li>
@@ -92,24 +92,20 @@
                 </div>
                 <div class="sidebar-content">
                     <div class="resource-bar">
-                        <div class="resource-item">
-                            <span class="resource-label">Gold:</span>
-                            <span id="gold-amount" class="resource-value">0</span>/<span id="gold-max" class="resource-value">10</span>
-                        </div>                        
-                        <div class="resource-item" id="research-resource" style="display: none;">
-                            <span class="resource-label">Research:</span>
-                            <span id="research-amount" class="resource-value">0</span>/<span id="research-max" class="resource-value">10</span>
-                        </div>
 
                     </div>
                 </div>
             </aside>
             <div class="main-area">
                 <!-- This area will change based on navigation -->
-                <div id="actions-section" class="game-section active">
+                <div id="main-section" class="game-section active">
                     <h2>Available Actions</h2>
                     <div class="available-actions">
                         <!-- Actions will be populated here -->
+                    </div>
+                    <h3 class="upgrades-header">Available Upgrades</h3>
+                    <div class="available-upgrades">
+                        <!-- Upgrades will be populated here -->
                     </div>
                 </div>
 

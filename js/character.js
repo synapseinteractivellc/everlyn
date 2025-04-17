@@ -1,217 +1,71 @@
-// character.js
+// character.js (modified)
+import Resource from './resource.js';
+import Stat from './stat.js';
+import { Currency, Scroll } from './currency.js';
+
 class Character {
-    constructor(name) {
+    constructor(name, game) {
         this.name = name;
         this.level = 1;
         this.experience = 0;
-        this.resources = {
-            gold: {
-            current: 0,
-            max: 10,
-            unlocked: true
-            },
-            research: {
-            current: 0,
-            max: 10,
-            unlocked: false
-            },
-            arcana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            scrolls: {
-            current: 0,
-            max: 10,
-            unlocked: false
-            },
-            codices: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            tomes: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            gemstones: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            waterGems: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            earthGems: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            fireGems: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            airGems: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            lightGems: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            shadowGems: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            waterRunes: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            earthRunes: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            fireRunes: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            airRunes: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            herbs: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            cloth: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            skins: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            leather: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            wood: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            stone: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            copper: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            bronze: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            iron: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            steel: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            quicksilver: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            mithral: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            admantine: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-        };
+        this.game = game;
+        
+        // Stats
         this.stats = {
-            health: {
-            current: 10,
-            max: 10,
-            unlocked: true
-            },
-            stamina: {
-            current: 10,
-            max: 10,
-            unlocked: true
-            },
-            mana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            waterMana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            earthMana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            fireMana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            airMana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            lightMana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            shadowMana: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
-            rage: {
-            current: 0,
-            max: 0,
-            unlocked: false
-            },
+            health: new Stat({
+                id: 'health',
+                name: 'Health',
+                description: 'Your physical wellbeing',
+                initial: 10,
+                max: 10,
+                unlocked: true,
+                recoveryRate: 0.5,
+                recoveryDelay: 3000
+            }),
+            stamina: new Stat({
+                id: 'stamina',
+                name: 'Stamina',
+                description: 'Your physical energy',
+                initial: 10,
+                max: 10,
+                unlocked: true,
+                recoveryRate: 0.5,
+                recoveryDelay: 1000
+            }),
+            mana: new Stat({
+                id: 'mana',
+                name: 'Mana',
+                description: 'Your magical energy',
+                max: 0,
+                unlocked: false,
+                recoveryRate: 0.3,
+                recoveryDelay: 5000
+            })
         };
-        this.actions = {
+        
+        // Currencies
+        this.currencies = {
+            gold: new Currency({
+                id: 'gold',
+                name: 'Gold',
+                description: 'Currency used for purchases',
+                max: 10,
+                unlocked: true
+            }),
+            research: new Currency({
+                id: 'research',
+                name: 'Research',
+                description: 'Knowledge gained from scrolls',
+                max: 10,
+                unlocked: false
+            }),
+            scrolls: new Scroll(game)
         };
+        
+        this.actions = {};
         this.skills = [];
         this.inventory = [];
+        this.upgrades = {};
     }
 
     // Get experience needed for next level
@@ -237,20 +91,115 @@ class Character {
         this.experience = 0;
         // Could add stat increases or other bonuses here
     }
-
-    // Save character data
-    save() {
-        localStorage.setItem('character', JSON.stringify(this));
+    
+    /**
+     * Get a resource by ID (can be either stat or currency)
+     * @param {string} id - Resource ID
+     * @returns {Resource} - The resource or null if not found
+     */
+    getResource(id) {
+        const resource = this.stats[id] || this.currencies[id];
+        if (!resource) {
+            console.error(`Resource not found: ${id}`);
+            return null;
+        }
+        console.log('Found resource:', resource); // Debugging statement
+        if (typeof resource.add !== 'function') {
+            console.error(`Resource ${id} is not a valid Resource instance.`);
+            return null;
+        }
+        return resource;
+    }
+    
+    /**
+     * Update all resources and stats
+     * @param {number} deltaTime - Time passed in seconds
+     */
+    update(deltaTime) {
+        // Update currencies
+        for (const currency of Object.values(this.currencies)) {
+            if (currency.unlocked) {
+                console.log('Updating currency:', currency); // Debugging statement
+                if (typeof currency.update === 'function') {
+                    currency.update(deltaTime, this);
+                } else {
+                    console.error(`Currency ${currency.id} does not have an update method.`);
+                }
+            }
+        }
+    
+        // Update stats
+        for (const stat of Object.values(this.stats)) {
+            if (stat.unlocked) {
+                console.log('Updating stat:', stat); // Debugging statement
+                if (typeof stat.update === 'function') {
+                    stat.update(deltaTime);
+                } else {
+                    console.error(`Stat ${stat.id} does not have an update method.`);
+                }
+            }
+        }
     }
 
-    // Static method to load character data
-    static load() {
-        const savedData = localStorage.getItem('character');
-        if (!savedData) return null;
+    // Save character data (updated)
+    save() {
+        const saveData = {
+            name: this.name,
+            level: this.level,
+            experience: this.experience,
+            stats: {},
+            currencies: {},
+            actions: this.actions,
+            skills: this.skills,
+            inventory: this.inventory,
+            upgrades: this.upgrades
+        };
         
-        const parsed = JSON.parse(savedData);
-        const character = new Character(parsed.name);
-        Object.assign(character, parsed);
+        // Serialize stats
+        for (const [id, stat] of Object.entries(this.stats)) {
+            saveData.stats[id] = stat.serialize();
+        }
+        
+        // Serialize currencies
+        for (const [id, currency] of Object.entries(this.currencies)) {
+            saveData.currencies[id] = currency.serialize();
+        }
+        
+        return saveData;
+    }
+
+    // Static method to load character data (updated)
+    static load(saveData, game) {
+        if (!saveData) return null;
+        
+        const character = new Character(saveData.name, game);
+        character.level = saveData.level || 1;
+        character.experience = saveData.experience || 0;
+        
+        // Load stats
+        if (saveData.stats) {
+            for (const [id, statData] of Object.entries(saveData.stats)) {
+                if (character.stats[id]) {
+                    character.stats[id].deserialize(statData);
+                }
+            }
+        }
+        
+        // Load currencies
+        if (saveData.currencies) {
+            for (const [id, currencyData] of Object.entries(saveData.currencies)) {
+                if (character.currencies[id]) {
+                    character.currencies[id].deserialize(currencyData);
+                }
+            }
+        }
+        
+        // Load other data
+        if (saveData.actions) character.actions = saveData.actions;
+        if (saveData.skills) character.skills = saveData.skills;
+        if (saveData.inventory) character.inventory = saveData.inventory;
+        if (saveData.upgrades) character.upgrades = saveData.upgrades;
+        
         return character;
     }
 }

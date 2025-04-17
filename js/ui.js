@@ -126,8 +126,6 @@ class UI {
         }
     }
 
-    // Inside UI class in ui.js
-
     /**
      * Update all resource displays based on character data
      * @param {Object} character - The character object with resource data
@@ -135,99 +133,178 @@ class UI {
     updateResourceDisplays(character) {
         if (!character) return;
         
-        // Update gold
-        const goldAmountElement = document.getElementById('gold-amount');
-        if (goldAmountElement) {
-            goldAmountElement.textContent = character.resources.gold.current;
-        }
-        
-        const goldMaxElement = document.getElementById('gold-max');
-        if (goldMaxElement) {
-            goldMaxElement.textContent = character.resources.gold.max;
-        }
-        
-        // Update health progress and text values
-        const healthBarElement = document.getElementById('health-bar');
-        const healthCurrentElement = document.getElementById('health-current');
-        const healthMaxElement = document.getElementById('health-max');
-        
-        if (healthBarElement) {
-            healthBarElement.value = character.stats.health.current;
-            healthBarElement.max = character.stats.health.max;
-        }
-        
-        if (healthCurrentElement) {
-            healthCurrentElement.textContent = Math.floor(character.stats.health.current);
-        }
-        
-        if (healthMaxElement) {
-            healthMaxElement.textContent = character.stats.health.max;
-        }
-        
-        // Update stamina progress and text values
-        const staminaBarElement = document.getElementById('stamina-bar');
-        const staminaCurrentElement = document.getElementById('stamina-current');
-        const staminaMaxElement = document.getElementById('stamina-max');
-        
-        if (staminaBarElement) {
-            staminaBarElement.value = character.stats.stamina.current;
-            staminaBarElement.max = character.stats.stamina.max;
-        }
-        
-        if (staminaCurrentElement) {
-            staminaCurrentElement.textContent = Math.floor(character.stats.stamina.current);
-        }
-        
-        if (staminaMaxElement) {
-            staminaMaxElement.textContent = character.stats.stamina.max;
-        }
-        
-        // Show/hide mana bar based on unlocked status
-        const manaBarContainer = document.getElementById('mana-bar-container');
-        if (manaBarContainer) {
-            if (character.stats.mana.unlocked) {
-                manaBarContainer.style.display = 'block';
-                
-                const manaBarElement = document.getElementById('mana-bar');
-                const manaCurrentElement = document.getElementById('mana-current');
-                const manaMaxElement = document.getElementById('mana-max');
-                
-                if (manaBarElement) {
-                    manaBarElement.value = character.stats.mana.current;
-                    manaBarElement.max = character.stats.mana.max;
-                }
-                
-                if (manaCurrentElement) {
-                    manaCurrentElement.textContent = Math.floor(character.stats.mana.current);
-                }
-                
-                if (manaMaxElement) {
-                    manaMaxElement.textContent = character.stats.mana.max;
-                }
-            } else {
-                manaBarContainer.style.display = 'none';
+        // Update currencies display
+        for (const [id, currency] of Object.entries(character.currencies)) {
+            // Skip if not unlocked
+            if (!currency.unlocked) continue;
+            console.log(`Updating currency: ${id}`); // Debugging statement
+            console.log(`Updating currency: ${currency.update}`); // Debugging statement
+            
+            // Get the container for this currency
+            const resourceItem = document.getElementById(`${id}-resource`);
+            
+            // If container doesn't exist, create it
+            if (!resourceItem && currency.unlocked) {
+                this.createResourceDisplay(id, currency);
+            }
+            
+            // Update values
+            const amountElement = document.getElementById(`${id}-amount`);
+            const maxElement = document.getElementById(`${id}-max`);
+            
+            if (amountElement) {
+                amountElement.textContent = Math.floor(currency.current * 10) / 10; // Round to 1 decimal
+            }
+            
+            if (maxElement) {
+                maxElement.textContent = currency.max;
             }
         }
         
-        // Research resource (if unlocked)
-        const researchResource = document.getElementById('research-resource');
-        if (researchResource) {
-            if (character.resources.research.unlocked) {
-                researchResource.style.display = 'block';
-                
-                const researchAmountElement = document.getElementById('research-amount');
-                if (researchAmountElement) {
-                    researchAmountElement.textContent = character.resources.research.current;
-                }
-                
-                const researchMaxElement = document.getElementById('research-max');
-                if (researchMaxElement) {
-                    researchMaxElement.textContent = character.resources.research.max;
-                }
-            } else {
-                researchResource.style.display = 'none';
+        // Update stat bars
+        for (const [id, stat] of Object.entries(character.stats)) {
+            if (!stat.unlocked) continue;
+            
+            // Get the elements
+            const barElement = document.getElementById(`${id}-bar`);
+            const currentElement = document.getElementById(`${id}-current`);
+            const maxElement = document.getElementById(`${id}-max`);
+            const containerElement = document.getElementById(`${id}-bar-container`);
+            
+            // Show/hide container based on unlocked status
+            if (containerElement) {
+                containerElement.style.display = stat.unlocked ? 'block' : 'none';
+            }
+            
+            // Update bar
+            if (barElement) {
+                barElement.value = stat.current;
+                barElement.max = stat.max;
+            }
+            
+            // Update text values
+            if (currentElement) {
+                currentElement.textContent = Math.floor(stat.current);
+            }
+            
+            if (maxElement) {
+                maxElement.textContent = stat.max;
             }
         }
+    }
+
+    /**
+     * Create display elements for a new resource
+     * @param {string} id - Resource ID
+     * @param {Resource} resource - The resource object
+     */
+    createResourceDisplay(id, resource) {
+        // Skip if not unlocked
+        if (!resource.unlocked) return;
+        
+        // Create resource item in sidebar
+        const sidebar = document.querySelector('.sidebar-content .resource-bar');
+        if (!sidebar) return;
+        
+        const resourceItem = document.createElement('div');
+        resourceItem.className = 'resource-item';
+        resourceItem.id = `${id}-resource`;
+        
+        resourceItem.innerHTML = `
+            <span class="resource-label">${resource.name}:</span>
+            <span id="${id}-amount" class="resource-value">0</span>/<span id="${id}-max" class="resource-value">${resource.max}</span>
+        `;
+        
+        sidebar.appendChild(resourceItem);
+    }
+
+    /**
+     * Update available purchase buttons
+     * @param {Object} character - The character object
+     */
+    updatePurchaseButtons(character) {
+        const upgradesContainer = document.querySelector('.available-upgrades');
+        if (!upgradesContainer) return;
+        
+        // Clear existing buttons
+        upgradesContainer.innerHTML = '';
+        
+        // Add buttons for purchasable currencies
+        for (const currency of Object.values(character.currencies)) {
+            // Skip if not purchasable or already at max
+            if (!currency.purchaseCost || currency.isFull()) continue;
+            
+            // Create button only if we're close to affording it or it's unlocked
+            let canShow = false;
+            
+            // Check if we have at least 90% of the cost
+            for (const [resourceId, cost] of Object.entries(currency.purchaseCost)) {
+                const resource = character.getResource(resourceId);
+                if (resource && resource.unlocked && resource.current >= cost * 0.9) {
+                    canShow = true;
+                    break;
+                }
+            }
+            
+            if (canShow || currency.unlocked) {
+                const button = this.createPurchaseButton(currency, character);
+                upgradesContainer.appendChild(button);
+            }
+        }
+    }
+
+    /**
+     * Create a purchase button for a currency
+     * @param {Currency} currency - The currency to purchase
+     * @param {Object} character - The character object
+     * @returns {HTMLElement} - The button element
+     */
+    createPurchaseButton(currency, character) {
+        const button = document.createElement('button');
+        button.className = 'upgrade-button';
+        button.dataset.upgrade = currency.id;
+        
+        // Create button content
+        const nameElement = document.createElement('span');
+        nameElement.className = 'upgrade-name';
+        nameElement.textContent = `Buy a ${currency.name.slice(0, -1)}`; // Remove 's' from the end
+        
+        const descElement = document.createElement('span');
+        descElement.className = 'upgrade-description';
+        descElement.textContent = currency.description;
+        
+        const costElement = document.createElement('span');
+        costElement.className = 'upgrade-cost';
+        
+        // Format cost text
+        const costText = Object.entries(currency.purchaseCost)
+            .map(([id, amount]) => {
+                const resource = character.getResource(id);
+                return `${amount} ${resource ? resource.name : id}`;
+            })
+            .join(', ');
+        
+        costElement.textContent = `Cost: ${costText}`;
+        
+        // Add elements to button
+        button.appendChild(nameElement);
+        button.appendChild(descElement);
+        button.appendChild(costElement);
+        
+        // Add event listener
+        button.addEventListener('click', () => {
+            const success = currency.purchase(character);
+            if (success) {
+                // Update UI
+                this.updateResourceDisplays(character);
+                this.updatePurchaseButtons(character);
+            }
+        });
+        
+        // Set disabled state
+        button.disabled = !currency.canPurchase(character);
+        
+        return button;
     }
 }
 
