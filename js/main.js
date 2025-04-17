@@ -261,9 +261,10 @@ class Game {
         const success = this.storage.wipeSave();
         if (success) {
             console.log('Game wiped successfully');
+            
             // Reset the game state
             this.character = null;
-    
+
             // Clear the adventure log
             const logContent = document.querySelector('.log-content');
             if (logContent) {
@@ -276,16 +277,20 @@ class Game {
                 this.autoSaveInterval = null;
             }
             
-            this.ui.hideElement('.game-container');
-            this.ui.showElement('.welcome-container');
+            // Show notification before refresh
+            this.ui.showNotification('Game wiped successfully! Refreshing page...');
             
-            this.ui.showNotification('Game wiped successfully!');
+            // Wait a moment for the notification to be visible, then refresh
+            setTimeout(() => {
+                window.location.reload();
+            }, 500); // 0.5 seconds delay
+            
+            return true;
         } else {
             console.error('Failed to wipe game');
             this.ui.showNotification('Failed to wipe game!', 'error');
+            return false;
         }
-        
-        return success;
     }
 }
 
