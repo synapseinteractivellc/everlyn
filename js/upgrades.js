@@ -307,6 +307,42 @@ class CoinPurseUpgrade extends Upgrade {
 }
 
 /**
+ * CoinPurse upgrade - Increases gold maximum capacity
+ */
+class SatchelUpgrade extends Upgrade {
+    constructor(game) {
+        super(game, {
+            id: 'satchel',
+            name: 'Satchel',
+            description: 'A leather satchel to carry more scrolls.',
+            costs: {
+                gold: 25
+            },
+            effects: {
+                // Increase scrolls.max by 10
+                'currencies.scrolls.max': 10
+            },
+            tooltipText: "Increases your maximum scrolls capacity by 10."
+        });
+    }
+    
+    /**
+     * Override purchase method to add special effects
+     * @returns {boolean} True if purchase was successful
+     */
+    purchase() {
+        const success = super.purchase();
+        
+        if (success) {
+            // Add custom notification
+            this.game.ui.showNotification("You purchased a Satchel! You can now hold more scrolls.");
+        }
+        
+        return success;
+    }
+}
+
+/**
  * UpgradesManager - Handles registering and managing all game upgrades
  */
 class UpgradesManager {
@@ -322,6 +358,7 @@ class UpgradesManager {
     initialize() {
         // Register default upgrades
         this.registerUpgrade(new CoinPurseUpgrade(this.game));
+        this.registerUpgrade(new SatchelUpgrade(this.game));
         
         // Populate UI with upgrade buttons
         this.populateUpgradeButtons();

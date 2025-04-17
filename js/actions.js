@@ -428,6 +428,25 @@ class Rest extends Action {
             ]
         });
     }
+
+    /**
+     * Override update to also recover mana if unlocked
+     * @param {number} deltaTime - Time passed in seconds
+     */
+    update(deltaTime) {
+        super.update(deltaTime);
+        
+        // Check if mana is unlocked and add regeneration
+        if (this.isActive) {
+            const character = this.game.character;
+            const mana = character.getResource('mana');
+            
+            if (mana && mana.unlocked) {
+                // Regenerate mana at the same rate as health/stamina
+                mana.add(2 * deltaTime);
+            }
+        }
+    }
     
     /**
      * Check if we should stop resting (when both health and stamina are full)
@@ -436,8 +455,17 @@ class Rest extends Action {
         const character = this.game.character;
         const health = character.getResource('health');
         const stamina = character.getResource('stamina');
+        const mana = character.getResource('mana');        
         
-        if (health && stamina && health.isFull() && stamina.isFull()) {
+        // Check if all unlocked resources are full
+        let shouldStop = health && stamina && health.isFull() && stamina.isFull();
+        
+        // Also check mana if it's unlocked
+        if (shouldStop && mana && mana.unlocked) {
+            shouldStop = mana.isFull();
+        }
+        
+        if (shouldStop) {
             this.stop();
         }
     }
@@ -557,6 +585,23 @@ class MeditateOnArcaneWisdom extends Action {
                 // Add XP at the rate of 1 per second
                 const xpGain = 1 * deltaTime;
                 mageLoreSkill.addExperience(xpGain);
+
+                // Update skill UI with new XP progress
+                const skillCard = document.querySelector(`.skill-card[data-skill="mageLore"]`);
+                if (skillCard) {
+                    const progressBar = skillCard.querySelector('.skill-progress');
+                    if (progressBar) {
+                        progressBar.style.width = `${mageLoreSkill.getProgressPercentage()}%`;
+                    }
+                    
+                    const xpElement = skillCard.querySelector('.skill-xp');
+                    if (xpElement) {
+                        const xpNeeded = mageLoreSkill.getXPForNextLevel();
+                        xpElement.textContent = xpNeeded ? 
+                            `XP: ${Math.floor(mageLoreSkill.experience)}/${xpNeeded}` : 
+                            'Max Level';
+                    }
+                }
                 
                 // If skill leveled up, refresh UI and show notification
                 if (mageLoreSkill.experience === 0 && mageLoreSkill.level > 0) {

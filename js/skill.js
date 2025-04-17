@@ -72,6 +72,11 @@ class Skill {
         // Log to adventure log
         this.logPurchase();
         
+        // Add this line to refresh the action buttons
+        if (this.game.actionsManager) {
+            this.game.actionsManager.populateActionButtons();
+        }
+        
         return true;
     }
     
