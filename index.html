@@ -85,7 +85,25 @@
             </ul>
         </nav>
         
-        <main class="game-content">           
+        <main class="game-content">
+            <aside class="resource-sidebar">
+                <div class="sidebar-header">
+                    <h2>Resources</h2>
+                </div>
+                <div class="sidebar-content">
+                    <div class="resource-bar">
+                        <div class="resource-item">
+                            <span class="resource-label">Gold:</span>
+                            <span id="gold-amount" class="resource-value">0</span>/<span id="gold-max" class="resource-value">10</span>
+                        </div>                        
+                        <div class="resource-item" id="research-resource" style="display: none;">
+                            <span class="resource-label">Research:</span>
+                            <span id="research-amount" class="resource-value">0</span>/<span id="research-max" class="resource-value">10</span>
+                        </div>
+
+                    </div>
+                </div>
+            </aside>
             <div class="main-area">
                 <!-- This area will change based on navigation -->
                 <div id="actions-section" class="game-section active">
@@ -130,6 +148,34 @@
                     </div>
                 </div>
             </div>
+            <aside id="status-sidebar" class="status-sidebar">
+                <h2>Current Action</h2>
+                <div class="action-status">
+                    <p id="current-action">None</p>
+                    <button id="cancel-action" class="btn-secondary">Cancel</button>
+                </div>
+                <h2>Character Stats</h2>
+                <div class="stats-list">
+                    <div class="stat-bar">
+                        <label for="health-bar">Health:</label>
+                        <progress id="health-bar" value="100" max="100"></progress>
+                    </div>
+                    <div class="stat-bar">
+                        <label for="stamina-bar">Stamina:</label>
+                        <progress id="stamina-bar" value="100" max="100"></progress>
+                    </div>
+                    <div class="stat-bar" id="mana-bar-container" style="display: none;">
+                        <label for="mana-bar">Mana:</label>
+                        <progress id="mana-bar" value="0" max="100"></progress>
+                    </div>
+                </div>
+            </aside>
+            <aside id="adventure-log" class="adventure-log">
+                <h2>Adventure Log</h2>
+                <div class="log-content">
+                    <!-- Adventure log will be populated here -->
+                </div>
+            </aside>
         </main>
         
         <footer class="game-footer">
