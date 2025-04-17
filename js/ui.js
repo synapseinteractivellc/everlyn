@@ -82,6 +82,33 @@ class UI {
     }
 
     /**
+     * Show a notification message
+     * @param {string} message - The message to display
+     * @param {string} type - The type of notification ('success' or 'error')
+     */
+    showNotification(message, type = 'success') {
+        // Create notification if it doesn't exist yet
+        let notification = document.querySelector('.game-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.className = 'game-notification';
+            document.body.appendChild(notification);
+        }
+        
+        // Set message and type
+        notification.textContent = message;
+        notification.className = `game-notification ${type}`;
+        
+        // Show notification
+        notification.classList.add('show');
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+
+    /**
      * Update character information displays
      * @param {Object} character - The character object with name and level
      * */

@@ -29,6 +29,9 @@ class Game {
         if (this.character) {
             this.actionsManager = new ActionsManager(this);
         }
+
+        // Set up auto-save interval (every 5 minutes)
+        this.setupAutoSave();
         
         this.initialized = true;
         console.log('Game initialized');
@@ -122,13 +125,33 @@ class Game {
         if (success) {
             console.log('Game saved successfully');
             // Optionally show a save notification
-            this.showNotification('Game saved successfully!');
+            this.ui.showNotification('Game saved successfully!');
         } else {
             console.error('Failed to save game');
-            this.showNotification('Failed to save game!', 'error');
+            this.ui.showNotification('Failed to save game!', 'error');
         }
         
         return success;
+    }
+
+    setupAutoSave() {
+        // Clear any existing interval
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+        }
+        
+        // Set up auto-save interval (5 minutes = 300,000 milliseconds)
+        this.autoSaveInterval = setInterval(() => {
+            if (this.character) {
+                const success = this.saveGame();
+                if (success) {
+                    console.log('Auto-saved game');
+                    this.ui.showNotification('Game auto-saved!');
+                }
+            }
+        }, 300000); // 5 minutes
+        
+        console.log('Auto-save set up to run every 5 minutes');
     }
     
     // Load game state
@@ -163,46 +186,29 @@ class Game {
             console.log('Game wiped successfully');
             // Reset the game state
             this.character = null;
-
+    
             // Clear the adventure log
             const logContent = document.querySelector('.log-content');
             if (logContent) {
                 logContent.innerHTML = '';
             }
             
+            // Clear auto-save interval
+            if (this.autoSaveInterval) {
+                clearInterval(this.autoSaveInterval);
+                this.autoSaveInterval = null;
+            }
+            
             this.ui.hideElement('.game-container');
             this.ui.showElement('.welcome-container');
             
-            this.showNotification('Game wiped successfully!');
+            this.ui.showNotification('Game wiped successfully!');
         } else {
             console.error('Failed to wipe game');
-            this.showNotification('Failed to wipe game!', 'error');
+            this.ui.showNotification('Failed to wipe game!', 'error');
         }
         
         return success;
-    }
-    
-    // Simple notification system
-    showNotification(message, type = 'success') {
-        // Create notification if it doesn't exist yet
-        let notification = document.querySelector('.game-notification');
-        if (!notification) {
-            notification = document.createElement('div');
-            notification.className = 'game-notification';
-            document.body.appendChild(notification);
-        }
-        
-        // Set message and type
-        notification.textContent = message;
-        notification.className = `game-notification ${type}`;
-        
-        // Show notification
-        notification.classList.add('show');
-        
-        // Hide after 3 seconds
-        setTimeout(() => {
-            notification.classList.remove('show');
-        }, 3000);
     }
 }
 

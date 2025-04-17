@@ -227,10 +227,7 @@ class Action {
         this.game.character.actions[this.id].completionCount = this.completionCount;
         
         // Log to adventure log
-        this.logCompletion();
-        
-        // Save game
-        this.game.saveGame();
+        this.logCompletion();        
     }
     
     /**
