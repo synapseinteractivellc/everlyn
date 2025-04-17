@@ -59,8 +59,10 @@ class Currency extends Resource {
         
         // Unlock any resources that should be unlocked
         for (const resourceId of this.purchaseUnlocks) {
+            console.log(`In the for loop for unlocking resource: ${resourceId}`);
             const resource = character.getResource(resourceId);
             if (resource) {
+                console.log(`Unlocking resource: ${resourceId}`);
                 resource.unlocked = true;
             }
         }
@@ -69,7 +71,7 @@ class Currency extends Resource {
         for (const effect of this.purchaseEffects) {
             effect(character);
         }
-        
+        console.log(`Purchased ${this.name}!`);
         return true;
     }
     
@@ -148,19 +150,36 @@ class Scroll extends Currency {
      * @returns {boolean} - True if purchase was successful
      */
     purchase(character) {
-        const success = super.purchase(character);
+        const unlockedScrolls = character.getResource('scrolls').unlocked;
+        const success = super.purchase(character);        
         
         if (success) {
-            // Log the purchase
-            const logContent = document.querySelector('.log-content');
-            if (logContent) {
-                const logEntry = document.createElement('p');
-                logEntry.textContent = `You purchased a scroll for 10 gold. Reading this makes your head hurt. In a good way?`;
-                logContent.insertBefore(logEntry, logContent.firstChild);
+            console.log('Purchased a scroll!');
+            
+            if (!unlockedScrolls) {
+                // Log the purchase
+                const logContent = document.querySelector('.log-content');
+                if (logContent) {
+                    const logEntry = document.createElement('p');
+                    logEntry.textContent = `You purchased a scroll for 10 gold. Reading this makes your head hurt. In a good way?`;
+                    logContent.insertBefore(logEntry, logContent.firstChild);
+                }
+                
+                // Show notification
+                this.game.ui.showNotification('You purchased a scroll! You can now generate research.');
+            } else {
+                // Log the purchase
+                const logContent = document.querySelector('.log-content');
+                if (logContent) {
+                    const logEntry = document.createElement('p');
+                    logEntry.textContent = `You purchased another scroll!`;
+                    logContent.insertBefore(logEntry, logContent.firstChild);
+                }
+                
+                // Show notification
+                this.game.ui.showNotification('You purchased another scroll! Research generation increased.');
             }
             
-            // Show notification
-            this.game.ui.showNotification('You purchased a scroll! You can now generate research.');
         }
         
         return success;

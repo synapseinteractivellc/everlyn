@@ -72,6 +72,9 @@ class Upgrade {
      */
     isNearlyAffordable() {
         const character = this.game.character;
+
+        // Make sure character exists
+        if (!character) return false;
         
         // Check each resource cost
         for (const resourceId in this.costs) {
@@ -416,6 +419,9 @@ class UpgradesManager {
      * Check for upgrades that should be unlocked
      */
     checkForUnlockableUpgrades() {
+        // Skip if there's no character
+        if (!this.game.character) return;
+        
         let changed = false;
         
         for (const id in this.upgrades) {
