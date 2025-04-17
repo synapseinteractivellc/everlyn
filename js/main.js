@@ -73,11 +73,11 @@ class Game {
     init() {
         if (this.initialized) return;
         
-        // Try to load existing character
-        this.loadGame();
-        
         // Initialize UI
         this.ui = new UI(this);
+        
+        // Try to load existing character
+        this.loadGame();       
         
         // Setup additional event listeners
         this.setupEventListeners();
@@ -86,6 +86,7 @@ class Game {
         if (this.character) {
             this.actionsManager = new ActionsManager(this);
             this.upgradesManager = new UpgradesManager(this);
+            this.skillsManager = new SkillsManager(this);
             
             // Register event handlers after managers are created
             this.registerEventHandlers();
@@ -195,25 +196,35 @@ class Game {
         if (!this.character) return false;
         
         try {
+            // Create a complete game state object
             const gameState = {
-                character: this.character.save() // Use the character's save method instead of directly using the character object
-                // Add other game state properties here as your game grows
+                character: this.character.save()
             };
+            
+            // Add skills data explicitly to the save
+            if (this.skillsManager) {
+                gameState.skills = this.skillsManager.saveData();
+            }
             
             const success = this.storage.saveGame(gameState);
             if (success) {
                 console.log('Game saved successfully');
-                // Optionally show a save notification
-                this.ui.showNotification('Game saved successfully!');
+                if (this.ui) {
+                    this.ui.showNotification('Game saved successfully!');
+                }
             } else {
                 console.error('Failed to save game');
-                this.ui.showNotification('Failed to save game!', 'error');
+                if (this.ui) {
+                    this.ui.showNotification('Failed to save game!', 'error');
+                }
             }
             
             return success;
         } catch (error) {
             console.error('Error saving game:', error);
-            this.ui.showNotification('Error saving game!', 'error');
+            if (this.ui) {
+                this.ui.showNotification('Error saving game!', 'error');
+            }
             return false;
         }
     }
@@ -246,12 +257,17 @@ class Game {
         try {
             // Rebuild character object from saved data
             if (gameState.character) {
-                this.character = new Character(gameState.character.name, this);
-                Object.assign(this.character, gameState.character);
+                this.character = Character.load(gameState.character, this);
                 
-                // If we have a skills manager, load skill data
-                if (this.skillsManager && gameState.character.skills) {
-                    this.skillsManager.loadSavedData(gameState.character);
+                // Set up skills manager if needed
+                if (!this.skillsManager) {
+                    this.skillsManager = new SkillsManager(this);
+                }
+                
+                // Load skill data if it exists
+                if (gameState.skills) {
+                    // Load skills directly from the game state
+                    this.skillsManager.loadSavedData({skills: gameState.skills});
                 }
                 
                 console.log('Game loaded successfully', this.character);

@@ -447,7 +447,7 @@ class MageLore extends Skill {
         if (research && research.current >= 10) {
             this.unlocked = true;
             
-            // Log the unlocking
+            // Log the unlocking only if UI is available
             const logContent = document.querySelector('.log-content');
             if (logContent) {
                 const logEntry = document.createElement('p');
@@ -455,11 +455,11 @@ class MageLore extends Skill {
                 logContent.insertBefore(logEntry, logContent.firstChild);
             }
             
-            // Show notification
-            this.game.ui.showNotification('New skill available: Mage Lore!');
-            
-            // Flash the skills tab
-            this.flashSkillsTab();
+            // Show notification only if UI is available
+            if (this.game.ui) {
+                this.game.ui.showNotification('New skill available: Mage Lore!');
+                this.flashSkillsTab();
+            }
             
             return true;
         }
@@ -621,9 +621,17 @@ class SkillsManager {
         for (const [skillId, skillData] of Object.entries(savedData.skills)) {
             const skill = this.skills[skillId];
             if (skill) {
-                skill.deserialize(skillData);
+                // Directly set the important properties to ensure they're loaded
+                if (skillData.purchased !== undefined) skill.purchased = skillData.purchased;
+                if (skillData.level !== undefined) skill.level = skillData.level;
+                if (skillData.experience !== undefined) skill.experience = skillData.experience;
+                
+                console.log(`Loaded skill ${skillId}: Level ${skill.level}, XP ${skill.experience}, Purchased: ${skill.purchased}`);
             }
         }
+        
+        // Refresh UI after loading skills
+        this.refreshSkillsUI();
     }
     
     /**
@@ -634,9 +642,15 @@ class SkillsManager {
         const data = {};
         
         for (const [skillId, skill] of Object.entries(this.skills)) {
-            data[skillId] = skill.serialize();
+            data[skillId] = {
+                id: skill.id,
+                purchased: skill.purchased,
+                level: skill.level,
+                experience: skill.experience
+            };
         }
         
+        console.log('Saving skills data:', data);
         return data;
     }
 }
