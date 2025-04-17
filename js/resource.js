@@ -33,7 +33,6 @@ class Resource {
         
         // Emit event if value changed and game exists
         if (this.current !== oldValue && this.game && this.game.events) {
-            console.log(`Resource ${this.id} changed: ${oldValue} -> ${this.current}`);
             this.game.events.emit('resource.changed', {
                 id: this.id,
                 oldValue: oldValue,
@@ -59,7 +58,6 @@ class Resource {
         
         // Emit event if value changed and game exists
         if (this.current !== oldValue && this.game && this.game.events) {
-            console.log(`Resource ${this.id} changed: ${oldValue} -> ${this.current}`);
             this.game.events.emit('resource.changed', {
                 id: this.id,
                 oldValue: oldValue,

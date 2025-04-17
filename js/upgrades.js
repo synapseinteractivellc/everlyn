@@ -343,9 +343,9 @@ class UpgradesManager {
      * @param {Object} data - Resource change data
      */
     onResourceChanged(data) {
-        console.log('UpgradesManager received resource change:', data);
         // Check if gold changed or resource increased
         if (data.id === 'gold' || data.newValue > data.oldValue) {
+            // Check for unlockable upgrades
             this.checkForUnlockableUpgrades();
             this.updateUpgradeButtons();
         }
@@ -365,7 +365,6 @@ class UpgradesManager {
             if (upgrade) {
                 // Update disabled state based on whether we can afford it
                 const canAfford = upgrade.canAfford();
-                console.log(`Upgrade ${upgradeId} can afford: ${canAfford}`);
                 button.disabled = !canAfford;
             }
         });

@@ -25,7 +25,6 @@ class Game {
         if (this.upgradesManager) {
             // Register event handlers for upgrade manager
             this.events.on('resource.changed', (data) => {
-                console.log('Resource changed event received in game:', data);
                 this.upgradesManager.onResourceChanged(data);
             });
         }
@@ -33,7 +32,6 @@ class Game {
         if (this.ui) {
             // Register event handlers for UI
             this.events.on('resource.changed', (data) => {
-                console.log('Resource changed event received in UI:', data);
                 this.ui.onResourceChanged(data);
             });
         }
@@ -151,7 +149,7 @@ class Game {
     createNewCharacter() {
         const nameInput = document.getElementById('character-name');
         if (nameInput && nameInput.value) {
-            this.character = new Character(nameInput.value);
+            this.character = new Character(nameInput.value, this);
             this.saveGame();
             
             // Initialize actions manager
@@ -245,7 +243,7 @@ class Game {
         try {
             // Rebuild character object from saved data
             if (gameState.character) {
-                this.character = new Character(gameState.character.name);
+                this.character = new Character(gameState.character.name, this);
                 Object.assign(this.character, gameState.character);
                 console.log('Game loaded successfully', this.character);
                 return true;

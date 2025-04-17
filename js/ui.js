@@ -144,7 +144,6 @@ class UI {
      * @param {Object} data - The resource change data
      * */
     onResourceChanged(data) {
-        console.log('UI received resource change:', data);
         // Update resource displays
         this.updateResourceDisplays(this.game.character);
         
@@ -259,8 +258,6 @@ class UI {
         for (const [currencyId, currency] of Object.entries(character.currencies)) {
             // Skip if not purchasable or already at max
             if (!currency.purchaseCost || currency.isFull()) continue;
-            
-            console.log(`Checking currency for purchase: ${currencyId}`, currency); // Debugging
             
             // Create button only if we're close to affording it or it's unlocked
             let canShow = false;

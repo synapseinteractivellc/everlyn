@@ -14,7 +14,6 @@ class EventEmitter {
             this.events[event] = [];
         }
         this.events[event].push(listener);
-        console.log(`Event subscribed: ${event}, ${listener}`); // Debug log
     }
 
     /**
@@ -25,7 +24,6 @@ class EventEmitter {
     off(event, listener) {
         if (!this.events[event]) return;
         this.events[event] = this.events[event].filter(l => l !== listener);
-        console.log(`Event unsubscribed: ${event}, ${listener}`); // Debug log
     }
 
     /**
@@ -36,7 +34,6 @@ class EventEmitter {
     emit(event, data) {
         if (!this.events[event]) return;
         this.events[event].forEach(listener => listener(data));
-        console.log(`Event emitted: ${event}`, data); // Debug log
     }
 }
 
