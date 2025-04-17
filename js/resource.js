@@ -16,6 +16,7 @@ class Resource {
         this.max = config.max !== undefined ? config.max : 0;
         this.unlocked = config.unlocked !== undefined ? config.unlocked : false;
         this.regenerationRate = config.regenerationRate || 0;
+        this.game = config.game || null;
     }
     
     /**
@@ -24,10 +25,23 @@ class Resource {
      * @returns {number} - Current value after adding
      */
     add(amount) {
+        const oldValue = this.current;
         this.current += amount;
         if (this.current > this.max) {
             this.current = this.max;
         }
+        
+        // Emit event if value changed and game exists
+        if (this.current !== oldValue && this.game && this.game.events) {
+            console.log(`Resource ${this.id} changed: ${oldValue} -> ${this.current}`);
+            this.game.events.emit('resource.changed', {
+                id: this.id,
+                oldValue: oldValue,
+                newValue: this.current,
+                resource: this
+            });
+        }
+        
         return this.current;
     }
     
@@ -37,10 +51,23 @@ class Resource {
      * @returns {number} - Current value after removing
      */
     remove(amount) {
+        const oldValue = this.current;
         this.current -= amount;
         if (this.current < 0) {
             this.current = 0;
         }
+        
+        // Emit event if value changed and game exists
+        if (this.current !== oldValue && this.game && this.game.events) {
+            console.log(`Resource ${this.id} changed: ${oldValue} -> ${this.current}`);
+            this.game.events.emit('resource.changed', {
+                id: this.id,
+                oldValue: oldValue,
+                newValue: this.current,
+                resource: this
+            });
+        }
+        
         return this.current;
     }
     

@@ -323,8 +323,52 @@ class UpgradesManager {
         // Populate UI with upgrade buttons
         this.populateUpgradeButtons();
         
-        // Set up update interval to check for new unlockable upgrades
+        // Listen for resource changes
+        if (this.game.events) {
+            this.game.events.on('resource.changed', (data) => {
+                // Check if we need to update the UI based on resource changes
+                if (data.id === 'gold' || data.newValue >= data.oldValue) {
+                    this.checkForUnlockableUpgrades();
+                    this.updateUpgradeButtons();
+                }
+            });
+        }
+        
+        // Set up update interval as a fallback
         setInterval(() => this.checkForUnlockableUpgrades(), 1000);
+    }
+
+    /**
+     * Handle resource changes and check for unlockable upgrades
+     * @param {Object} data - Resource change data
+     */
+    onResourceChanged(data) {
+        console.log('UpgradesManager received resource change:', data);
+        // Check if gold changed or resource increased
+        if (data.id === 'gold' || data.newValue > data.oldValue) {
+            this.checkForUnlockableUpgrades();
+            this.updateUpgradeButtons();
+        }
+    }
+
+    /**
+     * Update upgrade buttons based on current resources
+     * */
+    updateUpgradeButtons() {
+        console.log('Updating upgrade buttons');
+        const upgradeButtons = document.querySelectorAll('.upgrade-button');
+        
+        upgradeButtons.forEach(button => {
+            const upgradeId = button.dataset.upgrade;
+            const upgrade = this.getUpgrade(upgradeId);
+            
+            if (upgrade) {
+                // Update disabled state based on whether we can afford it
+                const canAfford = upgrade.canAfford();
+                console.log(`Upgrade ${upgradeId} can afford: ${canAfford}`);
+                button.disabled = !canAfford;
+            }
+        });
     }
     
     /**

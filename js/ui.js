@@ -5,10 +5,23 @@ class UI {
      * UI class to manage the user interface of the game
      * @param {Game} game - The game instance
      */
-     constructor(game) {
+    constructor(game) {
         this.game = game;
         this.setupEventListeners();
-    }    
+        
+        // Listen for resource events
+        if (this.game.events) {
+            this.game.events.on('resource.changed', (data) => {
+                // Update resource displays when any resource changes
+                this.updateResourceDisplays(this.game.character);
+                
+                // Only update purchase buttons when gold changes or increases
+                if (data.id === 'gold' || data.newValue > data.oldValue) {
+                    this.updatePurchaseButtons(this.game.character);
+                }
+            });
+        }
+    } 
 
     /**
      * Set up event listeners for UI elements
@@ -127,6 +140,21 @@ class UI {
     }
 
     /**
+     * Handle resource changes and update UI accordingly
+     * @param {Object} data - The resource change data
+     * */
+    onResourceChanged(data) {
+        console.log('UI received resource change:', data);
+        // Update resource displays
+        this.updateResourceDisplays(this.game.character);
+        
+        // Update purchase buttons if gold changed or resource increased
+        if (data.id === 'gold' || data.newValue > data.oldValue) {
+            this.updatePurchaseButtons(this.game.character);
+        }
+    }
+
+    /**
      * Update all resource displays based on character data
      * @param {Object} character - The character object with resource data
      */
@@ -137,8 +165,6 @@ class UI {
         for (const [id, currency] of Object.entries(character.currencies)) {
             // Skip if not unlocked
             if (!currency.unlocked) continue;
-            console.log(`Updating currency: ${id}`); // Debugging statement
-            console.log(`Updating currency: ${currency.update}`); // Debugging statement
             
             // Get the container for this currency
             const resourceItem = document.getElementById(`${id}-resource`);
@@ -230,9 +256,11 @@ class UI {
         upgradesContainer.innerHTML = '';
         
         // Add buttons for purchasable currencies
-        for (const currency of Object.values(character.currencies)) {
+        for (const [currencyId, currency] of Object.entries(character.currencies)) {
             // Skip if not purchasable or already at max
             if (!currency.purchaseCost || currency.isFull()) continue;
+            
+            console.log(`Checking currency for purchase: ${currencyId}`, currency); // Debugging
             
             // Create button only if we're close to affording it or it's unlocked
             let canShow = false;
@@ -249,6 +277,16 @@ class UI {
             if (canShow || currency.unlocked) {
                 const button = this.createPurchaseButton(currency, character);
                 upgradesContainer.appendChild(button);
+            }
+        }
+        
+        // Also check for regular upgrades from the upgrade manager
+        if (this.game.upgradesManager) {
+            for (const upgrade of Object.values(this.game.upgradesManager.upgrades)) {
+                if (upgrade.unlocked && !upgrade.purchased) {
+                    const button = upgrade.createButtonElement();
+                    upgradesContainer.appendChild(button);
+                }
             }
         }
     }

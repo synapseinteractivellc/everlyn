@@ -20,7 +20,8 @@ class Character {
                 max: 10,
                 unlocked: true,
                 recoveryRate: 0.5,
-                recoveryDelay: 3000
+                recoveryDelay: 3000,
+                game: game
             }),
             stamina: new Stat({
                 id: 'stamina',
@@ -30,7 +31,8 @@ class Character {
                 max: 10,
                 unlocked: true,
                 recoveryRate: 0.5,
-                recoveryDelay: 1000
+                recoveryDelay: 1000,
+                game: game
             }),
             mana: new Stat({
                 id: 'mana',
@@ -39,7 +41,8 @@ class Character {
                 max: 0,
                 unlocked: false,
                 recoveryRate: 0.3,
-                recoveryDelay: 5000
+                recoveryDelay: 5000,
+                game: game
             })
         };
         
@@ -50,14 +53,16 @@ class Character {
                 name: 'Gold',
                 description: 'Currency used for purchases',
                 max: 10,
-                unlocked: true
+                unlocked: true,
+                game: game
             }),
             research: new Currency({
                 id: 'research',
                 name: 'Research',
                 description: 'Knowledge gained from scrolls',
                 max: 10,
-                unlocked: false
+                unlocked: false,
+                game: game
             }),
             scrolls: new Scroll(game)
         };
@@ -103,7 +108,6 @@ class Character {
             console.error(`Resource not found: ${id}`);
             return null;
         }
-        console.log('Found resource:', resource); // Debugging statement
         if (typeof resource.add !== 'function') {
             console.error(`Resource ${id} is not a valid Resource instance.`);
             return null;
@@ -119,7 +123,6 @@ class Character {
         // Update currencies
         for (const currency of Object.values(this.currencies)) {
             if (currency.unlocked) {
-                console.log('Updating currency:', currency); // Debugging statement
                 if (typeof currency.update === 'function') {
                     currency.update(deltaTime, this);
                 } else {
@@ -131,7 +134,6 @@ class Character {
         // Update stats
         for (const stat of Object.values(this.stats)) {
             if (stat.unlocked) {
-                console.log('Updating stat:', stat); // Debugging statement
                 if (typeof stat.update === 'function') {
                     stat.update(deltaTime);
                 } else {

@@ -204,9 +204,6 @@ class Action {
         
         // Log to adventure log
         this.logCompletion();
-        
-        // Save game
-        this.game.saveGame();
     }
     
     /**

@@ -4,6 +4,7 @@ import UI from './ui.js';
 import Storage from './storage.js';
 import { ActionsManager } from './actions.js';
 import { UpgradesManager } from './upgrades.js';
+import EventEmitter from './eventEmitter.js';
 
 class Game {
     constructor() {
@@ -13,6 +14,29 @@ class Game {
         this.storage = new Storage();
         this.actionsManager = null;
         this.upgradesManager = null;
+        this.events = new EventEmitter();
+    }
+
+    /**
+     * Register event handlers for the game and UI
+     * @returns {void}
+     */
+    registerEventHandlers() {
+        if (this.upgradesManager) {
+            // Register event handlers for upgrade manager
+            this.events.on('resource.changed', (data) => {
+                console.log('Resource changed event received in game:', data);
+                this.upgradesManager.onResourceChanged(data);
+            });
+        }
+        
+        if (this.ui) {
+            // Register event handlers for UI
+            this.events.on('resource.changed', (data) => {
+                console.log('Resource changed event received in UI:', data);
+                this.ui.onResourceChanged(data);
+            });
+        }
     }
 
     /**
@@ -72,6 +96,9 @@ class Game {
         if (this.character) {
             this.actionsManager = new ActionsManager(this);
             this.upgradesManager = new UpgradesManager(this);
+            
+            // Register event handlers after managers are created
+            this.registerEventHandlers();
         }
 
         // Set up auto-save interval (every 5 minutes)
@@ -149,6 +176,9 @@ class Game {
         // Initialize upgrades manager if not already initialized
         if (!this.upgradesManager) {
             this.upgradesManager = new UpgradesManager(this);
+
+            // Register event handlers if they weren't registered before
+            this.registerEventHandlers();
         }
         
         // Update UI with character info
