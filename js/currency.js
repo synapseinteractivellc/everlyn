@@ -59,10 +59,8 @@ class Currency extends Resource {
         
         // Unlock any resources that should be unlocked
         for (const resourceId of this.purchaseUnlocks) {
-            console.log(`In the for loop for unlocking resource: ${resourceId}`);
             const resource = character.getResource(resourceId);
             if (resource) {
-                console.log(`Unlocking resource: ${resourceId}`);
                 resource.unlocked = true;
             }
         }
@@ -71,7 +69,6 @@ class Currency extends Resource {
         for (const effect of this.purchaseEffects) {
             effect(character);
         }
-        console.log(`Purchased ${this.name}!`);
         return true;
     }
     
@@ -154,7 +151,6 @@ class Scroll extends Currency {
         const success = super.purchase(character);        
         
         if (success) {
-            console.log('Purchased a scroll!');
             
             if (!unlockedScrolls) {
                 // Log the purchase

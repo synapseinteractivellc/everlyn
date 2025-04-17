@@ -68,7 +68,7 @@ class Character {
         };
         
         this.actions = {};
-        this.skills = [];
+        this.skills = {};
         this.inventory = [];
         this.upgrades = {};
     }

@@ -317,6 +317,15 @@ class Action {
         
         return button;
     }
+
+    /**
+     * Check if this action should be visible/available
+     * @returns {boolean} - True if the action should be available
+     */
+    isAvailable() {
+        // By default, all actions are available
+        return true;
+    }
 }
 
 /**
@@ -407,7 +416,7 @@ class Rest extends Action {
             costPerSecond: {}, // No cost
             gainPerSecond: {
                 health: 2,    // 2 health per second (10 over 5 seconds)
-                stamina: 2    // 2 stamina per second (10 over 5 seconds)
+                stamina: 2,    // 2 stamina per second (10 over 5 seconds)
             },
             duration: 5, // 5 seconds to complete
             autoRepeat: true,
@@ -507,6 +516,89 @@ class OddJobs extends Action {
 }
 
 /**
+ * MeditateOnArcaneWisdom action - Generates MageLore XP and research
+ */
+class MeditateOnArcaneWisdom extends Action {
+    constructor(game) {
+        super(game, {
+            id: 'meditateOnArcaneWisdom',
+            name: 'Meditate on Arcane Wisdom',
+            description: 'Focus your magical energy to internalize arcane knowledge',
+            costPerSecond: {
+                mana: 1,      // 1 mana per second
+                stamina: 0.2  // 0.2 stamina per second
+            },
+            gainPerSecond: {
+                // Handled in update method for skill XP
+            },
+            duration: 2.5,    // 2.5 seconds to complete
+            autoRepeat: true,
+            tooltipText: "Use your magical energy to deepen your arcane knowledge. Generates MageLore XP and research.",
+            successMessages: [
+                "You achieve a moment of arcane clarity.",
+                "The magical energies flow through your mind, expanding your knowledge.",
+                "Ancient symbols briefly materialize in your mind's eye.",
+                "You feel the threads of magical energy weaving into patterns of knowledge."
+            ]
+        });
+    }
+    
+    /**
+     * Apply continuous gains per second (including skill XP)
+     * @param {number} deltaTime - Time passed in seconds
+     */
+    applyGains(deltaTime) {
+        super.applyGains(deltaTime);
+        
+        // Add XP to MageLore skill if it exists and is purchased
+        if (this.game.skillsManager) {
+            const mageLoreSkill = this.game.skillsManager.skills['mageLore'];
+            if (mageLoreSkill && mageLoreSkill.purchased) {
+                // Add XP at the rate of 1 per second
+                const xpGain = 1 * deltaTime;
+                mageLoreSkill.addExperience(xpGain);
+                
+                // If skill leveled up, refresh UI and show notification
+                if (mageLoreSkill.experience === 0 && mageLoreSkill.level > 0) {
+                    this.game.skillsManager.refreshSkillsUI();
+                    this.game.ui.updateResourceDisplays(this.game.character);
+                    this.game.ui.showNotification(`MageLore skill increased to level ${mageLoreSkill.level}!`);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Apply rewards when action completes
+     */
+    applyRewards() {
+        const character = this.game.character;
+        
+        // Add research points
+        const research = character.getResource('research');
+        if (research) {
+            research.add(1);
+        }
+        
+        // Update UI
+        this.game.ui.updateResourceDisplays(character);
+    }
+    
+    /**
+     * Check if this action should be visible/available
+     * @returns {boolean} - True if the action should be available
+     */
+    isAvailable() {
+        // Only available if MageLore skill is purchased
+        if (this.game.skillsManager) {
+            const mageLoreSkill = this.game.skillsManager.skills['mageLore'];
+            return mageLoreSkill && mageLoreSkill.purchased;
+        }
+        return false;
+    }
+}
+
+/**
  * Cheat action - Instantly fills all resources to maximum
  */
 class Cheat extends Action {
@@ -567,6 +659,7 @@ class ActionsManager {
         this.registerAction(new BegForCoins(this.game));
         this.registerAction(new Rest(this.game));
         this.registerAction(new OddJobs(this.game));
+        this.registerAction(new MeditateOnArcaneWisdom(this.game));
         this.registerAction(new Cheat(this.game));
         
         // Setup event listeners
@@ -619,6 +712,12 @@ class ActionsManager {
         // Add all registered actions
         for (const id in this.actions) {
             const action = this.actions[id];
+            
+            // Check if action should be visible (if it has an isAvailable method)
+            if (typeof action.isAvailable === 'function' && !action.isAvailable()) {
+                continue; // Skip this action
+            }
+            
             const button = action.createButtonElement();
             actionsContainer.appendChild(button);
         }

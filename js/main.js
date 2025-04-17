@@ -4,6 +4,7 @@ import UI from './ui.js';
 import Storage from './storage.js';
 import { ActionsManager } from './actions.js';
 import { UpgradesManager } from './upgrades.js';
+import { SkillsManager } from './skill.js';
 import EventEmitter from './eventEmitter.js';
 
 class Game {
@@ -14,6 +15,7 @@ class Game {
         this.storage = new Storage();
         this.actionsManager = null;
         this.upgradesManager = null;
+        this.skillsManager = null;
         this.events = new EventEmitter();
     }
 
@@ -168,6 +170,11 @@ class Game {
             // Register event handlers if they weren't registered before
             this.registerEventHandlers();
         }
+
+        // Initialize skills manager if not already initialized
+        if (!this.skillsManager) {
+            this.skillsManager = new SkillsManager(this);
+        }
         
         // Update UI with character info
         this.updateUI();     
@@ -241,6 +248,12 @@ class Game {
             if (gameState.character) {
                 this.character = new Character(gameState.character.name, this);
                 Object.assign(this.character, gameState.character);
+                
+                // If we have a skills manager, load skill data
+                if (this.skillsManager && gameState.character.skills) {
+                    this.skillsManager.loadSavedData(gameState.character);
+                }
+                
                 console.log('Game loaded successfully', this.character);
                 return true;
             }

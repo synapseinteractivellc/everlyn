@@ -642,3 +642,116 @@ progress::-moz-progress-bar {
     color: #b95225;
     margin-top: 0.5rem;
 }
+
+/* Skills styling */
+.skills-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.skill-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f0f0;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.skill-card[data-purchased="true"] {
+    background-color: #e0f0ff;
+}
+
+.skill-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.skill-description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.8rem;
+    flex-grow: 1;
+}
+
+.skill-level {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.skill-progress-container {
+    height: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.skill-progress {
+    height: 100%;
+    background-color: var(--accent-color);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.skill-xp {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 0.8rem;
+}
+
+.skill-cost {
+    font-size: 0.9rem;
+    color: #b95225;
+    margin-bottom: 0.5rem;
+}
+
+.skill-purchase-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.skill-purchase-button:hover:not(:disabled) {
+    background-color: var(--secondary-color);
+}
+
+.skill-purchase-button:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+.skill-add-xp-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.skill-add-xp-button:hover {
+    background-color: #2980b9;
+}
+
+/* Flashing effect for nav buttons */
+@keyframes flash {
+    0% { background-color: var(--secondary-color); }
+    50% { background-color: var(--accent-color); }
+    100% { background-color: var(--secondary-color); }
+}
+
+.nav-button.flashing {
+    animation: flash 1s infinite;
+}
