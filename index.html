@@ -6,82 +6,51 @@
     <meta name="author" content="Synapse Interactive LLC">
     <meta name="description" content="Everlyn: City of Wonder - A 2D web-based Idle/Clicker Fantasy RPG">
     <title>Everlyn: City of Wonder</title>
-    <link rel="stylesheet" href="./css/reset.css">
-    <link rel="stylesheet" href="./css/themes.css">
-    <link rel="stylesheet" href="./css/base.css">
-    <link rel="stylesheet" href="./css/components.css">
-    <link rel="stylesheet" href="./css/layout.css">
-    <link rel="stylesheet" href="./css/animations.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Content will be loaded via templates -->
-        <!-- Initial welcome template will load here -->
-    </div>
-
-    <!-- Load libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.min.js"></script>
-    
-    <!-- Templates -->
-    <script id="welcome-template" type="text/x-handlebars-template">
-        <div class="welcome-container fade-in">
-            <div class="welcome-header">
-                <h1>Everlyn: City of Wonder</h1>
-                <p class="tagline">Begin your journey in the legendary city...</p>
+    <div class="welcome-container fade-in">
+        <div class="welcome-header">
+            <h1>Everlyn: City of Wonder</h1>
+            <p class="tagline">Begin your journey in the legendary city...</p>
+        </div>
+        
+        <div class="welcome-content">
+            <div class="welcome-description">
+                <p>Welcome to Everlyn, a city of ancient magic and endless opportunity. As a newcomer to these storied streets, your destiny awaits. What path will you choose in this city of wonder?</p>
             </div>
             
-            <div class="welcome-content">
-                <div class="welcome-description">
-                    <p>Welcome to Everlyn, a city of ancient magic and endless opportunity. As a newcomer to these storied streets, your destiny awaits. What path will you choose in this city of wonder?</p>
+            <div class="character-creation card">
+                <div class="card-header">
+                    <h2>Create Your Character</h2>
                 </div>
-                
-                <div class="character-creation card">
-                    <div class="card-header">
-                        <h2>Create Your Character</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="character-form">
-                            <div class="form-group">
-                                <label for="character-name">Character Name:</label>
-                                <input type="text" id="character-name" name="character-name" required 
-                                       placeholder="Enter your character's name" 
-                                       minlength="2" maxlength="20">
-                            </div>
-                            
-                            <div class="character-info">
-                                <p>You will begin as a humble <span class="highlight">Waif</span>, alone but determined in the grand city of Everlyn.</p>
-                                <p>Your story begins with nothing but the clothes on your back and your wits. Through persistence and clever choices, you'll rise through the ranks of society, mastering skills and uncovering the city's many secrets.</p>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <button type="submit" id="start-game" class="btn-primary">Enter the City</button>
-                            </div>
-                        </form>
-                    </div>
+                <div class="card-body">
+                    <form id="character-form">
+                        <div class="form-group">
+                            <label for="character-name">Character Name:</label>
+                            <input type="text" id="character-name" name="character-name" required 
+                                placeholder="Enter your character's name" 
+                                minlength="2" maxlength="20">
+                        </div>
+                        
+                        <div class="character-info">
+                            <p>You will begin as a humble <span class="highlight">Waif</span>, alone but determined in the grand city of Everlyn.</p>
+                            <p>Your story begins with nothing but the clothes on your back and your wits. Through persistence and clever choices, you'll rise through the ranks of society, mastering skills and uncovering the city's many secrets.</p>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" id="start-game" class="btn-primary">Enter the City</button>
+                        </div>
+                    </form>
                 </div>
-            </div>
-            
-            <div class="welcome-footer">
-                <div class="city-silhouette"></div>
-                <footer>
-                    &copy; 2025 Synapse Interactive LLC. MIT License.
-                </footer>
             </div>
         </div>
-    </script>
-
-    <!-- Load game scripts -->
-    <script src="./js/utils/helpers.js"></script>
-    <script src="./js/core/storage.js"></script>
-    <script src="./js/templates/templateLoader.js"></script>
-    <script src="./js/core/engine.js"></script>
-    <script src="./js/core/events.js"></script>
-    <script src="./js/components/component.js"></script>
-    <script src="./js/components/ui.js"></script>
-    <script src="./js/components/character.js"></script>
-    <script src="./js/components/map.js"></script>
-    <script src="./js/components/location.js"></script>
-    <script src="./js/components/actions.js"></script>
-    <script src="./js/main.js"></script>
+        
+        <div class="welcome-footer">
+            <div class="city-silhouette"></div>
+            <footer>
+                &copy; 2025 Synapse Interactive LLC. MIT License.
+            </footer>
+        </div>
+    </div>
 </body>
 </html>
