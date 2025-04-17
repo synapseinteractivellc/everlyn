@@ -248,6 +248,8 @@ class UI {
      * @param {Object} character - The character object
      */
     updatePurchaseButtons(character) {
+        if (!character) return;
+        
         const upgradesContainer = document.querySelector('.available-upgrades');
         if (!upgradesContainer) return;
         

@@ -37,41 +37,31 @@ class Game {
         }
     }
 
-    /**
-     * Main game update loop
-     * @param {number} timestamp - Current timestamp
-     */
     update(timestamp) {
         // Calculate delta time (in seconds)
         const now = timestamp || performance.now();
         const deltaTime = (now - (this.lastUpdate || now)) / 1000;
         this.lastUpdate = now;
         
-        // Update character resources
+        // Only update if character exists
         if (this.character) {
+            // Update character resources
             this.character.update(deltaTime);
             
             // Update UI periodically (not every frame to avoid performance issues)
             this.resourceUpdateCounter = (this.resourceUpdateCounter || 0) + deltaTime;
             if (this.resourceUpdateCounter >= 0.1) { // Update UI 10 times per second
                 this.ui.updateResourceDisplays(this.character);
+                
+                // Update purchase buttons less frequently
+                this.purchaseUpdateCounter = (this.purchaseUpdateCounter || 0) + 1;
+                if (this.purchaseUpdateCounter >= 10) { // Once per second
+                    this.ui.updatePurchaseButtons(this.character);
+                    this.purchaseUpdateCounter = 0;
+                }
+                
                 this.resourceUpdateCounter = 0;
             }
-        }
-
-        // Update UI periodically
-        this.resourceUpdateCounter = (this.resourceUpdateCounter || 0) + deltaTime;
-        if (this.resourceUpdateCounter >= 0.1) { // Update UI 10 times per second
-            this.ui.updateResourceDisplays(this.character);
-            
-            // Update purchase buttons less frequently
-            this.purchaseUpdateCounter = (this.purchaseUpdateCounter || 0) + 1;
-            if (this.purchaseUpdateCounter >= 10) { // Once per second
-                this.ui.updatePurchaseButtons(this.character);
-                this.purchaseUpdateCounter = 0;
-            }
-            
-            this.resourceUpdateCounter = 0;
         }
         
         // Request next frame
