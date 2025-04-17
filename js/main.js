@@ -187,22 +187,28 @@ class Game {
     saveGame() {
         if (!this.character) return false;
         
-        const gameState = {
-            character: this.character
-            // Add other game state properties here as your game grows
-        };
-        
-        const success = this.storage.saveGame(gameState);
-        if (success) {
-            console.log('Game saved successfully');
-            // Optionally show a save notification
-            this.ui.showNotification('Game saved successfully!');
-        } else {
-            console.error('Failed to save game');
-            this.ui.showNotification('Failed to save game!', 'error');
+        try {
+            const gameState = {
+                character: this.character.save() // Use the character's save method instead of directly using the character object
+                // Add other game state properties here as your game grows
+            };
+            
+            const success = this.storage.saveGame(gameState);
+            if (success) {
+                console.log('Game saved successfully');
+                // Optionally show a save notification
+                this.ui.showNotification('Game saved successfully!');
+            } else {
+                console.error('Failed to save game');
+                this.ui.showNotification('Failed to save game!', 'error');
+            }
+            
+            return success;
+        } catch (error) {
+            console.error('Error saving game:', error);
+            this.ui.showNotification('Error saving game!', 'error');
+            return false;
         }
-        
-        return success;
     }
 
     setupAutoSave() {
