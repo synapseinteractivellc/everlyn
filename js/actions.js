@@ -435,6 +435,78 @@ class Rest extends Action {
 }
 
 /**
+ * OddJobs action
+ */
+class OddJobs extends Action {
+    constructor(game) {
+        super(game, {
+            id: 'oddJobs',
+            name: 'Do Odd Jobs',
+            description: 'Find various odd jobs around the city to earn some extra gold.',
+            costPerSecond: {
+                stamina: 1 // 1 stamina per second
+            },
+            duration: 1, // 1 seconds to complete
+            autoRepeat: true,
+            tooltipText: "Do odd jobs to earn some extra gold. Uses stamina, but earns you some gold.",
+            successMessages: [
+                "You helped an elderly shopkeeper in the market arrange their merchandise: 1 gold for your efforts.",
+                "You delivered a message across the city and got a return message for double to pay: 2 gold for your efforts.",
+                "You swept the steps of the Grand Library and impressed the Librarian: 3 gold for your efforts."
+            ]
+        });
+    }
+    
+    /**
+     * Apply rewards with weighted randomization
+     * 90% chance for 1-2 gold
+     * 10% chance for 3 gold
+     */
+    applyRewards() {
+        const character = this.game.character;
+        let gold = 0;
+        
+        // Weighted random calculation
+        const roll = Math.random();
+        if (roll < 0.45) {
+            gold = 1; // 45% chance for 1 gold
+            this.lastRewardMessage = this.successMessages[0];
+        } else if (roll < 0.9) { 
+            gold = 2; // 45% chance for 2 gold
+            this.lastRewardMessage = this.successMessages[1];
+        } else {
+            gold = 3; // 10% chance for 3 gold
+            this.lastRewardMessage = this.successMessages[2];
+        }
+        
+        // Add gold to character
+        const goldResource = character.getResource('gold');
+        goldResource.add(gold);
+        
+        // Update UI
+        this.game.ui.updateResourceDisplays(character);
+    }
+    
+    /**
+     * Override log completion to use the specific message based on reward
+     */
+    logCompletion() {
+        // Find adventure log and add entry
+        const logContent = document.querySelector('.log-content');
+        if (logContent && this.lastRewardMessage) {
+            const logEntry = document.createElement('p');
+            logEntry.textContent = this.lastRewardMessage;
+            logContent.insertBefore(logEntry, logContent.firstChild);
+            
+            // Limit log entries
+            while (logContent.children.length > 50) {
+                logContent.removeChild(logContent.lastChild);
+            }
+        }
+    }
+}
+
+/**
  * Cheat action - Instantly fills all resources to maximum
  */
 class Cheat extends Action {
@@ -494,6 +566,7 @@ class ActionsManager {
         // Register default actions
         this.registerAction(new BegForCoins(this.game));
         this.registerAction(new Rest(this.game));
+        this.registerAction(new OddJobs(this.game));
         this.registerAction(new Cheat(this.game));
         
         // Setup event listeners
