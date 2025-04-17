@@ -355,7 +355,6 @@ class UpgradesManager {
      * Update upgrade buttons based on current resources
      * */
     updateUpgradeButtons() {
-        console.log('Updating upgrade buttons');
         const upgradeButtons = document.querySelectorAll('.upgrade-button');
         
         upgradeButtons.forEach(button => {
