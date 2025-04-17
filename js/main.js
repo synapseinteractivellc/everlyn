@@ -104,71 +104,8 @@ class Game {
             console.log('Updating UI with character info');
             this.ui.updateCharacterInfo(this.character);
             
-            // Update resource displays
-            this.updateResourceDisplays();
-        }
-    }
-    
-    // Update all resource displays
-    updateResourceDisplays() {
-        // Update gold
-        const goldAmountElement = document.getElementById('gold-amount');
-        if (goldAmountElement) {
-            goldAmountElement.textContent = this.character.resources.gold.current;
-        }
-        
-        const goldMaxElement = document.getElementById('gold-max');
-        if (goldMaxElement) {
-            goldMaxElement.textContent = this.character.resources.gold.max;
-        }
-        
-        // Update stats
-        const healthBarElement = document.getElementById('health-bar');
-        if (healthBarElement) {
-            healthBarElement.value = this.character.stats.health.current;
-            healthBarElement.max = this.character.stats.health.max;
-        }
-        
-        const staminaBarElement = document.getElementById('stamina-bar');
-        if (staminaBarElement) {
-            staminaBarElement.value = this.character.stats.stamina.current;
-            staminaBarElement.max = this.character.stats.stamina.max;
-        }
-        
-        // Show/hide mana bar based on unlocked status
-        const manaBarContainer = document.getElementById('mana-bar-container');
-        if (manaBarContainer) {
-            if (this.character.stats.mana.unlocked) {
-                manaBarContainer.style.display = 'block';
-                
-                const manaBarElement = document.getElementById('mana-bar');
-                if (manaBarElement) {
-                    manaBarElement.value = this.character.stats.mana.current;
-                    manaBarElement.max = this.character.stats.mana.max;
-                }
-            } else {
-                manaBarContainer.style.display = 'none';
-            }
-        }
-        
-        // Research resource (if unlocked)
-        const researchResource = document.getElementById('research-resource');
-        if (researchResource) {
-            if (this.character.resources.research.unlocked) {
-                researchResource.style.display = 'block';
-                
-                const researchAmountElement = document.getElementById('research-amount');
-                if (researchAmountElement) {
-                    researchAmountElement.textContent = this.character.resources.research.current;
-                }
-                
-                const researchMaxElement = document.getElementById('research-max');
-                if (researchMaxElement) {
-                    researchMaxElement.textContent = this.character.resources.research.max;
-                }
-            } else {
-                researchResource.style.display = 'none';
-            }
+            // Use the UI method to update resource displays
+            this.ui.updateResourceDisplays(this.character);
         }
     }
     
@@ -226,6 +163,12 @@ class Game {
             console.log('Game wiped successfully');
             // Reset the game state
             this.character = null;
+
+            // Clear the adventure log
+            const logContent = document.querySelector('.log-content');
+            if (logContent) {
+                logContent.innerHTML = '';
+            }
             
             this.ui.hideElement('.game-container');
             this.ui.showElement('.welcome-container');

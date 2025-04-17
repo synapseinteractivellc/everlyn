@@ -158,15 +158,30 @@
                 <div class="stats-list">
                     <div class="stat-bar">
                         <label for="health-bar">Health:</label>
-                        <progress id="health-bar" value="100" max="100"></progress>
+                        <div class="progress-container">
+                            <progress id="health-bar" value="100" max="100"></progress>
+                            <div class="stat-values">
+                                <span id="health-current">10</span>/<span id="health-max">10</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="stat-bar">
                         <label for="stamina-bar">Stamina:</label>
-                        <progress id="stamina-bar" value="100" max="100"></progress>
+                        <div class="progress-container">
+                            <progress id="stamina-bar" value="100" max="100"></progress>
+                            <div class="stat-values">
+                                <span id="stamina-current">10</span>/<span id="stamina-max">10</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="stat-bar" id="mana-bar-container" style="display: none;">
                         <label for="mana-bar">Mana:</label>
-                        <progress id="mana-bar" value="0" max="100"></progress>
+                        <div class="progress-container">
+                            <progress id="mana-bar" value="0" max="100"></progress>
+                            <div class="stat-values">
+                                <span id="mana-current">0</span>/<span id="mana-max">0</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </aside>

@@ -16,6 +16,7 @@ class Action {
         this.name = config.name;
         this.description = config.description;
         this.costPerSecond = config.costPerSecond || {}; // Resources consumed per second
+        this.gainPerSecond = config.gainPerSecond || {}; // Resources gained per second
         this.duration = config.duration || 1; // Time in seconds to complete one cycle
         this.rewards = config.rewards || {}; // Rewards gained on completion
         this.autoRepeat = config.autoRepeat !== undefined ? config.autoRepeat : true;
@@ -96,6 +97,9 @@ class Action {
             this.stop();
             return;
         }
+
+        // Apply continuous gains
+        this.applyGains(deltaTime);
         
         // Update progress
         this.progress += deltaTime / this.duration;
@@ -114,6 +118,55 @@ class Action {
         
         // Update UI
         this.updateUI();
+    }
+
+    /**
+     * Apply resource gains per second
+     * @param {number} deltaTime - Time passed in seconds
+     */
+    applyGains(deltaTime) {
+        const character = this.game.character;
+        
+        // Apply gains to each resource
+        for (const resourceType in this.gainPerSecond) {
+            const gain = this.gainPerSecond[resourceType] * deltaTime;
+            
+            // Check if we have this resource
+            if (!character.stats[resourceType] && !character.resources[resourceType]) {
+                console.error(`Resource not found: ${resourceType}`);
+                continue;
+            }
+            
+            // Check if it's a stat or resource
+            let resource;
+            if (character.stats[resourceType]) {
+                resource = character.stats[resourceType];
+            } else {
+                resource = character.resources[resourceType];
+            }
+            
+            // Apply gain
+            resource.current += gain;
+            
+            // Cap at maximum value
+            if (resource.current > resource.max) {
+                resource.current = resource.max;
+            }
+        }
+        
+        // Update UI to show the resource changes in real-time
+        this.game.ui.updateResourceDisplays(character);
+        
+        // Check if we should stop the action (all resources are full)
+        this.checkAutoStop();
+    }
+    
+    /**
+     * Check if action should automatically stop (e.g. when resources are full)
+     * Override in subclasses if needed
+     */
+    checkAutoStop() {
+        // Default implementation does nothing
     }
     
     /**
@@ -155,6 +208,9 @@ class Action {
                 resource.current = 0;
             }
         }
+        
+        // Update UI to show the resource changes in real-time
+        this.game.ui.updateResourceDisplays(character);
         
         return true;
     }
@@ -345,10 +401,7 @@ class BegForCoins extends Action {
      * Update UI with current resource amounts
      */
     updateResourceUI() {
-        const goldAmountElement = document.getElementById('gold-amount');
-        if (goldAmountElement) {
-            goldAmountElement.textContent = this.game.character.resources.gold.current;
-        }
+        this.game.ui.updateResourceDisplays(this.game.character);
     }
     
     /**
@@ -371,6 +424,55 @@ class BegForCoins extends Action {
 }
 
 /**
+ * Rest action - Allows player to recover stamina and health
+ */
+class Rest extends Action {
+    constructor(game) {
+        super(game, {
+            id: 'rest',
+            name: 'Rest',
+            description: 'Take a moment to catch your breath and recover',
+            costPerSecond: {}, // No cost
+            gainPerSecond: {
+                health: 2,    // 2 health per second (10 over 5 seconds)
+                stamina: 2    // 2 stamina per second (10 over 5 seconds)
+            },
+            duration: 5, // 5 seconds to complete
+            autoRepeat: true,
+            tooltipText: "Rest to recover your stamina and health. Automatically stops when you're fully rested.",
+            successMessages: [
+                "You rested for a moment and feel somewhat refreshed.",
+                "You took a short break to catch your breath.",
+                "A brief rest has restored some of your energy."
+            ]
+        });
+    }
+    
+    /**
+     * Check if we should stop resting (when both health and stamina are full)
+     */
+    checkAutoStop() {
+        const character = this.game.character;
+        
+        if (character.stats.health.current >= character.stats.health.max && 
+            character.stats.stamina.current >= character.stats.stamina.max) {
+            this.stop();
+        }
+    }
+    
+    /**
+     * Apply rewards when action completes (additional bonuses for completion)
+     * This is in addition to the continuous gains from gainPerSecond
+     */
+    applyRewards() {
+        // No additional rewards on completion - gains are handled by gainPerSecond
+        
+        // Update UI
+        this.game.ui.updateResourceDisplays(this.game.character);
+    }
+}
+
+/**
  * ActionsManager - Handles registering and managing all game actions
  */
 class ActionsManager {
@@ -386,6 +488,7 @@ class ActionsManager {
     initialize() {
         // Register default actions
         this.registerAction(new BegForCoins(this.game));
+        this.registerAction(new Rest(this.game));
         
         // Setup event listeners
         this.setupEventListeners();

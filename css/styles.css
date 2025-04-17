@@ -472,3 +472,110 @@ button {
 :root {
     --primary-color-rgb: 112, 112, 112;
 }
+
+/* Styling for stat bars */
+.stat-bar {
+    margin-bottom: 12px;
+}
+
+.stat-bar label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #555;
+}
+
+.progress-container {
+    position: relative;
+    width: 100%;
+    height: 22px;
+}
+
+progress {
+    width: 100%;
+    height: 22px;
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    border-radius: 10px;
+    background-color: #e0e0e0;
+    overflow: hidden;
+}
+
+/* Style the health bar */
+#health-bar::-webkit-progress-value {
+    background-color: #e74c3c;
+    background-image: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.15) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.15) 75%, 
+        transparent 75%, 
+        transparent);
+    background-size: 20px 20px;
+    transition: width 0.3s ease;
+}
+
+/* Style the stamina bar */
+#stamina-bar::-webkit-progress-value {
+    background-color: #3498db;
+    background-image: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.15) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.15) 75%, 
+        transparent 75%, 
+        transparent);
+    background-size: 20px 20px;
+    transition: width 0.3s ease;
+}
+
+/* Style the mana bar */
+#mana-bar::-webkit-progress-value {
+    background-color: #9b59b6;
+    background-image: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.15) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.15) 75%, 
+        transparent 75%, 
+        transparent);
+    background-size: 20px 20px;
+    transition: width 0.3s ease;
+}
+
+/* Firefox support */
+progress::-moz-progress-bar {
+    background-color: #e74c3c; /* Default to health color, will be overridden */
+}
+
+#health-bar::-moz-progress-bar {
+    background-color: #e74c3c;
+}
+
+#stamina-bar::-moz-progress-bar {
+    background-color: #3498db;
+}
+
+#mana-bar::-moz-progress-bar {
+    background-color: #9b59b6;
+}
+
+/* Text overlay for stat values */
+.stat-values {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    pointer-events: none; /* Allow clicks to pass through */
+}
