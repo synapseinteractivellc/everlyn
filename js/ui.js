@@ -253,13 +253,34 @@ class UI {
         const upgradesContainer = document.querySelector('.available-upgrades');
         if (!upgradesContainer) return;
         
-        // Clear existing buttons
-        upgradesContainer.innerHTML = '';
+        // Get all existing buttons
+        const existingButtons = document.querySelectorAll('.upgrade-button');
+        const existingButtonIds = Array.from(existingButtons).map(button => button.dataset.upgrade);
         
-        // Add buttons for purchasable currencies
+        // First, update states of existing buttons
+        existingButtons.forEach(button => {
+            const upgradeId = button.dataset.upgrade;
+            
+            // Check if this is a currency button
+            const currency = character.currencies[upgradeId];
+            if (currency && currency.purchaseCost) {
+                // Only change disabled state if needed
+                const canPurchase = currency.canPurchase(character);
+                if (!button.disabled && !canPurchase) {
+                    button.disabled = true;
+                } else if (button.disabled && canPurchase) {
+                    button.disabled = false;
+                }
+            }
+        });
+        
+        // Array to track buttons that should be shown
+        const buttonsToShow = [];
+        
+        // Check purchasable currencies
         for (const [currencyId, currency] of Object.entries(character.currencies)) {
-            // Skip if not purchasable or already at max
-            if (!currency.purchaseCost || currency.isFull()) continue;
+            // Skip if not purchasable, already at max, or already showing
+            if (!currency.purchaseCost || currency.isFull() || existingButtonIds.includes(currencyId)) continue;
             
             // Create button only if we're close to affording it or it's unlocked
             let canShow = false;
@@ -274,19 +295,36 @@ class UI {
             }
             
             if (canShow || currency.unlocked) {
-                const button = this.createPurchaseButton(currency, character);
-                upgradesContainer.appendChild(button);
+                buttonsToShow.push({
+                    type: 'currency',
+                    id: currencyId,
+                    object: currency
+                });
             }
         }
         
-        // Also check for regular upgrades from the upgrade manager
+        // Also check for upgrades from the upgrade manager
         if (this.game.upgradesManager) {
             for (const upgrade of Object.values(this.game.upgradesManager.upgrades)) {
-                if (upgrade.unlocked && !upgrade.purchased) {
-                    const button = upgrade.createButtonElement();
-                    upgradesContainer.appendChild(button);
+                if (upgrade.unlocked && !upgrade.purchased && !existingButtonIds.includes(upgrade.id)) {
+                    buttonsToShow.push({
+                        type: 'upgrade',
+                        id: upgrade.id,
+                        object: upgrade
+                    });
                 }
             }
+        }
+        
+        // Add new buttons if needed
+        for (const buttonInfo of buttonsToShow) {
+            let button;
+            if (buttonInfo.type === 'currency') {
+                button = this.createPurchaseButton(buttonInfo.object, character);
+            } else {
+                button = buttonInfo.object.createButtonElement();
+            }
+            upgradesContainer.appendChild(button);
         }
     }
 
@@ -330,15 +368,25 @@ class UI {
         
         // Add event listener
         button.addEventListener('click', () => {
-            const success = currency.purchase(character);
-            if (success) {
-                // Update UI
-                this.updateResourceDisplays(character);
-                this.updatePurchaseButtons(character);
+            // Always get the latest character state when clicked
+            const canPurchase = currency.canPurchase(character);
+            if (canPurchase) {
+                const success = currency.purchase(character);
+                if (success) {
+                    // Force UI update after purchase
+                    this.updateResourceDisplays(character);
+                    // Update purchase buttons with a slight delay to avoid conflicts
+                    setTimeout(() => {
+                        this.updatePurchaseButtons(character);
+                    }, 50);
+                }
+            } else {
+                // Notify user they can't afford it
+                this.game.ui.showNotification(`Not enough resources to purchase ${currency.name.slice(0, -1)}.`, 'error');
             }
         });
         
-        // Set disabled state
+        // Set initial disabled state
         button.disabled = !currency.canPurchase(character);
         
         return button;

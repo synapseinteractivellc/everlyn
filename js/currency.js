@@ -49,7 +49,9 @@ class Currency extends Resource {
         // Deduct costs
         for (const [resourceId, cost] of Object.entries(this.purchaseCost)) {
             const resource = character.getResource(resourceId);
-            resource.remove(cost);
+            if (resource) {
+                resource.remove(cost);
+            }
         }
         
         // Add one of this currency

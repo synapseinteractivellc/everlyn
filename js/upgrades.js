@@ -363,9 +363,13 @@ class UpgradesManager {
             const upgrade = this.getUpgrade(upgradeId);
             
             if (upgrade) {
-                // Update disabled state based on whether we can afford it
+                // Only change disabled state if needed
                 const canAfford = upgrade.canAfford();
-                button.disabled = !canAfford;
+                if (!button.disabled && !canAfford) {
+                    button.disabled = true;
+                } else if (button.disabled && canAfford) {
+                    button.disabled = false;
+                }
             }
         });
     }
