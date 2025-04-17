@@ -1,27 +1,37 @@
 // main.js
 import Character from './character.js';
+import UI from './ui.js';
+import Storage from './storage.js';
 
 class Game {
     constructor() {
         this.character = null;
         this.initialized = false;
+        this.ui = null;
+        this.storage = new Storage();
     }
 
-    // Initialize the game
     init() {
         if (this.initialized) return;
         
         // Try to load existing character
-        this.character = Character.load();
+        this.loadGame();
         
-        // Setup event listeners
+        // Initialize UI
+        this.ui = new UI(this);
+        
+        // Setup additional event listeners
         this.setupEventListeners();
         
         this.initialized = true;
         console.log('Game initialized');
+        
+        // If we have a character, start the game directly
+        if (this.character) {
+            this.startGame();
+        }
     }
 
-    // Set up necessary event listeners
     setupEventListeners() {
         const characterForm = document.getElementById('character-form');
         if (characterForm) {
@@ -30,45 +40,145 @@ class Game {
                 this.createNewCharacter();
             });
         }
+        
+        // Add event listeners for save and wipe buttons
+        const saveButton = document.getElementById('save-game');
+        if (saveButton) {
+            saveButton.addEventListener('click', () => {
+                this.saveGame();
+            });
+        }
+        
+        const wipeButton = document.getElementById('wipe-game');
+        if (wipeButton) {
+            wipeButton.addEventListener('click', () => {
+                this.wipeGame();
+            });
+        }
+    }
+    
+    // Called by UI when section changes
+    onSectionChanged(sectionName) {
+        console.log(`Section changed to: ${sectionName}`);
+        // Handle section-specific logic here
     }
 
-    // Create a new character
     createNewCharacter() {
         const nameInput = document.getElementById('character-name');
         if (nameInput && nameInput.value) {
             this.character = new Character(nameInput.value);
-            this.character.save();
+            this.saveGame();
             
             // Transition to the game screen
             this.startGame();
         }
     }
 
-    // Start the game (transition from welcome screen)
     startGame() {
-        const welcomeContainer = document.querySelector('.welcome-container');
-        const gameContainer = document.querySelector('.game-container');
+        console.log('Starting game...');
         
-        if (welcomeContainer && gameContainer) {
-            welcomeContainer.classList.add('hidden');
-            gameContainer.classList.remove('hidden');
-            
-            // Update UI with character info
-            this.updateUI();
-        } else {
-            console.error('Required containers not found');
-        }
+        this.ui.hideElement('.welcome-container');
+        this.ui.showElement('.game-container');
+        
+        // Update UI with character info
+        this.updateUI();     
     }
 
-    // Update UI with character information
     updateUI() {
-        if (!this.character) return;
-        
-        // For now, just update character name
-        const nameElement = document.getElementById('character-name-display');
-        if (nameElement) {
-            nameElement.textContent = this.character.name;
+        if (this.ui) {
+            console.log('Updating UI with character info');
+            this.ui.updateCharacterInfo(this.character);
         }
+    }
+    
+    // Save game state
+    saveGame() {
+        if (!this.character) return false;
+        
+        const gameState = {
+            character: this.character
+            // Add other game state properties here as your game grows
+        };
+        
+        const success = this.storage.saveGame(gameState);
+        if (success) {
+            console.log('Game saved successfully');
+            // Optionally show a save notification
+            this.showNotification('Game saved successfully!');
+        } else {
+            console.error('Failed to save game');
+            this.showNotification('Failed to save game!', 'error');
+        }
+        
+        return success;
+    }
+    
+    // Load game state
+    loadGame() {
+        const gameState = this.storage.loadGame();
+        if (!gameState) return false;
+        
+        try {
+            // Rebuild character object from saved data
+            if (gameState.character) {
+                this.character = new Character(gameState.character.name);
+                Object.assign(this.character, gameState.character);
+                console.log('Game loaded successfully', this.character);
+                return true;
+            }
+        } catch (error) {
+            console.error('Error loading game:', error);
+        }
+        
+        return false;
+    }
+    
+    // Wipe game state
+    wipeGame() {
+        // Confirm before wiping
+        if (!confirm('Are you sure you want to wipe your saved game? This cannot be undone.')) {
+            return false;
+        }
+        
+        const success = this.storage.wipeSave();
+        if (success) {
+            console.log('Game wiped successfully');
+            // Reset the game state
+            this.character = null;
+            
+            this.ui.hideElement('.game-container');
+            this.ui.showElement('.welcome-container');
+            
+            this.showNotification('Game wiped successfully!');
+        } else {
+            console.error('Failed to wipe game');
+            this.showNotification('Failed to wipe game!', 'error');
+        }
+        
+        return success;
+    }
+    
+    // Simple notification system
+    showNotification(message, type = 'success') {
+        // Create notification if it doesn't exist yet
+        let notification = document.querySelector('.game-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.className = 'game-notification';
+            document.body.appendChild(notification);
+        }
+        
+        // Set message and type
+        notification.textContent = message;
+        notification.className = `game-notification ${type}`;
+        
+        // Show notification
+        notification.classList.add('show');
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
     }
 }
 

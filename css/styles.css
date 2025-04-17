@@ -146,6 +146,15 @@ button {
     background-color: var(--primary-color);
     color: white;
     padding: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.game-header-left {
+    display: flex;
+    flex-direction: column;
 }
 
 .game-header h1 {
@@ -155,6 +164,42 @@ button {
 
 .character-info-bar {
     font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+}
+
+.header-buttons {
+    align-self: flex-start;
+}
+
+.header-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.header-btn:hover {
+    transform: translateY(-2px);
+}
+
+.header-btn:active {
+    transform: translateY(0);
+}
+
+#save-game, #wipe-game {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#save-game:hover {
+    background-color: var(--secondary-color);
+}
+
+#wipe-game:hover {
+    background-color: #c0392b;
 }
 
 .separator {
