@@ -140,6 +140,7 @@ button {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    max-width: 100%;
 }
 
 .game-header {
@@ -211,12 +212,15 @@ button {
     background-color: var(--secondary-color);
     padding: 0.5rem 2rem;
     border-bottom: 1px solid var(--border-color);
+    display: flex;    
+    width: 100%;
+    padding-left: calc(13%); /* Align with main-area left edge */
 }
 
 .game-nav ul {
     list-style: none;
     display: flex;
-    justify-content: center;
+    margin: 0;
     gap: 1rem;
 }
 
@@ -238,15 +242,71 @@ button {
     background-color: var(--primary-color);
 }
 
+/* Game Content Layout */
 .game-content {
-    display: block;
-    flex: 1;
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.resource-sidebar {
+    width: 13%;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-right: 1px solid var(--border-color);
+    min-height: calc(100vh - 140px); /* Adjust based on header/nav/footer height */
 }
 
 .main-area {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 60%;
+    padding: 1rem 2rem;
+    max-width: none; /* Remove the max-width constraint */
+    margin: 0; /* Remove auto margins */
+}
+
+.status-sidebar {
+    width: 13%;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-left: 1px solid var(--border-color);
+    min-height: calc(100vh - 140px); /* Adjust based on header/nav/footer height */
+}
+
+.adventure-log {
+    width: 14%;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-left: 1px solid var(--border-color);
+    min-height: calc(100vh - 140px); /* Adjust based on header/nav/footer height */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .game-content {
+        flex-wrap: wrap;
+    }
+    
+    .resource-sidebar, .status-sidebar, .adventure-log {
+        width: 20%;
+    }
+    
+    .main-area {
+        width: 60%;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-content {
+        flex-direction: column;
+    }
+    
+    .resource-sidebar, .main-area, .status-sidebar, .adventure-log {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+    }
 }
 
 .game-section {
