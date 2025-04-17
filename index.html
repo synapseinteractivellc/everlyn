@@ -6,9 +6,12 @@
     <meta name="author" content="Synapse Interactive LLC">
     <meta name="description" content="Everlyn: City of Wonder - A 2D web-based Idle/Clicker Fantasy RPG">
     <title>Everlyn: City of Wonder</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <script type="module" src="./js/main.js"></script>
 </head>
 <body>
-    <div class="welcome-container fade-in">
+    <!-- Welcome Screen -->
+    <div class="welcome-container">
         <div class="welcome-header">
             <h1>Everlyn: City of Wonder</h1>
             <p class="tagline">Begin your journey in the legendary city...</p>
@@ -51,6 +54,81 @@
                 &copy; 2025 Synapse Interactive LLC. MIT License.
             </footer>
         </div>
+    </div>
+
+    <!-- Game Screen (Initially Hidden) -->
+    <div class="game-container hidden">
+        <header class="game-header">
+            <h1>Everlyn: City of Wonder</h1>
+            <div class="character-info-bar">
+                <span id="character-name-display">Character Name</span>
+                <span class="separator">|</span>
+                <span>Level: <span id="character-level">1</span></span>
+            </div>
+        </header>
+
+        <!-- Navigation menu will go here -->
+        <nav class="game-nav">
+            <ul>
+                <li><button class="nav-button active" data-section="actions">Actions</button></li>
+                <li><button class="nav-button" data-section="skills">Skills</button></li>
+                <li><button class="nav-button" data-section="house">House</button></li>
+                <li><button class="nav-button" data-section="status">Status</button></li>
+                <li><button class="nav-button" data-section="inventory">Inventory</button></li>
+                <li><button class="nav-button" data-section="adventure">Adventure</button></li>
+            </ul>
+        </nav>
+        
+        <main class="game-content">           
+            <div class="main-area">
+                <!-- This area will change based on navigation -->
+                <div id="actions-section" class="game-section active">
+                    <h2>Available Actions</h2>
+                    <div class="available-actions">
+                        <!-- Actions will be populated here -->
+                    </div>
+                </div>
+
+                <div id="skills-section" class="game-section">
+                    <h2>Skills</h2>
+                    <div class="skills-list">
+                        <!-- Skills will be populated here -->
+                    </div>
+                </div>
+
+                <div id="house-section" class="game-section">
+                    <h2>House</h2>
+                    <div class="house-list">
+                        <!-- House will be populated here -->
+                    </div>
+                </div>
+
+                <div id="status-section" class="game-section">
+                    <h2>Character Status</h2>
+                    <div class="character-stats">
+                        <!-- Stats will be populated here -->
+                    </div>
+                </div>
+                
+                <div id="inventory-section" class="game-section">
+                    <h2>Inventory</h2>
+                    <div class="inventory-grid">
+                        <!-- Inventory will be populated here -->
+                    </div>
+                </div>
+                
+                <div id="adventure-section" class="game-section">
+                    <h2>Adventure</h2>
+                    <div class="adventure-list">
+                        <!-- Adventure will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="game-footer">
+            &copy; 2025 Synapse Interactive LLC. MIT License.
+        </footer>
     </div>
 </body>
 </html>
