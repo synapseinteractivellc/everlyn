@@ -56,7 +56,6 @@ class EventEmitter {
         
         // Proceed with emitting the event
         this.events[event].forEach(listener => listener(data));
-        console.log(`Event emitted: ${event}`, data); // Debug log
     }
 }
 
