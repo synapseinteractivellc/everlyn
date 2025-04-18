@@ -41,7 +41,7 @@
                         </div>
                         
                         <div class="form-actions">
-                            <button type="submit" id="start-game" class="btn-primary">Enter the City</button>
+                            <button type="submit" id="start-game" class="btn-primary" aria-label="Enter the City">Enter the City</button>
                         </div>
                     </form>
                 </div>
@@ -68,20 +68,20 @@
                 </div>
             </div>
             <div class="header-buttons">
-                <button id="save-game" class="header-btn">Save</button>
-                <button id="wipe-game" class="header-btn">Wipe</button>
+                <button id="save-game" class="header-btn" aria-label="Save Game">Save</button>
+                <button id="wipe-game" class="header-btn" aria-label="Wipe Game Data">Wipe</button>
             </div>
         </header>
 
-        <!-- Navigation menu will go here -->
+        <!-- Navigation Menu -->
         <nav class="game-nav">
             <ul>
-                <li><button class="nav-button active" data-section="main">Main</button></li>
-                <li><button class="nav-button" data-section="skills">Skills</button></li>
-                <li><button class="nav-button" data-section="house">House</button></li>
-                <li><button class="nav-button" data-section="status">Status</button></li>
-                <li><button class="nav-button" data-section="inventory">Inventory</button></li>
-                <li><button class="nav-button" data-section="adventure">Adventure</button></li>
+                <li><button class="nav-button active" data-section="main" aria-label="Main Section">Main</button></li>
+                <li><button class="nav-button" data-section="skills" aria-label="Skills Section">Skills</button></li>
+                <li><button class="nav-button" data-section="house" aria-label="House Section">House</button></li>
+                <li><button class="nav-button" data-section="status" aria-label="Status Section">Status</button></li>
+                <li><button class="nav-button" data-section="inventory" aria-label="Inventory Section">Inventory</button></li>
+                <li><button class="nav-button" data-section="adventure" aria-label="Adventure Section">Adventure</button></li>
             </ul>
         </nav>
         
@@ -92,7 +92,7 @@
                 </div>
                 <div class="sidebar-content">
                     <div class="resource-bar">
-
+                        <!-- Resource bars will be dynamically populated -->
                     </div>
                 </div>
             </aside>
@@ -148,7 +148,7 @@
                 <h2>Current Action</h2>
                 <div class="action-status">
                     <p id="current-action">None</p>
-                    <button id="cancel-action" class="btn-secondary">Cancel</button>
+                    <button id="cancel-action" class="btn-secondary" aria-label="Cancel Current Action">Cancel</button>
                 </div>
                 <h2>Character Stats</h2>
                 <div class="stats-list">
