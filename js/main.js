@@ -204,6 +204,7 @@ class Game {
             // Add skills data explicitly to the save
             if (this.skillsManager) {
                 gameState.skills = this.skillsManager.saveData();
+                console.log("Saving skills data:", gameState.skills);
             }
             
             const success = this.storage.saveGame(gameState);
@@ -266,8 +267,12 @@ class Game {
                 
                 // Load skill data if it exists
                 if (gameState.skills) {
+                    console.log("Loading skills from save:", gameState.skills);
                     // Load skills directly from the game state
                     this.skillsManager.loadSavedData({skills: gameState.skills});
+                    console.log("Game state:", gameState.skills);
+                } else {
+                    console.warn("No skills data found in save");
                 }
                 
                 console.log('Game loaded successfully', this.character);

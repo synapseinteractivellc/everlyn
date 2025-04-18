@@ -100,6 +100,14 @@ class Skill {
         
         this.experience += amount;
         
+        // Update character's skills object
+        if (this.game.character && this.game.character.skills) {
+            if (!this.game.character.skills[this.id]) {
+                this.game.character.skills[this.id] = {};
+            }
+            this.game.character.skills[this.id].experience = this.experience;
+        }
+        
         // Check if should level up
         const xpNeeded = this.getXPForNextLevel();
         if (xpNeeded !== null && this.experience >= xpNeeded) {
@@ -119,8 +127,21 @@ class Skill {
         // Level up
         this.level += 1;
         
+        // Update character's skills object
+        if (this.game.character && this.game.character.skills) {
+            if (!this.game.character.skills[this.id]) {
+                this.game.character.skills[this.id] = {};
+            }
+            this.game.character.skills[this.id].level = this.level;
+        }
+        
         // Reset experience for next level
         this.experience = 0;
+        
+        // Also update experience in character's skills object
+        if (this.game.character && this.game.character.skills && this.game.character.skills[this.id]) {
+            this.game.character.skills[this.id].experience = 0;
+        }
         
         // Apply level-up effects
         this.applyLevelEffects();
@@ -434,6 +455,25 @@ class MageLore extends Skill {
                 }
             ]
         });
+
+        // Check if there's existing data in character.skills
+        if (game.character && game.character.skills && game.character.skills.mageLore) {
+            const savedSkill = game.character.skills.mageLore;
+            this.purchased = savedSkill.purchased || this.purchased;
+            this.level = savedSkill.level || this.level;
+            this.experience = savedSkill.experience || this.experience;
+            
+            // If the skill was purchased, make sure any purchase effects are applied
+            if (this.purchased && !game.character.stats.mana.unlocked) {
+                // Apply purchase effects manually if needed
+                const mana = game.character.stats.mana;
+                if (mana) {
+                    mana.unlocked = true;
+                    mana.setMax(5 + this.level, true);
+                    mana.recoveryRate = 0.1 * this.level;
+                }
+            }
+        }
     }
     
     /**
@@ -491,6 +531,10 @@ class SkillsManager {
     constructor(game) {
         this.game = game;
         this.skills = {};
+        this.hasLoadedSkills = false;
+    
+        // Call initialize after construction
+        // This way the caller can load saved data before initialization
         this.initialize();
     }
     
@@ -498,8 +542,14 @@ class SkillsManager {
      * Initialize skills manager
      */
     initialize() {
-        // Register initial skills
-        this.registerSkill(new MageLore(this.game));
+        // Flag to track if we've already initialized skills
+        this._initialized = true;
+        
+        // Only register default skills if we haven't loaded them already
+        if (!this.hasLoadedSkills) {
+            // Register initial skills
+            this.registerSkill(new MageLore(this.game));
+        }
         
         // Set up event listeners
         this.setupEventListeners();
@@ -618,6 +668,14 @@ class SkillsManager {
     loadSavedData(savedData) {
         if (!savedData || !savedData.skills) return;
         
+        // Set flag to indicate skills were loaded
+        this.hasLoadedSkills = true;
+        
+        // Initialize character.skills if it doesn't exist
+        if (!this.game.character.skills) {
+            this.game.character.skills = {};
+        }
+        
         for (const [skillId, skillData] of Object.entries(savedData.skills)) {
             const skill = this.skills[skillId];
             if (skill) {
@@ -626,7 +684,16 @@ class SkillsManager {
                 if (skillData.level !== undefined) skill.level = skillData.level;
                 if (skillData.experience !== undefined) skill.experience = skillData.experience;
                 
+                // Also update the character's skills object with the same data
+                this.game.character.skills[skillId] = {
+                    purchased: skill.purchased,
+                    level: skill.level,
+                    experience: skill.experience
+                };
+                
                 console.log(`Loaded skill ${skillId}: Level ${skill.level}, XP ${skill.experience}, Purchased: ${skill.purchased}`);
+            } else {
+                console.warn(`Skill ${skillId} from save data not found in registered skills`);
             }
         }
         
