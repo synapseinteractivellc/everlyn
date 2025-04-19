@@ -523,6 +523,15 @@ progress::-moz-progress-bar {
     margin-bottom: 0.3rem;
 }
 
+.action-count {
+    font-size: 0.9rem;
+    color: #666;
+    flex-grow: 1;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
 .action-description {
     font-size: 0.9rem;
     color: #666;

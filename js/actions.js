@@ -14,6 +14,7 @@ class Action {
         this.game = game;
         this.id = config.id;
         this.name = config.name;
+        this.unlocked = config.unlocked !== undefined ? config.unlocked : false;
         this.description = config.description;
         this.costPerSecond = config.costPerSecond || {}; // Resources consumed per second
         this.gainPerSecond = config.gainPerSecond || {}; // Resources gained per second
@@ -264,6 +265,11 @@ class Action {
             } else {
                 actionButton.classList.remove('active');
             }
+
+            const countElement = actionButton.querySelector('.action-count');
+            if (countElement) {
+                countElement.textContent = ` (${this.completionCount})`;
+            }
         }
     }
     
@@ -280,6 +286,10 @@ class Action {
         const nameElement = document.createElement('span');
         nameElement.className = 'action-name';
         nameElement.textContent = this.name;
+
+        const countElement = document.createElement('span');
+        countElement.className = 'action-count';
+        countElement.textContent = ` (${this.completionCount})`;
         
         const descElement = document.createElement('span');
         descElement.className = 'action-description';
@@ -304,6 +314,7 @@ class Action {
         
         // Add elements to button
         button.appendChild(nameElement);
+        button.appendChild(countElement);
         button.appendChild(descElement);
         button.appendChild(progressContainer);
         
@@ -341,6 +352,7 @@ class BegForCoins extends Action {
         super(game, {
             id: 'begForCoins',
             name: 'Beg for Coins',
+            unlocked: true,
             description: 'Hold out your hand and hope for the best',
             costPerSecond: {
                 stamina: 1 // 1 stamina per second
@@ -351,7 +363,8 @@ class BegForCoins extends Action {
             successMessages: [
                 "You begged for coins but were shunned by all: 0 gold for your efforts.",
                 "You begged for coins and found a generous soul: 1 gold for your efforts.",
-                "You begged for coins and got lucky: 2 gold for your efforts."
+                "You begged for coins and got lucky: 2 gold for your efforts.",
+                "You begged for coins and the innkeeper took pity on you: 1 gold for your efforts. New action unlocked!"
             ]
         });
     }
@@ -373,9 +386,21 @@ class BegForCoins extends Action {
         } else if (roll < 0.9) { 
             gold = 1; // 45% chance for 1 gold
             this.lastRewardMessage = this.successMessages[1];
-        } else {
-            gold = 2; // 10% chance for 2 gold
+        } else if (roll < 0.95) {
+            gold = 2; // 5% chance for 2 gold
             this.lastRewardMessage = this.successMessages[2];
+        } else {
+            gold = 1; // 5% chance for 1 gold and unlock new action
+            this.lastRewardMessage = this.successMessages[3];
+            
+            // Unlock new action (OddJobs)
+            const oddJobsAction = this.game.actionsManager.getAction('oddJobs');
+            if (oddJobsAction) {
+                oddJobsAction.unlocked = true; // Unlock the action
+                if (this.game.actionsManager) {
+                    this.game.actionsManager.populateActionButtons();
+                }
+            }
         }
         
         // Add gold to character
@@ -417,6 +442,7 @@ class Rest extends Action {
         super(game, {
             id: 'rest',
             name: 'Rest',
+            unlocked: true,
             description: 'Take a moment to catch your breath and recover',
             costPerSecond: {}, // No cost
             gainPerSecond: {
@@ -484,6 +510,7 @@ class OddJobs extends Action {
         super(game, {
             id: 'oddJobs',
             name: 'Do Odd Jobs',
+            unlocked: false,
             description: 'Find various odd jobs around the city to earn some extra gold.',
             costPerSecond: {
                 stamina: 1 // 1 stamina per second
@@ -495,8 +522,17 @@ class OddJobs extends Action {
                 "You helped an elderly shopkeeper in the market arrange their merchandise: 1 gold for your efforts.",
                 "You delivered a message across the city and got a return message for double to pay: 2 gold for your efforts.",
                 "You swept the steps of the Grand Library and impressed the Librarian: 3 gold for your efforts."
-            ]
+            ],
+
         });
+    }
+
+    /**
+     * Check if this action should be visible/available
+     * @returns {boolean} - True if the action should be available
+     */
+    isAvailable() {
+       if(unlocked) return true; // Action is unlocked
     }
     
     /**
@@ -556,6 +592,7 @@ class MeditateOnArcaneWisdom extends Action {
         super(game, {
             id: 'meditateOnArcaneWisdom',
             name: 'Meditate on Arcane Wisdom',
+            unlocked: false,
             description: 'Focus your magical energy to internalize arcane knowledge',
             costPerSecond: {
                 mana: 1,      // 1 mana per second
@@ -642,7 +679,10 @@ class MeditateOnArcaneWisdom extends Action {
         // Only available if MageLore skill is purchased
         if (this.game.skillsManager) {
             const mageLoreSkill = this.game.skillsManager.skills['mageLore'];
-            return mageLoreSkill && mageLoreSkill.purchased;
+            if (mageLoreSkill && mageLoreSkill.purchased) {
+                this.unlocked = true; // Action is unlocked
+                return true; // Action is available
+            } 
         }
         return false;
     }
@@ -656,6 +696,7 @@ class Cheat extends Action {
         super(game, {
             id: 'cheat',
             name: 'Cheat',
+            unlocked: true,
             description: 'Instantly fill all resources to maximum (for testing)',
             costPerSecond: {}, // No cost
             duration: 0.1, // Very quick
@@ -763,8 +804,8 @@ class ActionsManager {
         for (const id in this.actions) {
             const action = this.actions[id];
             
-            // Check if action should be visible (if it has an isAvailable method)
-            if (typeof action.isAvailable === 'function' && !action.isAvailable()) {
+            // Check if action is unlocked
+            if (!action.unlocked) {
                 continue; // Skip this action
             }
             
