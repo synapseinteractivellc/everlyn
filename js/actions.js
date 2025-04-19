@@ -293,6 +293,11 @@ class Action {
         const progressBar = document.createElement('div');
         progressBar.className = 'action-progress';
         progressBar.style.width = '0%';
+
+        // Add tooltip data attribute if tooltip text exists
+        if (this.tooltipText) {
+            button.dataset.tooltip = this.tooltipText;
+        }
         
         // Add progress bar to container
         progressContainer.appendChild(progressBar);

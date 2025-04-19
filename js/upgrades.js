@@ -253,6 +253,12 @@ class Upgrade {
         costElement.className = 'upgrade-cost';
         costElement.textContent = `Cost: ${this.getFormattedCost()}`;
         
+        // Add tooltip data attribute if tooltip text exists
+        if (this.tooltipText) {
+            button.dataset.tooltip = this.tooltipText;
+            button.classList.add('has-tooltip');
+        }
+
         // Add elements to button
         button.appendChild(nameElement);
         button.appendChild(descElement);

@@ -91,6 +91,29 @@ button {
     margin: 0 0.5rem;
 }
 
+/* Tooltip styling - simplified */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]:hover::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: max-content;
+    max-width: 200px;
+    text-align: center;
+    z-index: 1000;
+    margin-bottom: 5px;
+}
+
 /* ================================
  * 4. FORM ELEMENTS
  * ================================ */

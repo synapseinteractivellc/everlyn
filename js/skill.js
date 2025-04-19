@@ -215,6 +215,12 @@ class Skill {
         const skillCard = document.createElement('div');
         skillCard.className = 'skill-card';
         skillCard.dataset.skill = this.id;
+
+        // Add tooltip if tooltipText exists
+        if (this.tooltipText) {
+            skillCard.dataset.tooltip = this.tooltipText;
+            skillCard.classList.add('has-tooltip');
+        }
         
         // Add skill name
         const nameElement = document.createElement('div');
