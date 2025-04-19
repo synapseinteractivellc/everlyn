@@ -6,6 +6,7 @@ import { ActionsManager } from './actions.js';
 import { UpgradesManager } from './upgrades.js';
 import { SkillsManager } from './skill.js';
 import EventEmitter from './eventEmitter.js';
+import GameState from './state.js';
 
 class Game {
     constructor() {
@@ -17,6 +18,9 @@ class Game {
         this.upgradesManager = null;
         this.skillsManager = null;
         this.events = new EventEmitter();
+
+        // initialize game state
+        this.state = new GameState();
     }
 
     /**
@@ -90,6 +94,9 @@ class Game {
             
             // Register event handlers after managers are created
             this.registerEventHandlers();
+
+            // Set up state subscriptions
+            this.setupStateSubscriptions();
         }
 
         // Set up auto-save interval (every 5 minutes)
@@ -106,6 +113,18 @@ class Game {
         if (this.character) {
             this.startGame();
         }
+    }
+
+    // Method to set up state subscriptions
+    setupStateSubscriptions() {
+        // Subscribe to character stat changes
+        this.state.subscribe('character.stats', (newValue, oldValue, path) => {
+            // Update UI when stats change
+            if (this.ui) {                
+                console.log('Character stats updated:', newValue, oldValue);
+                this.ui.updateResourceDisplays(this.character);
+            }
+        });
     }
 
     setupEventListeners() {
@@ -143,12 +162,18 @@ class Game {
         const nameInput = document.getElementById('character-name');
         if (nameInput && nameInput.value) {
             this.character = new Character(nameInput.value, this);
+
+            // Update the state with initial character data
+            this.state.setState('character', this.character.save());
+            this.state.setState('settings.timestamp', Date.now());
+
+            // Save the game
             this.saveGame();
-            
+
             // Initialize actions manager
             this.actionsManager = new ActionsManager(this);
-            
-            // Transition to the game screen
+
+            // Transition to game view
             this.startGame();
         }
     }
@@ -197,20 +222,29 @@ class Game {
         
         try {
             // Create a complete game state object
-            const gameState = {
-                character: this.character.save()
+            const gameStateData = {
+                character: this.character.save(),
+                settings: {
+                    version: 1,
+                    timestamp: Date.now()
+                }
             };
-            
+
             // Add skills data explicitly to the save
             if (this.skillsManager) {
-                gameState.skills = this.skillsManager.saveData();
-                console.log("Saving skills data:", gameState.skills);
+                gameStateData.skills = this.skillsManager.saveData();
+                console.log("Saving skills data:", gameStateData.skills);
             }
-            
-            const success = this.storage.saveGame(gameState);
+
+            // Update our state object
+            this.state.loadState(gameStateData);
+
+            // Save the entire state
+            const success = this.storage.saveGame(this.state.serialize());
+
             if (success) {
-                console.log('Game saved successfully');
-                if (this.ui) {
+                console.log('Game saved successfully', gameStateData);
+                if (this.ui) {                    
                     this.ui.showNotification('Game saved successfully!');
                 }
             } else {
@@ -219,7 +253,6 @@ class Game {
                     this.ui.showNotification('Failed to save game!', 'error');
                 }
             }
-            
             return success;
         } catch (error) {
             console.error('Error saving game:', error);
@@ -252,36 +285,45 @@ class Game {
     
     // Load game state
     loadGame() {
-        const gameState = this.storage.loadGame();
-        if (!gameState) return false;
-        
+        const savedData = this.storage.loadGame();
+        if (!savedData) return false;
+
         try {
-            // Rebuild character object from saved data
-            if (gameState.character) {
-                this.character = Character.load(gameState.character, this);
-                
+            // Load the saved data into our state object
+            this.state.loadState(savedData);
+
+            //Get character data from the state
+            const characterData = this.state.getState('character');
+            if (characterData) {
+                console.log("Loading character data:", characterData);
+                // Rebuild the character object from state
+                this.character = Character.load(characterData, this);
+
+                // After loading the character, check and repair any broken stats or currencies
+                this.repairCharacterState();
+
                 // Set up skills manager if needed
                 if (!this.skillsManager) {
                     this.skillsManager = new SkillsManager(this);
                 }
-                
-                // Load skill data if it exists
-                if (gameState.skills) {
-                    console.log("Loading skills from save:", gameState.skills);
-                    // Load skills directly from the game state
-                    this.skillsManager.loadSavedData({skills: gameState.skills});
-                    console.log("Game state:", gameState.skills);
+
+                // Load skills data if it exists
+                const skillsData = this.state.getState('skills');
+                if (skillsData) {
+                    console.log("Loading skills data:", skillsData);
+                    // Load skills directly from the state
+                    this.skillsManager.loadSavedData({skills: skillsData});
                 } else {
                     console.warn("No skills data found in save");
                 }
-                
+
                 console.log('Game loaded successfully', this.character);
                 return true;
             }
         } catch (error) {
             console.error('Error loading game:', error);
         }
-        
+
         return false;
     }
     
@@ -325,6 +367,51 @@ class Game {
             this.ui.showNotification('Failed to wipe game!', 'error');
             return false;
         }
+    }
+
+    repairCharacterState() {
+        if (!this.character) return;
+        
+        console.log("Checking and repairing character state...");
+        
+        // Check and repair stats
+        for (const statId in this.character.stats) {
+            console.log(`Checking stat: ${statId}, ${this.character.stats[statId].current}`);
+            const stat = this.character.stats[statId];
+            
+            // Check if stat is a proper Stat instance with required methods
+            if (!stat || typeof stat.update !== 'function' || typeof stat.add !== 'function') {
+                console.warn(`Repairing broken stat: ${statId}`);
+                this.character.repairStat(statId);
+            } else {
+                // Stat object is intact, but make sure the current value is correct
+                const stateStatData = this.state.getState(`character.stats.${statId}`);
+                if (stateStatData && stateStatData.current !== undefined) {
+                    console.log(`Setting ${statId} current value from state: ${stateStatData.current}`);
+                    stat.current = stateStatData.current;
+                }
+            }
+        }
+        
+        // Check and repair currencies
+        for (const currencyId in this.character.currencies) {
+            const currency = this.character.currencies[currencyId];
+            
+            // Check if currency is a proper Currency instance with required methods
+            if (!currency || typeof currency.update !== 'function' || typeof currency.add !== 'function') {
+                console.warn(`Repairing broken currency: ${currencyId}`);
+                this.character.repairCurrency(currencyId);
+            } else {
+                // Currency object is intact, but make sure the current value is correct
+                const stateCurrencyData = this.state.getState(`character.currencies.${currencyId}`);
+                if (stateCurrencyData && stateCurrencyData.current !== undefined) {
+                    console.log(`Setting ${currencyId} current value from state: ${stateCurrencyData.current}`);
+                    currency.current = stateCurrencyData.current;
+                }
+            }
+        }
+        
+        console.log("Character state repair complete");
     }
 }
 

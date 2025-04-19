@@ -19,7 +19,7 @@ class Character {
                 initial: 10,
                 max: 10,
                 unlocked: true,
-                recoveryRate: 0.5,
+                recoveryRate: 0.0,
                 recoveryDelay: 3000,
                 game: game
             }),
@@ -30,7 +30,7 @@ class Character {
                 initial: 10,
                 max: 10,
                 unlocked: true,
-                recoveryRate: 0.5,
+                recoveryRate: 0.0,
                 recoveryDelay: 1000,
                 game: game
             }),
@@ -40,7 +40,7 @@ class Character {
                 description: 'Your magical energy',
                 max: 0,
                 unlocked: false,
-                recoveryRate: 0.3,
+                recoveryRate: 0.0,
                 recoveryDelay: 5000,
                 game: game
             })
@@ -153,6 +153,12 @@ class Character {
                 if (typeof stat.update === 'function') {
                     try {
                         stat.update(deltaTime);
+
+                        // Update the game state if it exists
+                        if (this.game && this.game.state) {
+                            this.game.state.setState(`character.stats.${id}`, stat.current);
+                        }
+
                     } catch (error) {
                         console.error(`Error updating stat ${id}:`, error);
                         
@@ -319,17 +325,17 @@ class Character {
         if (id === 'health') {
             defaultName = 'Health';
             defaultDescription = 'Your physical wellbeing';
-            defaultRecoveryRate = 0.5;
+            defaultRecoveryRate = 0.0;
             defaultRecoveryDelay = 3000;
         } else if (id === 'stamina') {
             defaultName = 'Stamina';
             defaultDescription = 'Your physical energy';
-            defaultRecoveryRate = 0.5;
+            defaultRecoveryRate = 0.0;
             defaultRecoveryDelay = 1000;
         } else if (id === 'mana') {
             defaultName = 'Mana';
             defaultDescription = 'Your magical energy';
-            defaultRecoveryRate = 0.3;
+            defaultRecoveryRate = 0.0;
             defaultRecoveryDelay = 5000;
         }
         
@@ -348,6 +354,8 @@ class Character {
         
         // Copy over the current value explicitly
         newStat.current = brokenStat.current || 0;
+        console.log(`Broken stat ${id} repaired with name: ${brokenStat.name}, current: ${brokenStat.current}`);
+        console.log(`Repaired stat ${id} with name: ${newStat.name}, current: ${newStat.current}`);
         
         // Copy over the lastDamaged property if it exists
         if (brokenStat.lastDamaged !== undefined) {
@@ -383,6 +391,7 @@ class Character {
             try {
                 if (stat && typeof stat.serialize === 'function') {
                     saveData.stats[id] = stat.serialize();
+                    console.log(`Serialized stat ${id}:`, saveData.stats[id]);
                 } else {
                     // Fallback serialization for broken stat objects
                     saveData.stats[id] = {
