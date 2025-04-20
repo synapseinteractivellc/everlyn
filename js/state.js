@@ -30,15 +30,19 @@ class GameState {
 
   // Get the entire state or a specific path
   getState(path = null) {
-    if (!path) return this.state;
+    if (!path) {
+      return this.state;
+    }
     
-    return this.getNestedProperty(this.state, path);
+    const result = this.getNestedProperty(this.state, path);
+    return result;
   }
   
   // Get a nested property using dot notation (e.g., "character.stats.health")
   getNestedProperty(obj, path) {
-    return path.split('.').reduce((acc, part) => 
+    const result = path.split('.').reduce((acc, part) => 
       acc && acc[part] !== undefined ? acc[part] : null, obj);
+    return result;
   }
 
   // Update state and notify subscribers
@@ -51,14 +55,19 @@ class GameState {
     
     // Notify subscribers
     this.notifySubscribers(path, previousValue, value);
+    
+    return this.state;
   }
   
   // Update a nested property using dot notation
   updateNestedProperty(obj, path, value) {
     const parts = path.split('.');
     const lastKey = parts.pop();
+    
     const target = parts.reduce((acc, part) => {
-      if (!acc[part]) acc[part] = {};
+      if (!acc[part]) {
+        acc[part] = {};
+      }
       return acc[part];
     }, obj);
     
@@ -102,8 +111,15 @@ class GameState {
 
   // Load state from saved data
   loadState(savedData) {
+    console.log(`STATE LOAD: Loading state`);
+    
     // Merge saved data into state
     this.state = this.deepMerge(this.state, savedData);
+    
+    // Check for stamina specifically
+    if (this.state.character && this.state.character.stats && this.state.character.stats.stamina) {
+      console.log(`STATE LOAD: Stamina after load:`, this.state.character.stats.stamina);
+    }
     
     // Notify all subscribers of the load
     this.notifySubscribers('*', null, this.state);
@@ -136,6 +152,11 @@ class GameState {
   
   // Serialize the state for saving
   serialize() {
+    // Only log stamina
+    if (this.state.character && this.state.character.stats && this.state.character.stats.stamina) {
+      console.log(`STATE SERIALIZE: Stamina in serialized state:`, this.state.character.stats.stamina);
+    }
+    
     return this.state;
   }
 }

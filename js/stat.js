@@ -31,11 +31,30 @@ class Stat extends Resource {
      * @param {number} deltaTime - Time passed in seconds
      */
     update(deltaTime) {
+        // Check if this is stamina and log
+        if (this.id === 'stamina') {
+        }
+        
         // Check if enough time has passed since last damage
         const now = Date.now();
         if (this.recoveryRate > 0 && this.current < this.max && 
             (now - this.lastDamaged > this.recoveryDelay)) {
+            
+            const amountToAdd = this.recoveryRate * deltaTime;
+            
+            // If this is stamina, log the recovery details
+            if (this.id === 'stamina') {
+            }
+            
             this.add(this.recoveryRate * deltaTime);
+            
+            // If this is stamina, log after the add
+            if (this.id === 'stamina') {
+            }
+        }
+        
+        // If this is stamina, log at the end
+        if (this.id === 'stamina') {
         }
     }
     

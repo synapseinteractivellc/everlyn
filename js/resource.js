@@ -135,11 +135,34 @@ class Resource {
      * @param {Object} data - Saved resource data
      */
     deserialize(data) {
-        if (!data) return;
+        console.log(`RESOURCE DESERIALIZE: Starting deserialize for resource ${this.id}`);
+        console.log(`RESOURCE DESERIALIZE: Data received:`, data);
         
-        if (data.current !== undefined) this.current = data.current;
-        if (data.max !== undefined) this.max = data.max;
-        if (data.unlocked !== undefined) this.unlocked = data.unlocked;
+        if (!data) {
+            console.log(`RESOURCE DESERIALIZE: No data received for ${this.id}`);
+            return;
+        }
+        
+        if (data.current !== undefined) {
+            console.log(`RESOURCE DESERIALIZE: Setting current from ${this.current} to ${data.current}`);
+            this.current = data.current;
+        }
+        
+        if (data.max !== undefined) {
+            console.log(`RESOURCE DESERIALIZE: Setting max from ${this.max} to ${data.max}`);
+            this.max = data.max;
+        }
+        
+        if (data.unlocked !== undefined) {
+            console.log(`RESOURCE DESERIALIZE: Setting unlocked from ${this.unlocked} to ${data.unlocked}`);
+            this.unlocked = data.unlocked;
+        }
+        
+        console.log(`RESOURCE DESERIALIZE: Final state for ${this.id}:`, {
+            current: this.current,
+            max: this.max,
+            unlocked: this.unlocked
+        });
     }
 }
 

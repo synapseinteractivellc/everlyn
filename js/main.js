@@ -221,6 +221,8 @@ class Game {
         if (!this.character) return false;
         
         try {
+            console.log("SAVE: Starting save process in Game.saveGame()");
+
             // Create a complete game state object
             const gameStateData = {
                 character: this.character.save(),
@@ -229,18 +231,25 @@ class Game {
                     timestamp: Date.now()
                 }
             };
+            console.log("SAVE: Character data after character.save():", gameStateData.character);
+            console.log("SAVE: Character stats from gameStateData:", gameStateData.character.stats);
+            
+
 
             // Add skills data explicitly to the save
             if (this.skillsManager) {
                 gameStateData.skills = this.skillsManager.saveData();
-                console.log("Saving skills data:", gameStateData.skills);
+                console.log("SAVE: Adding skills data:", gameStateData.skills);
             }
 
             // Update our state object
             this.state.loadState(gameStateData);
-
+            console.log("SAVE: State after loadState:", this.state.getState());
+        
             // Save the entire state
             const success = this.storage.saveGame(this.state.serialize());
+            console.log("SAVE: Serialized state sent to storage:", this.state.serialize());
+        
 
             if (success) {
                 console.log('Game saved successfully', gameStateData);
@@ -285,45 +294,49 @@ class Game {
     
     // Load game state
     loadGame() {
+        console.log("LOAD: Starting load process in Game.loadGame()");
+        
         const savedData = this.storage.loadGame();
-        if (!savedData) return false;
-
+        console.log("LOAD: Data received from storage:", savedData);
+        
+        if (!savedData) {
+            console.log("LOAD: No saved data found");
+            return false;
+        }
+        
         try {
             // Load the saved data into our state object
             this.state.loadState(savedData);
-
-            //Get character data from the state
+            console.log("LOAD: State after loadState:", this.state.getState());
+            
+            // Get character data from state
             const characterData = this.state.getState('character');
+            console.log("LOAD: Character data from state:", characterData);
+            
             if (characterData) {
-                console.log("Loading character data:", characterData);
-                // Rebuild the character object from state
+                // Specifically log the stats before loading the character
+                console.log("LOAD: Stats data before Character.load():", characterData.stats);
+                
+                // Rebuild character object from saved data
                 this.character = Character.load(characterData, this);
-
-                // After loading the character, check and repair any broken stats or currencies
-                this.repairCharacterState();
-
-                // Set up skills manager if needed
-                if (!this.skillsManager) {
-                    this.skillsManager = new SkillsManager(this);
+                console.log("LOAD: Character after Character.load():", this.character);
+                console.log("LOAD: Character stats after load:", this.character.stats);
+                
+                // Check stamina specifically
+                if (this.character.stats.stamina) {
+                    console.log("LOAD: Stamina after load:", this.character.stats.stamina);
+                    console.log("LOAD: Stamina current value:", this.character.stats.stamina.current);
+                    console.log("LOAD: Stamina is instance of Stat:", this.character.stats.stamina instanceof Stat);
                 }
-
-                // Load skills data if it exists
-                const skillsData = this.state.getState('skills');
-                if (skillsData) {
-                    console.log("Loading skills data:", skillsData);
-                    // Load skills directly from the state
-                    this.skillsManager.loadSavedData({skills: skillsData});
-                } else {
-                    console.warn("No skills data found in save");
-                }
-
-                console.log('Game loaded successfully', this.character);
+                
+                // Log successful load
+                console.log("LOAD: Game loaded successfully");
                 return true;
             }
         } catch (error) {
-            console.error('Error loading game:', error);
+            console.error("LOAD ERROR:", error);
         }
-
+        
         return false;
     }
     

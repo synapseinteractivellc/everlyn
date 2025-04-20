@@ -119,7 +119,7 @@ class Character {
      * Update all resources and stats
      * @param {number} deltaTime - Time passed in seconds
      */
-    update(deltaTime) {
+    update(deltaTime) {  
         let repairsMade = false;
         
         // Update currencies
@@ -131,50 +131,50 @@ class Character {
                         currency.update(deltaTime, this);
                     } catch (error) {
                         console.error(`Error updating currency ${id}:`, error);
-                        
-                        // Attempt to repair the currency object
                         this.repairCurrency(id);
                         repairsMade = true;
                     }
                 } else {
                     console.error(`Currency ${id} does not have an update method. Currency:`, currency);
-                    
-                    // Attempt to repair the currency object
                     this.repairCurrency(id);
                     repairsMade = true;
                 }
             }
         }
-
+    
         // Update stats
         for (const [id, stat] of Object.entries(this.stats)) {
             if (stat && stat.unlocked) {
                 // Check if stat is a proper instance with an update method
                 if (typeof stat.update === 'function') {
                     try {
-                        stat.update(deltaTime);
-
-                        // Update the game state if it exists
-                        if (this.game && this.game.state) {
-                            this.game.state.setState(`character.stats.${id}`, stat.current);
+                        // If this is stamina, add extra logging
+                        if (id === 'stamina') {
                         }
-
+                        
+                        stat.update(deltaTime);
+                        
+                        // If this is stamina, add extra logging
+                        if (id === 'stamina') {
+                        }
+                        
+                        // Update the game state if it exists
+                        if (this.game && this.game.state) {                           
+                            this.game.state.setState(`character.stats.${id}.current`, stat.current);                           
+                        }
                     } catch (error) {
                         console.error(`Error updating stat ${id}:`, error);
-                        
-                        // Attempt to repair the stat object
                         this.repairStat(id);
                         repairsMade = true;
                     }
                 } else {
                     console.error(`Stat ${id} does not have an update method. Stat:`, stat);
-                    
-                    // Attempt to repair the stat object
                     this.repairStat(id);
                     repairsMade = true;
                 }
             }
         }
+        
         
         // If any repairs were made, trigger a full game state update
         if (repairsMade && this.game && this.game.ui) {
@@ -374,6 +374,9 @@ class Character {
 
     // Save character data (updated)
     save() {
+        console.log("CHAR SAVE: Starting character save");
+        console.log("CHAR SAVE: Current stamina value:", this.stats.stamina.current);
+        
         const saveData = {
             name: this.name,
             level: this.level,
@@ -391,19 +394,19 @@ class Character {
             try {
                 if (stat && typeof stat.serialize === 'function') {
                     saveData.stats[id] = stat.serialize();
-                    console.log(`Serialized stat ${id}:`, saveData.stats[id]);
+                    console.log(`CHAR SAVE: Serialized stat ${id}:`, saveData.stats[id]);
                 } else {
-                    // Fallback serialization for broken stat objects
+                    // Fallback serialization
                     saveData.stats[id] = {
                         current: stat.current || 0,
                         max: stat.max || 0,
                         unlocked: stat.unlocked || false,
                         lastDamaged: stat.lastDamaged || 0
                     };
-                    console.warn(`Using fallback serialization for stat ${id}`);
+                    console.log(`CHAR SAVE: Used fallback serialization for stat ${id}:`, saveData.stats[id]);
                 }
             } catch (error) {
-                console.error(`Error serializing stat ${id}:`, error);
+                console.error(`CHAR SAVE: Error serializing stat ${id}:`, error);
                 
                 // Still save basic properties
                 saveData.stats[id] = {
@@ -414,37 +417,17 @@ class Character {
             }
         }
         
-        // Serialize currencies with error handling
-        for (const [id, currency] of Object.entries(this.currencies)) {
-            try {
-                if (currency && typeof currency.serialize === 'function') {
-                    saveData.currencies[id] = currency.serialize();
-                } else {
-                    // Fallback serialization for broken currency objects
-                    saveData.currencies[id] = {
-                        current: currency.current || 0,
-                        max: currency.max || 0,
-                        unlocked: currency.unlocked || false
-                    };
-                    console.warn(`Using fallback serialization for currency ${id}`);
-                }
-            } catch (error) {
-                console.error(`Error serializing currency ${id}:`, error);
-                
-                // Still save basic properties
-                saveData.currencies[id] = {
-                    current: currency.current || 0,
-                    max: currency.max || 0,
-                    unlocked: currency.unlocked || false
-                };
-            }
-        }
+        // Log the completed stats object
+        console.log("CHAR SAVE: Complete stats object:", saveData.stats);
         
         return saveData;
     }
 
     // Static method to load character data (updated)
     static load(saveData, game) {
+        console.log("CHAR LOAD: Starting character load");
+        console.log("CHAR LOAD: Save data received:", saveData);
+        
         if (!saveData) return null;
         
         const character = new Character(saveData.name, game);
@@ -453,35 +436,37 @@ class Character {
         
         // Load stats - properly recreate Stat objects
         if (saveData.stats) {
+            console.log("CHAR LOAD: Loading stats from save data:", saveData.stats);
+            
             for (const [id, statData] of Object.entries(saveData.stats)) {
+                console.log(`CHAR LOAD: Loading stat ${id}:`, statData);
+                
                 if (character.stats[id]) {
+                    console.log(`CHAR LOAD: Deserializing stat ${id} from:`, statData);
+                    
+                    // Special attention to stamina
+                    if (id === 'stamina') {
+                        console.log("CHAR LOAD: Before deserialize, stamina current =", character.stats.stamina.current);
+                    }
+                    
                     // Keep the original Stat instance and just update its properties
                     character.stats[id].deserialize(statData);
-                }
-            }
-        }
-        
-        // Load currencies - properly recreate Currency objects
-        if (saveData.currencies) {
-            for (const [id, currencyData] of Object.entries(saveData.currencies)) {
-                if (id === 'scrolls') {
-                    // Handle Scroll class specifically since it's a special case
-                    if (!character.currencies[id]) {
-                        character.currencies[id] = new Scroll(game);
+                    
+                    // Special attention to stamina
+                    if (id === 'stamina') {
+                        console.log("CHAR LOAD: After deserialize, stamina current =", character.stats.stamina.current);
+                        // Force the current value for stamina 
+                        if (statData.current !== undefined) {
+                            character.stats.stamina.current = statData.current;
+                            console.log("CHAR LOAD: After explicit set, stamina current =", character.stats.stamina.current);
+                        }
                     }
-                    character.currencies[id].deserialize(currencyData);
-                } else if (character.currencies[id]) {
-                    // Keep the original Currency instance and update its properties
-                    character.currencies[id].deserialize(currencyData);
                 }
             }
         }
         
-        // Load other data
-        if (saveData.actions) character.actions = saveData.actions;
-        if (saveData.skills) character.skills = saveData.skills;
-        if (saveData.inventory) character.inventory = saveData.inventory;
-        if (saveData.upgrades) character.upgrades = saveData.upgrades;
+        // Log the final character stats
+        console.log("CHAR LOAD: Final character stats after load:", character.stats);
         
         return character;
     }
