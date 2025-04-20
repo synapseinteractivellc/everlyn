@@ -7,6 +7,7 @@ import { UpgradesManager } from './upgrades.js';
 import { SkillsManager } from './skill.js';
 import EventEmitter from './eventEmitter.js';
 import GameState from './state.js';
+import Stat from './stat.js';
 
 class Game {
     constructor() {
@@ -117,12 +118,36 @@ class Game {
 
     // Method to set up state subscriptions
     setupStateSubscriptions() {
+        // First set up standard subscriptions provided by the state system
+        this.state.setupStandardSubscriptions();
+        
         // Subscribe to character stat changes
         this.state.subscribe('character.stats', (newValue, oldValue, path) => {
             // Update UI when stats change
             if (this.ui) {                
                 console.log('Character stats updated:', newValue, oldValue);
                 this.ui.updateResourceDisplays(this.character);
+            }
+        });
+        
+        // Subscribe to currency changes
+        this.state.subscribe('character.currencies', (newValue, oldValue, path) => {
+            // Update UI when currencies change
+            if (this.ui) {
+                console.log('Character currencies updated:', newValue, oldValue);
+                this.ui.updateResourceDisplays(this.character);
+                this.ui.updatePurchaseButtons(this.character);
+            }
+        });
+        
+        // Subscribe to UI state changes
+        this.state.subscribe('ui.activeSection', (newValue, oldValue) => {
+            if (newValue !== oldValue) {
+                console.log(`UI section changed from ${oldValue} to ${newValue}`);
+                // Update active section in UI
+                if (this.ui) {
+                    this.ui.switchSection(newValue);
+                }
             }
         });
     }
@@ -155,6 +180,8 @@ class Game {
     // Called by UI when section changes
     onSectionChanged(sectionName) {
         console.log(`Section changed to: ${sectionName}`);
+        // Update state
+        this.state.setState('ui.activeSection', sectionName);
         // Handle section-specific logic here
     }
 

@@ -62,9 +62,9 @@ class UI {
             activeSection.classList.add('active');
         }
         
-        // Notify game of section change (optional)
-        if (this.game) {
-            this.game.onSectionChanged(sectionName);
+        // Update state if available
+        if (this.game && this.game.state) {
+            this.game.state.setState('ui.activeSection', sectionName);
         }
     }
 
@@ -160,17 +160,29 @@ class UI {
     updateResourceDisplays(character) {
         if (!character) return;
         
+        // Get current state if available
+        const state = this.game.state;
+
         // Update currencies display
         for (const [id, currency] of Object.entries(character.currencies)) {
+            // Get currency data from state if available
+            let currencyData = currency;
+            if (state) {
+                const stateData = state.getCurrency(id);
+                if (stateData) {
+                    currencyData = { ...currency, ...stateData };
+                }
+            }
+            
             // Skip if not unlocked
-            if (!currency.unlocked) continue;
+            if (!currencyData.unlocked) continue;
             
             // Get the container for this currency
             const resourceItem = document.getElementById(`${id}-resource`);
             
             // If container doesn't exist, create it
-            if (!resourceItem && currency.unlocked) {
-                this.createResourceDisplay(id, currency);
+            if (!resourceItem && currencyData.unlocked) {
+                this.createResourceDisplay(id, currencyData);
             }
             
             // Update values
@@ -178,11 +190,11 @@ class UI {
             const maxElement = document.getElementById(`${id}-max`);
             
             if (amountElement) {
-                amountElement.textContent = Math.floor(currency.current * 10) / 10; // Round to 1 decimal
+                amountElement.textContent = Math.floor(currencyData.current * 10) / 10; // Round to 1 decimal
             }
             
             if (maxElement) {
-                maxElement.textContent = currency.max;
+                maxElement.textContent = currencyData.max;
             }
         }
         
