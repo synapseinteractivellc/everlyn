@@ -33,12 +33,27 @@ class Resource {
         
         // Emit event if value changed and game exists
         if (this.current !== oldValue && this.game && this.game.events) {
+            console.log(`Resource ${this.id} changed: ${oldValue} -> ${this.current}`);
             this.game.events.emit('resource.changed', {
                 id: this.id,
                 oldValue: oldValue,
                 newValue: this.current,
                 resource: this
             });
+        }
+        
+        // Update state if state management exists
+        if (this.game && this.game.state) {
+            if (this.id.includes(".")) {
+                // Handle nested resources (like currencies.gold)
+                const [category, resourceId] = this.id.split(".");
+                this.game.state.adjustCurrencyAmount(resourceId, this.current - oldValue);
+            } else {
+                // Direct update for non-nested resources
+                const stateCategory = this.constructor.name.toLowerCase() === "currency" ? 
+                    "currencies" : "stats";
+                this.game.state.setState(`character.${stateCategory}.${this.id}.current`, this.current);
+            }
         }
         
         return this.current;
