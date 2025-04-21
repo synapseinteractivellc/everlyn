@@ -261,7 +261,11 @@ class Game {
             console.log("SAVE: Character data after character.save():", gameStateData.character);
             console.log("SAVE: Character stats from gameStateData:", gameStateData.character.stats);
             
-
+            // Add actions data explicitly to the save
+            if (this.actionsManager) {
+                gameStateData.actions = this.actionsManager.saveData();
+                console.log("SAVE: Adding actions data:", gameStateData.actions);
+            }
 
             // Add skills data explicitly to the save
             if (this.skillsManager) {
@@ -330,7 +334,7 @@ class Game {
             console.log("LOAD: No saved data found");
             return false;
         }
-        
+
         try {
             // Load the saved data into our state object
             this.state.loadState(savedData);
@@ -340,6 +344,12 @@ class Game {
             const characterData = this.state.getState('character');
             console.log("LOAD: Character data from state:", characterData);
             
+            // Load actions data if available
+            if (savedData.actions && this.actionsManager) {
+                console.log("LOAD: Loading actions data:", savedData.actions);
+                this.actionsManager.loadSavedData(savedData.actions);
+            }
+
             if (characterData) {
                 // Specifically log the stats before loading the character
                 console.log("LOAD: Stats data before Character.load():", characterData.stats);

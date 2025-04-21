@@ -342,6 +342,37 @@ class Action {
         // By default, all actions are available
         return true;
     }
+
+    /**
+     * Convert to an object for saving
+     * @returns {Object} - Serialized action data
+     */
+    serialize() {
+        return {
+            id: this.id,
+            completionCount: this.completionCount,
+            isActive: this.isActive,
+            progress: this.progress
+        };
+    }
+
+    /**
+     * Load from saved data
+     * @param {Object} data - Saved action data
+     */
+    deserialize(data) {
+        if (!data) return;
+        
+        if (data.completionCount !== undefined) this.completionCount = data.completionCount;
+        if (data.isActive !== undefined && data.isActive) {
+            // Don't auto-start the action, just restore the state
+            this.isActive = true;
+            if (data.progress !== undefined) this.progress = data.progress;
+            
+            // Update UI to show action is active
+            this.updateUI();
+        }
+    }
 }
 
 /**
@@ -753,6 +784,23 @@ class ActionsManager {
         this.registerAction(new MeditateOnArcaneWisdom(this.game));
         this.registerAction(new Cheat(this.game));
         
+        // Check if we're initializing after a load
+        if (this.game.character && this.game.character.actions) {
+            // Update actions with saved data
+            for (const id in this.actions) {
+                const action = this.actions[id];
+                const savedAction = this.game.character.actions[id];
+                
+                if (savedAction) {
+                    // Set completion count
+                    action.completionCount = savedAction.completionCount || 0;
+                    
+                    // Set UI to reflect saved state
+                    action.updateUI();
+                }
+            }
+        }
+
         // Setup event listeners
         this.setupEventListeners();
         
@@ -840,6 +888,58 @@ class ActionsManager {
                 action.stop();
             }
         }
+    }
+
+    /**
+     * Save all action data
+     * @returns {Object} - Saved action data
+     */
+    saveData() {
+        const data = {};
+        
+        for (const id in this.actions) {
+            const action = this.actions[id];
+            data[id] = action.serialize();
+        }
+        
+        return data;
+    }
+
+    /**
+     * Load saved action data
+     * @param {Object} savedData - Saved action data
+     */
+    loadSavedData(savedData) {
+        if (!savedData) return;
+        
+        // Stop any active actions first
+        this.stopAllActions();
+        
+        for (const id in savedData) {
+            const action = this.getAction(id);
+            if (action) {
+                action.deserialize(savedData[id]);
+                
+                // If this action was active, restore it properly
+                if (action.isActive) {
+                    // Update current action display
+                    const currentActionElement = document.getElementById('current-action');
+                    if (currentActionElement) {
+                        const percent = Math.floor(action.progress * 100);
+                        currentActionElement.textContent = `${action.name} (${percent}%)`;
+                    }
+                    
+                    // Restart the progress interval
+                    const intervalTime = 100; // Update every 100ms
+                    action.progressInterval = setInterval(() => {
+                        action.update(intervalTime / 1000); // Convert ms to seconds
+                    }, intervalTime);
+                }
+            }
+        }
+        
+        // Refresh the UI
+        this.populateActionButtons();
     }
 }
 

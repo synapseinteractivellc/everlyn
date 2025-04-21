@@ -542,6 +542,10 @@ progress::-moz-progress-bar {
     color: #eee;
 }
 
+.action-button.active .action-count {
+    color: #eee;
+}
+
 /* Progress bar */
 .action-progress-container {
     height: 6px;
