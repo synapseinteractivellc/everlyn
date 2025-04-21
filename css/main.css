@@ -27,30 +27,43 @@ body {
 .creation-container {
     background-color: #2c3e50; /* Dark blue background */
     color: white;
-    padding: 40px;
-    border-radius: 10px;
+    padding: 60px; /* Increased padding */
+    border-radius: 20px; /* More curved corners */
     text-align: center;
-    max-width: 500px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    max-width: 600px; /* Increased width */
+    width: 90%; /* Responsive width */
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
     border: 1px solid #34495e;
 }
 
 .creation-container h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
-    color: #3498db; /* Blue instead of yellow */
+    font-size: 34px; /* Larger heading */
+    margin-bottom: 15px;
+    color: #3498db;
 }
 
 .creation-container h2 {
-    font-size: 20px;
-    margin-bottom: 20px;
-    color: #ecf0f1; /* Light gray-white instead of red/orange */
+    font-size: 24px; /* Larger subheading */
+    margin-bottom: 25px;
+    color: #ecf0f1;
 }
 
 .creation-container p {
-    margin-bottom: 15px;
-    font-size: 16px;
-    color: #bdc3c7; /* Lighter gray for paragraph text */
+    margin-bottom: 20px;
+    font-size: 18px; /* Larger paragraph text */
+    color: #bdc3c7;
+    line-height: 1.5; /* Better line spacing */
+}
+
+#character-name-input {
+    width: 100%;
+    padding: 15px; /* Larger input field */
+    margin: 20px 0;
+    border: none;
+    border-radius: 10px; /* Curved corners on input */
+    font-size: 18px; /* Larger text */
+    background-color: #34495e;
+    color: white;
 }
 
 #character-name-input::placeholder {
@@ -58,15 +71,15 @@ body {
 }
 
 #enter-city-button {
-    background-color: #3498db; /* Blue button */
+    background-color: #3498db;
     color: white;
-    padding: 10px 25px;
+    padding: 15px 30px; /* Larger button */
     border: none;
-    border-radius: 5px;
+    border-radius: 10px; /* Curved corners on button */
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px; /* Larger text */
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 20px;
     transition: background-color 0.3s;
 }
 
