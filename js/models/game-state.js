@@ -37,6 +37,7 @@ class GameState {
                 id: "gold",
                 name: "Gold",
                 amount: 0,
+                maximum: 10,
                 generationRate: 0,
                 description: "The common currency of the realm."
             }
@@ -54,6 +55,26 @@ class GameState {
                 description: "Basic skills to survive on the streets."
             }
             // Other skills will be unlocked via progression
+        };
+
+        this.upgrades = {
+            goldPurse: {
+                id: "goldPurse",
+                name: "Coin Purse",
+                description: "A simple leather pouch to store more gold.",
+                costs: {
+                    currencies: { gold: 10 }
+                },
+                gains: {
+                    currencyMaximum: { gold: 15 }  // Increases gold max by 15
+                },
+                requiredClass: null,
+                requiredSkills: {},
+                unlocked: false,
+                purchased: 0,
+                numberOfPurchasesPossible: 1
+            }
+            // Other upgrades can be added here
         };
         
         // Actions

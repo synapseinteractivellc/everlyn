@@ -11,6 +11,7 @@ class SaveController {
             character: this.gameState.character,
             statPools: this.gameState.statPools,
             currencies: this.gameState.currencies,
+            upgrades: this.gameState.upgrades,
             skills: this.gameState.skills,
             home: this.gameState.home,
             currentAction: this.gameState.currentAction,
@@ -37,11 +38,13 @@ class SaveController {
         try {
             localStorage.setItem(this.saveKey, JSON.stringify(saveData));
             console.log('Game saved successfully.');
+            console.log('Save Data:', saveData); // Debugging line to check saved data
             return true;
         } catch (e) {
             console.error('Failed to save game:', e);
             return false;
         }
+
     }
     
     loadGame() {
@@ -53,6 +56,7 @@ class SaveController {
             this.gameState.character = saveData.character;
             this.gameState.statPools = saveData.statPools;
             this.gameState.currencies = saveData.currencies;
+            this.gameState.upgrades = saveData.upgrades || this.gameState.upgrades;
             this.gameState.skills = saveData.skills;
             this.gameState.home = saveData.home;
             this.gameState.currentAction = saveData.currentAction;

@@ -21,6 +21,7 @@
         
         <div id="nav-bar">
             <div class="nav-button active" data-screen="main">Main</div>
+            <div class="nav-button" data-screen="upgrades">Upgrades</div>
             <div class="nav-button" data-screen="skills">Skills</div>
             <div class="nav-button" data-screen="house">House</div>
             <div class="nav-button" data-screen="status">Status</div>
@@ -37,6 +38,11 @@
                 <div id="screen-main" class="screen active">
                     <h2>Available Actions</h2>
                     <div id="actions-container"></div>
+                </div>
+
+                <div id="screen-upgrades" class="screen">
+                    <h2>Available Upgrades</h2>
+                    <div id="upgrades-container"></div>
                 </div>
                 
                 <div id="screen-skills" class="screen">
@@ -88,6 +94,7 @@
     <script src="js/models/stat-pool.js"></script>
     <script src="js/models/currency.js"></script>
     <script src="js/models/skill.js"></script>
+    <script src="js/models/upgrade.js"></script>
     <script src="js/models/action.js"></script>
     <script src="js/models/home.js"></script>
     
@@ -96,6 +103,7 @@
     <script src="js/controllers/action-controller.js"></script>
     <script src="js/controllers/currency-controller.js"></script>
     <script src="js/controllers/skill-controller.js"></script>
+    <script src="js/controllers/upgrade-controller.js"></script>
     <script src="js/controllers/home-controller.js"></script>
     <script src="js/controllers/ui-controller.js"></script>
     <script src="js/controllers/save-controller.js"></script>

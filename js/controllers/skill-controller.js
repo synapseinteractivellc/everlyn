@@ -40,7 +40,7 @@ class SkillController {
     
     checkSkillUnlocks(skillId, level) {
         // Example skill unlocks - these would be moved to a config file later
-        if (skillId === 'survival' && level === 2) {
+        if (skillId === 'survival' && level >= 1) {
             // Unlock scavenging action
             if (!this.gameState.actions.scavenge) {
                 this.gameState.actions.scavenge = {
@@ -49,7 +49,7 @@ class SkillController {
                     description: "Search through garbage for useful items.",
                     isRestAction: false,
                     requiredClass: "Waif",
-                    requiredSkills: { survival: 2 },
+                    requiredSkills: { survival: 1 },
                     statPoolCosts: { stamina: 3 },
                     currencyCosts: {},
                     baseDuration: 3000, // 3 seconds
@@ -72,6 +72,11 @@ class SkillController {
                     message: `You unlocked a new action: Scavenge for Supplies!`,
                     timestamp: Date.now()
                 });
+
+                // Save the game to persist the new action
+                if (window.game && window.game.saveController) {
+                    window.game.saveController.saveGame();
+                }
             }
         }
         

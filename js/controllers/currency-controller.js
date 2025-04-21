@@ -11,14 +11,19 @@ class CurrencyController {
     updateCurrencies(deltaTimeSeconds) {
         for (const currency of Object.values(this.gameState.currencies)) {
             if (currency.generationRate > 0) {
-                currency.amount += currency.generationRate * deltaTimeSeconds;
+                const newAmount = currency.amount + currency.generationRate * deltaTimeSeconds;
+                currency.amount = Math.min(newAmount, currency.maximum || Infinity);
             }
         }
     }
     
     addCurrency(currencyId, amount) {
         if (this.gameState.currencies[currencyId]) {
-            this.gameState.currencies[currencyId].amount += amount;
+            const currency = this.gameState.currencies[currencyId];
+            const newAmount = currency.amount + amount;
+            
+            // Cap at maximum
+            currency.amount = Math.min(newAmount, currency.maximum || Infinity);
             return true;
         }
         return false;

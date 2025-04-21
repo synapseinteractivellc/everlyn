@@ -9,6 +9,7 @@ class Game {
         this.currencyController = new CurrencyController(this.gameState);
         this.skillController = new SkillController(this.gameState);
         this.homeController = new HomeController(this.gameState);
+        this.upgradeController = new UpgradeController(this.gameState);
         this.uiController = new UIController(this.gameState);
         this.saveController = new SaveController(this.gameState);
         
@@ -34,6 +35,7 @@ class Game {
         this.actionController.update(deltaTime);
         this.currencyController.update(deltaTime);
         this.skillController.update(deltaTime);
+        this.upgradeController.update(deltaTime);
         
         // Update UI
         this.uiController.update();

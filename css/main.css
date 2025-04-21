@@ -276,3 +276,43 @@ body {
 .cancel-action-btn:hover {
     color: #c0392b !important;
 }
+
+.upgrade-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.upgrade-button:hover {
+    background-color: #e0e0e0;
+}
+
+.upgrade-button.cannot-afford {
+    opacity: 0.7;
+    background-color: #f8f8f8;
+    cursor: not-allowed;
+}
+
+.upgrade-button h3 {
+    margin-bottom: 5px;
+}
+
+.upgrade-details {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.upgrade-costs, .upgrade-gains, .upgrade-limit {
+    margin-right: 10px;
+}
+
+.gain {
+    color: #27ae60;
+    margin-right: 5px;
+}

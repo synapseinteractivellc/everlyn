@@ -442,6 +442,105 @@ class UIController {
             }
         }
     }
+
+    updateUpgrades() {
+        // Check if we're on the Upgrades screen
+        if (this.gameState.currentScreen !== 'upgrades') return;
+        
+        const container = document.getElementById('upgrades-container');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        for (const upgrade of Object.values(this.gameState.upgrades)) {
+            // Skip if not unlocked
+            if (!upgrade.unlocked) continue;
+            
+            // Skip if already purchased maximum times
+            if (upgrade.purchased >= upgrade.numberOfPurchasesPossible) continue;
+            
+            const div = document.createElement('div');
+            div.className = 'upgrade-button';
+            
+            // Add class if can't afford
+            if (!window.game.upgradeController.canAffordUpgrade(upgrade)) {
+                div.classList.add('cannot-afford');
+            }
+            
+            div.setAttribute('data-upgrade-id', upgrade.id);
+            
+            div.innerHTML = `
+                <h3>${upgrade.name}</h3>
+                <p>${upgrade.description}</p>
+                <div class="upgrade-details">
+                    <div class="upgrade-costs">
+                        ${Object.entries(upgrade.costs.currencies || {}).map(([currencyId, cost]) => 
+                            `<span class="cost">${this.gameState.currencies[currencyId].name}: ${cost}</span>`
+                        ).join(' ')}
+                        
+                        ${Object.entries(upgrade.costs.statPools || {}).map(([statPoolId, cost]) => 
+                            `<span class="cost">${this.gameState.statPools[statPoolId].name}: ${cost}</span>`
+                        ).join(' ')}
+                    </div>
+                    <div class="upgrade-gains">
+                        ${this.formatGains(upgrade.gains)}
+                    </div>
+                    <div class="upgrade-limit">
+                        ${upgrade.purchased}/${upgrade.numberOfPurchasesPossible} purchased
+                    </div>
+                </div>
+            `;
+            
+            div.addEventListener('click', () => {
+                window.game.upgradeController.purchaseUpgrade(upgrade.id);
+                this.updateUpgrades(); // Refresh UI after purchase
+                this.updateCurrencies(); // Refresh currencies display
+            });
+            
+            container.appendChild(div);
+        }
+    }
+    
+    formatGains(gains) {
+        let gainsText = [];
+        
+        // Format currency maximums
+        if (gains.currencyMaximum) {
+            for (const [currencyId, value] of Object.entries(gains.currencyMaximum)) {
+                if (this.gameState.currencies[currencyId]) {
+                    gainsText.push(`+${value} ${this.gameState.currencies[currencyId].name} Maximum`);
+                }
+            }
+        }
+        
+        // Format stat pool maximums
+        if (gains.statPoolMaximum) {
+            for (const [statPoolId, value] of Object.entries(gains.statPoolMaximum)) {
+                if (this.gameState.statPools[statPoolId]) {
+                    gainsText.push(`+${value} ${this.gameState.statPools[statPoolId].name} Maximum`);
+                }
+            }
+        }
+        
+        // Format currency generation
+        if (gains.currencyGeneration) {
+            for (const [currencyId, value] of Object.entries(gains.currencyGeneration)) {
+                if (this.gameState.currencies[currencyId]) {
+                    gainsText.push(`+${value}/s ${this.gameState.currencies[currencyId].name} Generation`);
+                }
+            }
+        }
+        
+        // Format special effects
+        if (gains.specialEffects) {
+            if (gains.specialEffects.doubleActions) {
+                gainsText.push(`Perform multiple actions simultaneously`);
+            }
+            // Add other special effects formatting here
+        }
+        
+        return gainsText.map(text => `<span class="gain">${text}</span>`).join(' ');
+    }
     
     updateHouse() {
         const container = document.getElementById('house-container');
