@@ -1,0 +1,1 @@
+// ./js/models/character.js

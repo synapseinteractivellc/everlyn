@@ -3,195 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="Synapse Interactive LLC">
-    <meta name="description" content="Everlyn: City of Wonder - A 2D web-based Idle/Clicker Fantasy RPG">
-    <title>Everlyn: City of Wonder</title>
-    <link rel="stylesheet" href="./css/styles.css">
-    <script type="module" src="./js/main.js"></script>
+    <title>Everlyn:City of Wonder</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <!-- Welcome Screen -->
-    <div class="welcome-container">
-        <div class="welcome-header">
-            <h1>Everlyn: City of Wonder</h1>
-            <p class="tagline">Begin your journey in the legendary city...</p>
-        </div>
-        
-        <div class="welcome-content">
-            <div class="welcome-description">
-                <p>Welcome to Everlyn, a city of ancient magic and endless opportunity. As a newcomer to these storied streets, your destiny awaits. What path will you choose in this city of wonder?</p>
-            </div>
-            
-            <div class="character-creation card">
-                <div class="card-header">
-                    <h2>Create Your Character</h2>
-                </div>
-                <div class="card-body">
-                    <form id="character-form">
-                        <div class="form-group">
-                            <label for="character-name">Character Name:</label>
-                            <input type="text" id="character-name" name="character-name" required 
-                                placeholder="Enter your character's name" 
-                                minlength="2" maxlength="20">
-                        </div>
-                        
-                        <div class="character-info">
-                            <p>You will begin as a humble <span class="highlight">Waif</span>, alone but determined in the grand city of Everlyn.</p>
-                            <p>Your story begins with nothing but the clothes on your back and your wits. Through persistence and clever choices, you'll rise through the ranks of society, mastering skills and uncovering the city's many secrets.</p>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="submit" id="start-game" class="btn-primary" aria-label="Enter the City">Enter the City</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
-        <div class="welcome-footer">
-            <div class="city-silhouette"></div>
-            <footer>
-                &copy; 2025 Synapse Interactive LLC. MIT License.
-            </footer>
-        </div>
-    </div>
-
-    <!-- Game Screen (Initially Hidden) -->
-    <div class="game-container hidden">
-        <header class="game-header">
-            <div class="game-header-left">
-                <h1>Everlyn: City of Wonder</h1>
-                <div class="character-info-bar">
-                    <span id="character-name-display">Character Name</span>
-                    <span class="separator">|</span>
-                    <span>Level: <span id="character-level">1</span></span>
-                </div>
+    <div id="game-container">
+        <div id="header">
+            <div class="header-content">
+                <h1 id="game-title">Everlyn:City of Wonder</h1>
+                <div id="character-info">Unnamed the Level 1 Waif</div>
             </div>
             <div class="header-buttons">
-                <button id="save-game" class="header-btn" aria-label="Save Game">Save</button>
-                <button id="wipe-game" class="header-btn" aria-label="Wipe Game Data">Wipe</button>
+                <button id="save-button" class="header-button">Save</button>
+                <button id="wipe-button" class="header-button">Wipe</button>
             </div>
-        </header>
-
-        <!-- Navigation Menu -->
-        <nav class="game-nav">
-            <ul>
-                <li><button class="nav-button active" data-section="main" aria-label="Main Section">Main</button></li>
-                <li><button class="nav-button" data-section="skills" aria-label="Skills Section">Skills</button></li>
-                <li><button class="nav-button" data-section="house" aria-label="House Section">House</button></li>
-                <li><button class="nav-button" data-section="status" aria-label="Status Section">Status</button></li>
-                <li><button class="nav-button" data-section="inventory" aria-label="Inventory Section">Inventory</button></li>
-                <li><button class="nav-button" data-section="adventure" aria-label="Adventure Section">Adventure</button></li>
-            </ul>
-        </nav>
+        </div>
         
-        <main class="game-content">
-            <aside class="resource-sidebar">
-                <div class="sidebar-header">
-                    <h2>Resources</h2>
-                </div>
-                <div class="sidebar-content">
-                    <div class="resource-bar">
-                        <!-- Resource bars will be dynamically populated -->
-                    </div>
-                </div>
-            </aside>
-            <div class="main-area">
-                <!-- This area will change based on navigation -->
-                <div id="main-section" class="game-section active">
+        <div id="nav-bar">
+            <div class="nav-button active" data-screen="main">Main</div>
+            <div class="nav-button" data-screen="skills">Skills</div>
+            <div class="nav-button" data-screen="house">House</div>
+            <div class="nav-button" data-screen="status">Status</div>
+        </div>
+        
+        <div id="main-content">
+            <div id="currency-sidebar">
+                <h3>Resources</h3>
+                <div id="currencies-container"></div>
+            </div>
+            
+            <div id="action-area">
+                <!-- Content changes based on active screen -->
+                <div id="screen-main" class="screen active">
                     <h2>Available Actions</h2>
-                    <div class="available-actions">
-                        <!-- Actions will be populated here -->
-                    </div>
-                    <h3 class="upgrades-header">Available Upgrades</h3>
-                    <div class="available-upgrades">
-                        <!-- Upgrades will be populated here -->
-                    </div>
+                    <div id="actions-container"></div>
                 </div>
-
-                <div id="skills-section" class="game-section">
+                
+                <div id="screen-skills" class="screen">
                     <h2>Skills</h2>
-                    <div class="skills-list">
-                        <!-- Skills will be populated here -->
-                    </div>
+                    <div id="skills-container"></div>
                 </div>
-
-                <div id="house-section" class="game-section">
+                
+                <div id="screen-house" class="screen">
                     <h2>House</h2>
-                    <div class="house-list">
-                        <!-- House will be populated here -->
+                    <div id="house-container">
+                        <p>You are currently homeless.</p>
                     </div>
                 </div>
-
-                <div id="status-section" class="game-section">
+                
+                <div id="screen-status" class="screen">
                     <h2>Character Status</h2>
-                    <div class="character-stats">
-                        <!-- Stats will be populated here -->
-                    </div>
-                </div>
-                
-                <div id="inventory-section" class="game-section">
-                    <h2>Inventory</h2>
-                    <div class="inventory-grid">
-                        <!-- Inventory will be populated here -->
-                    </div>
-                </div>
-                
-                <div id="adventure-section" class="game-section">
-                    <h2>Adventure</h2>
-                    <div class="adventure-list">
-                        <!-- Adventure will be populated here -->
-                    </div>
+                    <div id="status-container"></div>
                 </div>
             </div>
-            <aside id="status-sidebar" class="status-sidebar">
-                <h2>Current Action</h2>
-                <div class="action-status">
-                    <p id="current-action">None</p>
-                    <button id="cancel-action" class="btn-secondary" aria-label="Cancel Current Action">Cancel</button>
-                </div>
-                <h2>Character Stats</h2>
-                <div class="stats-list">
-                    <div class="stat-bar">
-                        <label for="health-bar">Health:</label>
-                        <div class="progress-container">
-                            <progress id="health-bar" value="100" max="100"></progress>
-                            <div class="stat-values">
-                                <span id="health-current">10</span>/<span id="health-max">10</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-bar">
-                        <label for="stamina-bar">Stamina:</label>
-                        <div class="progress-container">
-                            <progress id="stamina-bar" value="100" max="100"></progress>
-                            <div class="stat-values">
-                                <span id="stamina-current">10</span>/<span id="stamina-max">10</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-bar" id="mana-bar-container" style="display: none;">
-                        <label for="mana-bar">Mana:</label>
-                        <div class="progress-container">
-                            <progress id="mana-bar" value="0" max="100"></progress>
-                            <div class="stat-values">
-                                <span id="mana-current">0</span>/<span id="mana-max">0</span>
-                            </div>
-                        </div>
+            
+            <div id="status-sidebar">
+                <div id="current-action">
+                    <h3>Current Action</h3>
+                    <div id="action-name">None</div>
+                    <div class="progress-container">
+                        <div id="action-progress" class="progress-bar progress-action" style="width: 0%;">0%</div>
                     </div>
                 </div>
-            </aside>
-            <aside id="adventure-log" class="adventure-log">
-                <h2>Adventure Log</h2>
-                <div class="log-content">
-                    <!-- Adventure log will be populated here -->
+                
+                <div id="stat-pools">
+                    <h3>Stat Pools</h3>
+                    <div id="stat-pools-container"></div>
                 </div>
-            </aside>
-        </main>
-        
+            </div>
+            
+            <div id="log-sidebar">
+                <h3>Adventure Log</h3>
+                <div id="action-log"></div>
+            </div>
+        </div>
         <footer class="game-footer">
             &copy; 2025 Synapse Interactive LLC. MIT License.
         </footer>
     </div>
+
+    <!-- Game Scripts -->
+    <script src="js/models/game-state.js"></script>
+    <script src="js/models/character.js"></script>
+    <script src="js/models/stat-pool.js"></script>
+    <script src="js/models/currency.js"></script>
+    <script src="js/models/skill.js"></script>
+    <script src="js/models/action.js"></script>
+    <script src="js/models/home.js"></script>
+    
+    <script src="js/controllers/game-controller.js"></script>
+    <script src="js/controllers/character-controller.js"></script>
+    <script src="js/controllers/action-controller.js"></script>
+    <script src="js/controllers/currency-controller.js"></script>
+    <script src="js/controllers/skill-controller.js"></script>
+    <script src="js/controllers/home-controller.js"></script>
+    <script src="js/controllers/ui-controller.js"></script>
+    <script src="js/controllers/save-controller.js"></script>
+    
+    <script src="js/views/view-manager.js"></script>
+    
+    <script src="js/game.js"></script>
 </body>
 </html>
