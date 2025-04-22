@@ -21,6 +21,10 @@ class Game {
         // Check if we need to show character creation
         if (!loadSuccessful || this.gameState.character.name === "Unnamed") {
             this.showCharacterCreation();
+        } else {
+            // If we have a saved game, hide character creation and show game
+            document.getElementById('character-creation-overlay').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
         }
 
         // Start game loop
@@ -35,28 +39,40 @@ class Game {
     showCharacterCreation() {
         const overlay = document.getElementById('character-creation-overlay');
         overlay.style.display = 'flex';
+        document.getElementById('game-container').style.display = 'none';
         
-        const nameInput = document.getElementById('character-name-input');
-        const enterButton = document.getElementById('enter-city-button');
+        const characterForm = document.getElementById('character-form');
+        const nameInput = document.getElementById('character-name');
         
         // Set focus to the input field
         nameInput.focus();
         
-        // Handle enter key press
-        nameInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                this.createCharacter();
-            }
+        // Handle class selection buttons
+        const classButtons = document.querySelectorAll('.class-choice');
+        let selectedClass = 'Waif'; // Default class
+        
+        classButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                classButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Store the selected class
+                selectedClass = button.getAttribute('data-class');
+            });
         });
         
-        // Handle button click
-        enterButton.addEventListener('click', () => {
-            this.createCharacter();
+        // Handle form submission
+        characterForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.createCharacter(selectedClass);
         });
     }
     
-    createCharacter() {
-        const nameInput = document.getElementById('character-name-input');
+    createCharacter(characterClass) {
+        const nameInput = document.getElementById('character-name');
         const name = nameInput.value.trim();
         
         // Validate name (not empty)
@@ -70,8 +86,12 @@ class Game {
         // Set character name
         this.gameController.setCharacterName(name);
         
-        // Hide overlay
+        // Set character class
+        this.gameState.character.class = characterClass;
+        
+        // Hide overlay and show game
         document.getElementById('character-creation-overlay').style.display = 'none';
+        document.getElementById('game-container').style.display = 'flex';
         
         // Update UI
         this.uiController.updateCharacterInfo();
@@ -81,7 +101,7 @@ class Game {
         
         // Add welcome message to log
         this.gameState.actionLog.unshift({
-            message: `Welcome to Everlyn, ${name}! Your journey begins...`,
+            message: `Welcome to Everlyn, ${name}! Your journey begins as a ${characterClass}...`,
             timestamp: Date.now()
         });
         

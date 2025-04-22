@@ -13,17 +13,56 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <div id="character-creation-overlay" style="display: none;">
-        <div class="creation-container">
-            <h1>Welcome to Everlyn</h1>
-            <h2>The City of Wonders</h2>
-            <p>Where all paths lead to the pinnacle.</p>
-            <p>Who seeks to enter our fair city?</p>
-            <input type="text" id="character-name-input" placeholder="Enter Character Name"><br>
-            <button id="enter-city-button">Enter the City</button>
+    <div id="character-creation-overlay">
+        <div class="welcome-container">           
+            <div class="welcome-content">
+                <div class="character-creation card">
+                    <div class="card-header">
+                        <h2>Everlyn: City of Wonder</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="welcome-description">
+                            <p>Welcome to Everlyn, a city of ancient magic and endless opportunity.<br>
+                                As a newcomer to these storied streets, your destiny awaits.<br>
+                                What path will you choose in this city of wonder?</p>
+                        </div>
+                        <form id="character-form">
+                            <div class="form-group">
+                                <label for="character-name">Character Name</label>
+                                <input type="text" id="character-name" name="character-name" required 
+                                    placeholder="Enter your character's name" 
+                                    minlength="2" maxlength="20">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Choose Your Starting Class</label>
+                                <div class="class-selection">
+                                    <button type="button" id="class-waif" class="class-choice active" data-class="Waif">
+                                        <span class="class-name">Waif</span>
+                                        <span class="class-desc">A humble street urchin with quick wits and survival instincts</span>
+                                    </button>
+                                    <button type="button" id="class-vagabond" class="class-choice" data-class="Vagabond">
+                                        <span class="class-name">Vagabond</span>
+                                        <span class="class-desc">A wanderer with basic skills and knowledge of the wilds</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="character-info">
+                                <p>Your story begins with nothing but the clothes on your back and your wits. Through persistence and clever choices, you'll rise through the ranks of society, mastering skills and uncovering the city's many secrets.</p>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" id="start-game" class="btn-primary" aria-label="Enter the City">Enter the City</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="game-container">
+
+    <div id="game-container" style="display: none;">
         <div id="header">
             <div class="header-content">
                 <h1 id="game-title">Everlyn: City of Wonder</h1>
