@@ -94,7 +94,7 @@ class Game {
         document.getElementById('game-container').style.display = 'flex';
         
         // Update UI
-        this.uiController.updateCharacterInfo();
+        this.uiController.forceInitialUIUpdate();
         
         // Save game
         this.saveController.saveGame();

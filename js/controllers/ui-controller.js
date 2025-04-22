@@ -89,8 +89,56 @@ class UIController {
         if (this.gameState.currentScreen === 'skills') {
             this.updateSkills();
         }
+
+        // Update the upgrades tab if we're viewing it
+        if (this.gameState.currentScreen === 'upgrades') {
+            this.updateUpgrades();
+        }
         // Don't constantly update action buttons, skills, etc.
         // Only update them when specifically needed (e.g., when unlocking new actions)
+    }
+
+    forceInitialUIUpdate() {
+        this.updateCharacterInfo();
+        
+        // Force currency update
+        const currencyContainer = document.getElementById('currencies-container');
+        currencyContainer.innerHTML = '';
+        for (const currency of Object.values(this.gameState.currencies)) {
+            const div = document.createElement('div');
+            div.className = 'currency';
+            div.innerHTML = `
+                <span class="currency-name">${currency.name}:</span>
+                <span class="currency-amount">${Math.floor(currency.amount)}/${Math.floor(currency.maximum)}</span>
+                ${currency.generationRate > 0 ? 
+                    `<span class="currency-rate">(+${currency.generationRate.toFixed(1)}/s)</span>` : ''}
+            `;
+            currencyContainer.appendChild(div);
+        }
+        
+        // Force stat pool update
+        const statPoolContainer = document.getElementById('stat-pools-container');
+        statPoolContainer.innerHTML = '';
+        for (const statPool of Object.values(this.gameState.statPools)) {
+            const div = document.createElement('div');
+            div.className = 'stat-pool';
+            div.innerHTML = `
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: ${(statPool.current / statPool.max * 100).toFixed(1)}%; background-color: ${statPool.color}">
+                        ${statPool.name}: ${Math.floor(statPool.current)}/${Math.floor(statPool.max)}
+                    </div>
+                </div>
+            `;
+            statPoolContainer.appendChild(div);
+        }
+        
+        // Update the rest normally
+        this.updateCurrentAction();
+        this.updateActionLog();
+        this.updateActions();
+        this.updateSkills();
+        this.updateHouse();
+        this.updateStatus();
     }
     
     updateAll() {
@@ -103,6 +151,7 @@ class UIController {
         this.updateSkills();
         this.updateHouse();
         this.updateStatus();
+        this.updateUpgrades();
     }
     
     changeScreen(screen) {
@@ -168,7 +217,7 @@ class UIController {
                 div.className = 'currency';
                 div.innerHTML = `
                     <span class="currency-name">${currency.name}:</span>
-                    <span class="currency-amount">${Math.floor(currency.amount)}</span>
+                    <span class="currency-amount">${Math.floor(currency.amount)}/${Math.floor(currency.maximum)}</span>
                     ${currency.generationRate > 0 ? 
                         `<span class="currency-rate">(+${currency.generationRate.toFixed(1)}/s)</span>` : ''}
                 `;
@@ -210,10 +259,9 @@ class UIController {
                 const div = document.createElement('div');
                 div.className = 'stat-pool';
                 div.innerHTML = `
-                    <div class="stat-name">${statPool.name}: ${Math.floor(statPool.current)}/${Math.floor(statPool.max)}</div>
                     <div class="progress-container">
                         <div class="progress-bar" style="width: ${(statPool.current / statPool.max * 100).toFixed(1)}%; background-color: ${statPool.color}">
-                            ${Math.floor(statPool.current / statPool.max * 100)}%
+                            ${statPool.name}: ${Math.floor(statPool.current)}/${Math.floor(statPool.max)}
                         </div>
                     </div>
                 `;
@@ -446,60 +494,102 @@ class UIController {
     updateUpgrades() {
         // Check if we're on the Upgrades screen
         if (this.gameState.currentScreen !== 'upgrades') return;
-        
+
         const container = document.getElementById('upgrades-container');
         if (!container) return;
-        
-        container.innerHTML = '';
-        
+
+        // Track changes to avoid unnecessary updates
+        let hasChanges = false;
+
+        // Create a map of current upgrades in the container
+        const existingUpgrades = new Map();
+        container.querySelectorAll('.upgrade-button').forEach(button => {
+            const upgradeId = button.getAttribute('data-upgrade-id');
+            existingUpgrades.set(upgradeId, button);
+        });
+
         for (const upgrade of Object.values(this.gameState.upgrades)) {
-            // Skip if not unlocked
-            if (!upgrade.unlocked) continue;
-            
-            // Skip if already purchased maximum times
-            if (upgrade.purchased >= upgrade.numberOfPurchasesPossible) continue;
-            
-            const div = document.createElement('div');
-            div.className = 'upgrade-button';
-            
-            // Add class if can't afford
-            if (!window.game.upgradeController.canAffordUpgrade(upgrade)) {
-                div.classList.add('cannot-afford');
+            // Skip if not unlocked or already purchased maximum times
+            if (!upgrade.unlocked || upgrade.purchased >= upgrade.numberOfPurchasesPossible) {
+                if (existingUpgrades.has(upgrade.id)) {
+                    existingUpgrades.get(upgrade.id).remove();
+                    hasChanges = true;
+                }
+                continue;
             }
-            
-            div.setAttribute('data-upgrade-id', upgrade.id);
-            
-            div.innerHTML = `
-                <h3>${upgrade.name}</h3>
-                <p>${upgrade.description}</p>
-                <div class="upgrade-details">
-                    <div class="upgrade-costs">
-                        ${Object.entries(upgrade.costs.currencies || {}).map(([currencyId, cost]) => 
-                            `<span class="cost">${this.gameState.currencies[currencyId].name}: ${cost}</span>`
-                        ).join(' ')}
-                        
-                        ${Object.entries(upgrade.costs.statPools || {}).map(([statPoolId, cost]) => 
-                            `<span class="cost">${this.gameState.statPools[statPoolId].name}: ${cost}</span>`
-                        ).join(' ')}
+
+            const canAfford = window.game.upgradeController.canAffordUpgrade(upgrade);
+            const existingButton = existingUpgrades.get(upgrade.id);
+
+            // Check if the button needs to be updated
+            if (existingButton) {
+                const isCannotAfford = existingButton.classList.contains('cannot-afford');
+                if (isCannotAfford !== !canAfford) {
+                    existingButton.classList.toggle('cannot-afford', !canAfford);
+                    hasChanges = true;
+                }
+
+                const limitText = `${upgrade.purchased}/${upgrade.numberOfPurchasesPossible} purchased`;
+                const limitElement = existingButton.querySelector('.upgrade-limit');
+                if (limitElement && limitElement.textContent !== limitText) {
+                    limitElement.textContent = limitText;
+                    hasChanges = true;
+                }
+            } else {
+                // Create a new button if it doesn't exist
+                const div = document.createElement('div');
+                div.className = 'upgrade-button';
+                if (!canAfford) div.classList.add('cannot-afford');
+
+                div.setAttribute('data-upgrade-id', upgrade.id);
+
+                div.innerHTML = `
+                    <h3>${upgrade.name}</h3>
+                    <p>${upgrade.description}</p>
+                    <div class="upgrade-details">
+                        <div class="upgrade-costs">
+                            ${Object.entries(upgrade.costs.currencies || {}).map(([currencyId, cost]) =>
+                                `<span class="cost">${this.gameState.currencies[currencyId].name}: ${cost}</span>`
+                            ).join(' ')}
+                            
+                            ${Object.entries(upgrade.costs.statPools || {}).map(([statPoolId, cost]) =>
+                                `<span class="cost">${this.gameState.statPools[statPoolId].name}: ${cost}</span>`
+                            ).join(' ')}
+                        </div>
+                        <div class="upgrade-gains">
+                            ${this.formatGains(upgrade.gains)}
+                        </div>
+                        <div class="upgrade-limit">
+                            ${upgrade.purchased}/${upgrade.numberOfPurchasesPossible} purchased
+                        </div>
                     </div>
-                    <div class="upgrade-gains">
-                        ${this.formatGains(upgrade.gains)}
-                    </div>
-                    <div class="upgrade-limit">
-                        ${upgrade.purchased}/${upgrade.numberOfPurchasesPossible} purchased
-                    </div>
-                </div>
-            `;
-            
-            div.addEventListener('click', () => {
-                window.game.upgradeController.purchaseUpgrade(upgrade.id);
-                this.updateUpgrades(); // Refresh UI after purchase
-                this.updateCurrencies(); // Refresh currencies display
-            });
-            
-            container.appendChild(div);
+                `;
+
+                div.addEventListener('click', () => {
+                    window.game.upgradeController.purchaseUpgrade(upgrade.id);
+                    this.updateUpgrades(); // Refresh UI after purchase
+                    this.updateCurrencies(); // Refresh currencies display
+                });
+
+                container.appendChild(div);
+                hasChanges = true;
+            }
+        }
+
+        // Remove any buttons that no longer correspond to active upgrades
+        existingUpgrades.forEach((button, upgradeId) => {
+            if (!this.gameState.upgrades[upgradeId] || 
+                this.gameState.upgrades[upgradeId].purchased >= this.gameState.upgrades[upgradeId].numberOfPurchasesPossible) {
+                button.remove();
+                hasChanges = true;
+            }
+        });
+
+        if (!hasChanges) {
+            console.log('No changes detected, skipping update.');
         }
     }
+    // Generated by Copilot
     
     formatGains(gains) {
         let gainsText = [];

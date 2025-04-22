@@ -83,4 +83,50 @@ class GameController {
         }
         return false;
     }
+
+    unlockHome(homeType, home) {
+        if (!this.gameState.home.type) {
+            this.gameState.home.type = homeType;
+            this.gameState.home.furniture = home.furniture || {};
+            
+            // Add to log
+            this.gameState.actionLog.unshift({
+                message: `You've unlocked a new home: ${homeType}!`,
+                timestamp: Date.now()
+            });
+            
+            return true;
+        }
+        return false;
+    }
+
+    unlockUpgrade(upgradeId, upgrade) {
+        if (!this.gameState.upgrades[upgradeId]) {
+            this.gameState.upgrades[upgradeId] = upgrade;
+            
+            // Add to log
+            this.gameState.actionLog.unshift({
+                message: `You've unlocked a new upgrade: ${upgrade.name}!`,
+                timestamp: Date.now()
+            });
+            
+            return true;
+        }
+        return false;
+    }
+
+    unlockClass(classId, characterClass) {
+        if (!this.gameState.classes[classId]) {
+            this.gameState.classes[classId] = characterClass;
+            
+            // Add to log
+            this.gameState.actionLog.unshift({
+                message: `You've unlocked a new class: ${characterClass.name}!`,
+                timestamp: Date.now()
+            });
+            
+            return true;
+        }
+        return false;
+    }
 }

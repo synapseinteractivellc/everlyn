@@ -135,7 +135,15 @@ class ActionController {
                     amount = Math.floor(Math.random() * (reward.max - reward.min + 1)) + reward.min;
                 }
                 
-                this.gameState.currencies[currencyId].amount += amount;
+                // Use currency controller to add currency (which respects maximums)
+                if (window.game && window.game.currencyController) {
+                    window.game.currencyController.addCurrency(currencyId, amount);
+                } else {
+                    // Fallback if currency controller isn't available
+                    const currency = this.gameState.currencies[currencyId];
+                    const newAmount = currency.amount + amount;
+                    currency.amount = Math.min(newAmount, currency.maximum || Infinity);
+                }
             }
         }
         

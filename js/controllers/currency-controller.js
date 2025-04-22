@@ -21,7 +21,6 @@ class CurrencyController {
         if (this.gameState.currencies[currencyId]) {
             const currency = this.gameState.currencies[currencyId];
             const newAmount = currency.amount + amount;
-            
             // Cap at maximum
             currency.amount = Math.min(newAmount, currency.maximum || Infinity);
             return true;
