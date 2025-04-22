@@ -20,22 +20,53 @@ class SkillController {
     levelUpSkill(skillId) {
         const skill = this.gameState.skills[skillId];
         if (!skill) return;
-        
+
+        // Ensure the skill does not exceed max level
+        if (skill.level >= skill.maxLevel) {
+            this.gameState.actionLog.unshift({
+                message: `Your ${skill.name} skill is already at the maximum level!`,
+                timestamp: Date.now()
+            });
+            return;
+        }
+
         // Level up the skill
         skill.level++;
         skill.experience -= skill.nextLevelExperience;
-        
+
         // Increase next level experience requirement
         skill.nextLevelExperience = Math.floor(skill.nextLevelExperience * 1.5);
-        
+
         // Check for new unlocks based on skill level
         this.checkSkillUnlocks(skillId, skill.level);
-        
+
         // Add to log
         this.gameState.actionLog.unshift({
             message: `Your ${skill.name} skill increased to level ${skill.level}!`,
             timestamp: Date.now()
         });
+    }
+
+    addSkillExperience(skillId, amount) {
+        const skill = this.gameState.skills[skillId];
+        if (skill) {
+            // Ensure the skill does not exceed max level
+            if (skill.level >= skill.maxLevel) {
+                this.gameState.actionLog.unshift({
+                    message: `Your ${skill.name} skill is already at the maximum level and cannot gain more experience!`,
+                    timestamp: Date.now()
+                });
+                return false;
+            }
+
+            skill.experience += amount;
+            // Check if the skill should level up
+            if (skill.experience >= skill.nextLevelExperience) {
+                this.levelUpSkill(skillId);
+            }
+        }
+
+        return false;
     }
     
     checkSkillUnlocks(skillId, level) {

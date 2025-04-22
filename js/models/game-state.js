@@ -50,6 +50,7 @@ class GameState {
                 id: "survival",
                 name: "Survival",
                 level: 0,
+                maxLevel: 5,
                 experience: 0,
                 nextLevelExperience: 50,
                 description: "Basic skills to survive on the streets."
@@ -111,12 +112,12 @@ class GameState {
                 requiredSkills: {},
                 statPoolCosts: {},
                 currencyCosts: {},
-                baseDuration: 1000, // 1 second
+                baseDuration: 5000, // 5 second
                 currencyRewards: {},
                 skillExperience: {},
                 statPoolRestoration: {
-                    health: 1,
-                    stamina: 1
+                    health: 5,
+                    stamina: 5
                 },
                 completionCount: 0,
                 totalTimeSpent: 0,

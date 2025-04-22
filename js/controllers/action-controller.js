@@ -150,8 +150,13 @@ class ActionController {
         // Apply skill experience
         for (const [skillId, expAmount] of Object.entries(action.skillExperience)) {
             if (this.gameState.skills[skillId]) {
-                this.gameState.skills[skillId].experience += expAmount;
-                // Skill leveling is handled by SkillController
+                if (window.game && window.game.skillController) {
+                    // Use skill controller to add experience (which handles leveling up)
+                    window.game.skillController.addSkillExperience(skillId, expAmount);
+                } else {
+                    // Fallback if skill controller isn't available
+                    this.gameState.skills[skillId].experience += expAmount;
+                }
             }
         }
         
