@@ -282,7 +282,7 @@ class UIController {
             // Clear previous content
             actionNameEl.textContent = '';
             
-            if (this.gameState.currentAction) {
+            if (this.gameState.currentAction && this.gameState.actions[this.gameState.currentAction]) {
                 console.log(`Current action: ${this.gameState.currentAction}`);
                 const action = this.gameState.actions[this.gameState.currentAction];
                 
@@ -325,7 +325,7 @@ class UIController {
         }
         
         // Update progress only if it changed significantly (avoid tiny updates)
-        if (this.gameState.currentAction) {
+        if (this.gameState.currentAction && this.gameState.actions[this.gameState.currentAction]) {
             const action = this.gameState.actions[this.gameState.currentAction];
             const progress = action.currentProgress * 100;
             
