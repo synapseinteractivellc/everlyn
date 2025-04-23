@@ -1,5 +1,6 @@
 // js/controllers/ui-controller.js
 class UIController {
+    // Update the initialize method in UIController
     constructor(gameState) {
         this.gameState = gameState;
         
@@ -14,26 +15,27 @@ class UIController {
         // Pre-populate tracking values for existing currencies and stat pools
         for (const currencyId in this.gameState.currencies) {
             if (this.gameState.currencies[currencyId]) {
-                this.lastCurrencyValues[currencyId] = this.gameState.currencies[currencyId].amount;
+                // Force the initial value to be different so it updates on first load
+                this.lastCurrencyValues[currencyId] = -1; // Different from any possible currency value
             }
         }
         
         for (const statPoolId in this.gameState.statPools) {
             if (this.gameState.statPools[statPoolId]) {
                 this.lastStatPoolValues[statPoolId] = {
-                    current: this.gameState.statPools[statPoolId].current,
-                    max: this.gameState.statPools[statPoolId].max
+                    current: -1, // Force an update
+                    max: -1     // Force an update
                 };
             }
         }
-    
+
         // Initialize skill experience tracking
         for (const skillId in this.gameState.skills) {
             if (this.gameState.skills[skillId]) {
                 this.lastSkillExperience[skillId] = {
-                    level: this.gameState.skills[skillId].level,
-                    experience: this.gameState.skills[skillId].experience,
-                    nextLevelExperience: this.gameState.skills[skillId].nextLevelExperience
+                    level: -1, // Force an update
+                    experience: -1,
+                    nextLevelExperience: -1
                 };
             }
         }
@@ -189,6 +191,7 @@ class UIController {
     }
     
     updateCurrencies() {
+        // Force update on first call by setting hasChanges to true
         let hasChanges = false;
         
         // Check if any currency values changed
@@ -197,10 +200,9 @@ class UIController {
                 const currency = this.gameState.currencies[currencyId];
                 
                 // Make sure we have the currency in our tracking object
-                if (this.lastCurrencyValues[currencyId] === undefined) {
-                    this.lastCurrencyValues[currencyId] = currency.amount;
-                    hasChanges = true;
-                } else if (this.lastCurrencyValues[currencyId] !== currency.amount) {
+                if (this.lastCurrencyValues[currencyId] === undefined || 
+                    this.lastCurrencyValues[currencyId] === -1 ||
+                    this.lastCurrencyValues[currencyId] !== currency.amount) {
                     hasChanges = true;
                     this.lastCurrencyValues[currencyId] = currency.amount;
                 }
@@ -217,7 +219,7 @@ class UIController {
                 div.className = 'currency';
                 div.innerHTML = `
                     <span class="currency-name">${currency.name}:</span>
-                    <span class="currency-amount">${Math.floor(currency.amount)}/${Math.floor(currency.maximum)}</span>
+                    <span class="currency-amount">${Math.floor(currency.amount)}/${Math.floor(currency.maximum || 0)}</span>
                     ${currency.generationRate > 0 ? 
                         `<span class="currency-rate">(+${currency.generationRate.toFixed(1)}/s)</span>` : ''}
                 `;
@@ -364,6 +366,17 @@ class UIController {
             // Skip if not unlocked
             if (!action.unlocked) continue;
             
+            // Skip if missing required skills
+            let meetsSkillRequirements = true;
+            for (const [skillId, level] of Object.entries(action.requiredSkills || {})) {
+                if (!this.gameState.skills[skillId] || this.gameState.skills[skillId].level < level) {
+                    meetsSkillRequirements = false;
+                    break;
+                }
+            }
+            
+            if (!meetsSkillRequirements) continue;
+            
             const div = document.createElement('div');
             div.className = 'action-button';
             
@@ -385,27 +398,32 @@ class UIController {
                 <p>${action.description}</p>
                 <div class="action-details">
                     <div class="action-costs">
-                        ${Object.entries(action.statPoolCosts).map(([statId, cost]) => 
-                            `<span class="cost">${this.gameState.statPools[statId].name}: ${cost}</span>`
+                        ${Object.entries(action.statPoolCosts || {}).map(([statId, cost]) => 
+                            this.gameState.statPools[statId] ? 
+                            `<span class="cost">${this.gameState.statPools[statId].name}: ${cost}</span>` : ''
                         ).join(' ')}
                         
-                        ${Object.entries(action.currencyCosts).map(([currencyId, cost]) => 
-                            `<span class="cost">${this.gameState.currencies[currencyId].name}: ${cost}</span>`
+                        ${Object.entries(action.currencyCosts || {}).map(([currencyId, cost]) => 
+                            this.gameState.currencies[currencyId] ?
+                            `<span class="cost">${this.gameState.currencies[currencyId].name}: ${cost}</span>` : ''
                         ).join(' ')}
                     </div>
                     <div class="action-rewards">
-                        ${Object.entries(action.currencyRewards).map(([currencyId, reward]) => {
+                        ${Object.entries(action.currencyRewards || {}).map(([currencyId, reward]) => {
+                            if (!this.gameState.currencies[currencyId]) return '';
+                            
                             let rewardText = '';
-                            if (reward.min !== undefined) {
+                            if (reward && reward.min !== undefined) {
                                 rewardText = `${reward.min}-${reward.max} ${this.gameState.currencies[currencyId].name}`;
-                            } else {
+                            } else if (reward) {
                                 rewardText = `${reward} ${this.gameState.currencies[currencyId].name}`;
                             }
-                            return `<span class="reward">${rewardText}</span>`;
+                            return rewardText ? `<span class="reward">${rewardText}</span>` : '';
                         }).join(' ')}
                         
-                        ${Object.entries(action.statPoolRestoration).map(([statId, amount]) => 
-                            `<span class="reward">+${amount} ${this.gameState.statPools[statId].name}</span>`
+                        ${Object.entries(action.statPoolRestoration || {}).map(([statId, amount]) => 
+                            this.gameState.statPools[statId] ?
+                            `<span class="reward">+${amount} ${this.gameState.statPools[statId].name}</span>` : ''
                         ).join(' ')}
                     </div>
                     <div class="action-duration">
