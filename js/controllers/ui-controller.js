@@ -283,6 +283,7 @@ class UIController {
             actionNameEl.textContent = '';
             
             if (this.gameState.currentAction) {
+                console.log(`Current action: ${this.gameState.currentAction}`);
                 const action = this.gameState.actions[this.gameState.currentAction];
                 
                 // Create action name with cancel button
