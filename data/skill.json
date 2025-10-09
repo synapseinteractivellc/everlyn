@@ -1,0 +1,25 @@
+{
+  "survival": {
+    "id": "survival",
+    "unlocked": true,
+    "name": "Survival",
+    "description": "Knowledge on how to survive in this world.",
+    "level": 0,
+    "maxLevel": 5,
+    "XPtoNextLevel": 100,
+    "levelMultiplier": 1.05
+  },
+  "exploration": {
+    "id": "exploration",
+    "unlocked": false,
+    "requirement": [
+        {"skill": "survival", "level": 1}
+    ],    
+    "name": "Exploration",
+    "description": "Finding new places and remembering where you've been.",
+    "level": 0,
+    "maxLevel": 5,
+    "XPtoNextLevel": 100,
+    "levelMultiplier": 1.05
+  }
+}

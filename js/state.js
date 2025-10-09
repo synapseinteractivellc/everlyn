@@ -29,6 +29,10 @@ function createState() {
     // is populated by UI.renderActions() and is used by UI.updateUI() to
     // enable/disable or hide individual buttons.
     actionButtons: {},
+    // A map of skill IDs to their corresponding DOM elements. This
+    // is populated by UI.renderSkills() and is used by UI.updateUI() to
+    // enable/disable or hide individual skills.
+    skills: {},
   };
 }
 
@@ -73,8 +77,45 @@ function updateActionUnlocks(state, actions) {
   });
 }
 
+/*
+ * updateSkillUnlocks(state, skills)
+ *
+ * Examine each skill definition and adjust its `unlocked` property based
+ * on the player's ability to unlock said skill.  The logic
+ * implements the following rules:
+ *
+ * 1. If a skill has a defined `exclusion` and the player has
+ *    that exclusion, the skill is permanently locked
+ *    (`unlocked = false`).
+ * 2. For upgrade-type actions with a gold cost, the action remains
+ *    locked until the player first accumulates enough gold to afford it.
+ *    Once unlocked, it stays unlocked even if the player's gold drops
+ *    below the cost afterwards.
+ * 3. Skills that start as unlocked (e.g. `survival`) remain so
+ *    unless rule (1) applies.
+ */
+function updateSkillUnlocks(state, skills) {
+  Object.keys(skills).forEach((id) => {
+    const skill = skills[id];
+    // Check exclusions
+    const exclusion = typeof skill.exclusion === true ? skill.exclusion : false;
+    if (exclusion) {
+        // If the player is excluded from learning this skill remain locked.
+        skill.unlocked = false;
+        return;
+    }
+    // If the skill has a prerequisite, unlock it when the player meets the prereq.  
+    // Once unlocked, it should not be re-locked unless an exclusion or loss gets applied.
+    // Something like exploration requires survival.level.1
+    if (typeof skill.require === 'skill') {
+    }
+    // No unlocking logic needed for actions that start unlocked.
+  });
+}
+
 // Expose factory and update functions on the global State object
 window.State = {
   createState,
   updateActionUnlocks,
+  updateSkillUnlocks,
 };
