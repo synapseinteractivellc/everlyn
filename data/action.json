@@ -1,0 +1,32 @@
+{
+  "beg": {
+    "id": "beg",
+    "unlocked": true,
+    "name": "Beg for Coins",
+    "description": "Ask passersby for spare change.",
+    "duration": 2000,
+    "staminaCost": 2,
+    "goldRewardMin": 0,
+    "goldRewardMax": 2
+  },
+  "rest": {
+    "id": "rest",
+    "unlocked": true,
+    "name": "Rest",
+    "description": "Sleep in an alley gutter.",
+    "duration": 2000,
+    "staminaCost": 0,
+    "staminaReward": 2
+  },
+  "coinpurse": {
+    "id": "coinpurse",
+    "unlocked": false,
+    "name": "Coinpurse",
+    "description": "Increase gold capacity by 15. Can be purchased twice.",
+    "duration": 100,
+    "staminaCost": 0,
+    "goldCost": 10,
+    "goldMaxIncrease": 15,
+    "maxPurchases": 2 
+  }
+}

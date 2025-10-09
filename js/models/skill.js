@@ -1,1 +1,0 @@
-// ./js/models/skill.js
