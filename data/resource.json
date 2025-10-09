@@ -19,7 +19,7 @@
     "id": "mana",
     "unlocked": false,
     "require": [
-      {"resource": "scrolls", "amount": 1}
+      {"resource": "scroll", "amount": 1}
     ],
     "name": "Mana",
     "description": "Your mana.",
@@ -34,13 +34,13 @@
     "current": 0,
     "max": 10
   },
-  "scrolls": {
-    "id": "scrolls",
+  "scroll": {
+    "id": "scroll",
     "unlocked": false,
     "require": [
       {"resource": "gold", "current": 15}
     ],
-    "name": "Scrolls",
+    "name": "Scroll(s)",
     "description": "Something interesting to read.",
     "current": 0,
     "max": 10

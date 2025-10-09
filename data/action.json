@@ -7,7 +7,9 @@
     "duration": 2000,
     "staminaCost": 2,
     "goldRewardMin": 0,
-    "goldRewardMax": 2
+    "goldRewardMax": 2,
+    "skill": "survival",
+    "xpReward": 1
   },
   "rest": {
     "id": "rest",
@@ -15,20 +17,42 @@
     "name": "Rest",
     "description": "Sleep in an alley gutter.",
     "duration": 2000,
-    "staminaCost": 0,
-    "staminaReward": 2
+    "resourceCost": [
+      {"gold": 0}
+    ],
+    "resourceGain": [
+      {"life": 2},
+      {"stamina": 2}
+    ]
   },
   "explore": {
     "id": "explore",
     "unlocked": false,
     "require": [
-      {"skill": "exploration", "level": 1}
+      {"skill": "exploration", "level": 0}
     ],
     "name": "Explore the City",
     "description": "Explore the city to find new locations.",
     "duration": 2000,
     "staminaCost": 2,
-    "special": true
+    "special": true,
+    "skill": "exploration",
+    "xpReward": 1
+  },
+  "cleanStables": {
+    "id": "cleanStables",
+    "unlocked": false,
+    "require": [
+      {"location": "stables", "unlocked": true}
+    ],
+    "name": "Clean the Stables",
+    "description": "Muck out stales and shovel hay.",
+    "duration": 2000,
+    "staminaCost": 2,
+    "goldRewardMin": 2,
+    "goldRewardMax": 2,
+    "skill": "survival",
+    "xpReward": 1
   },
   "coinpurse": {
     "id": "coinpurse",
@@ -40,5 +64,18 @@
     "goldCost": 10,
     "goldMaxIncrease": 15,
     "maxPurchases": 2 
+  },
+  "purchaseScroll": {
+    "id": "purchaseScroll",
+    "unlocked": false,
+    "name": "Purchase a Scroll",
+    "description": "Something interesting to read.",
+    "duration": 100,
+    "resourceCost": [
+      {"gold": 15}
+    ],
+    "resourceGain": [
+      {"scroll": 1}
+    ]
   }
 }
