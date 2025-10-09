@@ -52,6 +52,48 @@ function renderActions(actions, state) {
 }
 
 /**
+ * Render display for each skill definition. Displays are created
+ * regardless of whether the action is currently unlocked; UI.updateUI
+ * will handle showing or hiding them based on the `unlocked` flag.
+ *
+ * @param {Object} skills - Map of skill definitions keyed by ID.
+ * @param {Object} state   - Current game state; will be mutated to
+ *                           store references to button elements.
+ */
+function renderSkills(skills, state) {
+  const container = document.getElementById('skills-container');
+  container.innerHTML = '';
+  // Clear any previously stored button references
+  state.actionButtons = {};
+  // Create a button for each action definition
+  Object.keys(actions).forEach((id) => {
+    const action = actions[id];
+    const btn = document.createElement('button');
+    btn.id = `action-${id}`;
+    btn.textContent = action.name;
+    // When an action button is clicked, perform the action.  After
+    // completion, update unlocks and UI.
+    btn.addEventListener('click', () => {
+      // Prevent clicks if another action is already in progress
+      if (state.isPerforming) {
+        return;
+      }
+      window.Actions.performAction(state, action, () => {
+        // After the action finishes, update unlock states and UI
+        window.State.updateActionUnlocks(state, actions);
+        updateUI(state, actions);
+      });
+      // Immediately reflect in-progress state (disable buttons, show
+      // progress bar) before the action completes
+      updateUI(state, actions);
+    });
+    container.appendChild(btn);
+    // Store reference for later updates
+    state.actionButtons[id] = btn;
+  });
+}
+
+/**
  * Update the UI to reflect the current state of the game.  This
  * includes player details, resource values and action button
  * visibility/availability.

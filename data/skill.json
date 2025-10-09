@@ -21,5 +21,51 @@
     "maxLevel": 5,
     "XPtoNextLevel": 100,
     "levelMultiplier": 1.05
+  },
+  "arcana": {
+    "id": "arcana",
+    "unlocked": false,
+    "requirement": [
+        {"resource": "scrolls"}
+    ],
+    "name": "arcana",
+    "description": "The power of magic through diligent study.",
+    "level": 0,
+    "maxLevel": 5,
+    "XPtoNextLevel": 100,
+    "levelMultiplier": 1.05
+  },
+  
+  "necromancy": {
+    "id": "necromancy",
+    "unlocked": false,
+    "requirement": [
+        {"skill": "arcana", "level": 1}
+    ],
+    "exclusions": [
+        {"skill": "vitamancy"}
+    ],
+    "name": "Necromancy",
+    "description": "Raise the dead under your command.",
+    "level": 0,
+    "maxLevel": 5,
+    "XPtoNextLevel": 100,
+    "levelMultiplier": 1.05
+  },
+  "vitamancy": {
+    "id": "vitamancy",
+    "unlocked": false,
+    "requirement": [
+        {"skill": "arcana", "level": 1}
+    ],
+    "exclusions": [
+        {"skill": "necromancy"}
+    ],
+    "name": "Vitamancy",
+    "description": "Control the living with your will.",
+    "level": 0,
+    "maxLevel": 5,
+    "XPtoNextLevel": 100,
+    "levelMultiplier": 1.05
   }
 }

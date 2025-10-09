@@ -18,6 +18,18 @@
     "staminaCost": 0,
     "staminaReward": 2
   },
+  "explore": {
+    "id": "explore",
+    "unlocked": false,
+    "require": [
+      {"skill": "exploration", "level": 1}
+    ],
+    "name": "Explore the City",
+    "description": "Explore the city to find new locations.",
+    "duration": 2000,
+    "staminaCost": 2,
+    "special": true
+  },
   "coinpurse": {
     "id": "coinpurse",
     "unlocked": false,

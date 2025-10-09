@@ -73,6 +73,10 @@ function updateActionUnlocks(state, actions) {
         action.unlocked = true;
       }
     }
+
+    if (typeof action.require === 'skill') {
+        // I need help with the logic here.
+    }
     // No unlocking logic needed for actions that start unlocked.
   });
 }
@@ -109,7 +113,7 @@ function updateSkillUnlocks(state, skills) {
     // Something like exploration requires survival.level.1
     if (typeof skill.require === 'skill') {
     }
-    // No unlocking logic needed for actions that start unlocked.
+    // No unlocking logic needed for skills that start unlocked.
   });
 }
 

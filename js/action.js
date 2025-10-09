@@ -113,6 +113,13 @@ function performAction(state, action, updateUI) {
         }
         state.upgrades[action.id] = purchasedCount + 1;
       }
+
+      if (typeof action.special) {
+        // If this is the explore function we need to see if we find any new locations. Stable, Library, Blacksmith, Market, etc. 
+        // Every location has a % chance of being found. Once found is removed from possibilities and it's percentage is distributed
+        // to the other possible locations to be found. Once all locations are found the Explore action will lock and disappear.
+        // Need massive help with this code and how to do it.
+      }
       // Hide progress bar after completion
       progressBar.style.width = '0%';
       progressContainer.style.display = 'none';

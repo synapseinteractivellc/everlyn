@@ -1,0 +1,48 @@
+{
+  "life": {
+    "id": "life",
+    "unlocked": true,
+    "name": "Life",
+    "description": "Your health.",
+    "current": 10,
+    "max": 10
+  },
+  "stamina": {
+    "id": "stamina",
+    "unlocked": true,
+    "name": "Stamina",
+    "description": "Your stamina.",
+    "current": 10,
+    "max": 10
+  },
+  "mana": {
+    "id": "mana",
+    "unlocked": false,
+    "require": [
+      {"resource": "scrolls", "amount": 1}
+    ],
+    "name": "Mana",
+    "description": "Your mana.",
+    "current": 10,
+    "max": 10
+  },
+  "gold": {
+    "id": "gold",
+    "unlocked": true,
+    "name": "Gold",
+    "description": "Your Gold.",
+    "current": 0,
+    "max": 10
+  },
+  "scrolls": {
+    "id": "scrolls",
+    "unlocked": false,
+    "require": [
+      {"resource": "gold", "current": 15}
+    ],
+    "name": "Scrolls",
+    "description": "Something interesting to read.",
+    "current": 0,
+    "max": 10
+  }
+}
