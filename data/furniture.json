@@ -1,0 +1,12 @@
+{
+  "bedroll": {
+    "id": "bedroll",
+    "name": "Bedroll",
+    "floorSpace": 1,
+    "cost": [
+      { "resource": "gold", "amt": 20 }
+    ],
+    "effects": [ { "type": "increaseRegen", "resource": "stamina", "amount": 1 } ],
+    "unlocked": true
+  }
+}

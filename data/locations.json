@@ -1,0 +1,29 @@
+{
+  "inn": {
+    "id": "inn",
+    "name": "Inn",
+    "description": "A warm place to rest, increases stamina recovery.",
+    "discovered": false,
+    "requirement": [
+        {}
+    ]
+  },
+  "stables": {
+    "id": "stables",
+    "name": "Stables",
+    "description": "Shelter for animals; provides access to mounts and other benefits.",
+    "discovered": false,
+    "requirement": [
+      { "skill": "exploration", "level": 1 }
+    ]
+  },
+  "library": {
+    "id": "library",
+    "name": "Library",
+    "description": "A place filled with knowledge and scrolls.",
+    "discovered": false,
+    "requirement": [
+      { "resource": "scroll", "amt": 1 }
+    ]
+  }
+}

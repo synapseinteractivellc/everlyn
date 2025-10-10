@@ -1,0 +1,32 @@
+{
+  "waif": {
+    "id": "waif",
+    "name": "Waif",
+    "tier": 0,
+    "unlocked": true
+  },
+  "vagabond": {
+    "id": "vagabond",
+    "name": "Vagabond",
+    "tier": 0,
+    "unlocked": true
+  },
+  "warrior_trainee": {
+    "id": "warrior_trainee",
+    "name": "Warrior Trainee",
+    "tier": 1,
+    "unlocked": false,
+    "requirement": [
+      { "skill": "combat", "level": 3 }
+    ]
+  },
+  "mage_trainee": {
+    "id": "mage_trainee",
+    "name": "Mage Trainee",
+    "tier": 1,
+    "unlocked": false,
+    "requirement": [
+      { "skill": "arcana", "level": 3 }
+    ]
+  }
+}

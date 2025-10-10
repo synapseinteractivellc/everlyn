@@ -1,0 +1,30 @@
+{
+  "homeless": {
+    "id": "homeless",
+    "name": "Homeless",
+    "floorSpace": 0,
+    "unlocked": true
+  },
+  "tent": {
+    "id": "tent",
+    "name": "Tent",
+    "floorSpace": 2,
+    "cost": {"gold": 10},    
+    "unlocked": false,
+   "requirement": [
+      { "skill": "survival", "level": 1 }
+    ]
+  },
+  "abandoned_building": {
+    "id": "abandoned_building",
+    "name": "Abandoned Building",
+    "floorSpace": 5,
+    "cost": [
+    ],   
+    "unlocked": false,
+    "requirement": [
+      { "skill": "survival", "level": 1 },
+      { "skill": "exploration", "level": 1 }
+    ]
+  }
+}

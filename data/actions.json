@@ -1,0 +1,114 @@
+{
+  "beg": {
+    "id": "beg",
+    "name": "Beg",
+    "description": "Ask strangers for spare coins.",
+    "duration": 2,
+    "cost": [
+      { "resource": "stamina", "amt": 2 }
+    ],
+    "reward": [
+      { "resource": "gold", "min": 0, "max": 2 },
+      { "skill": "survival", "amt": 1 }
+    ],
+    "unlocked": true
+  },
+  "rest": {
+    "id": "rest",
+    "name": "Rest",
+    "description": "Take a short break to restore stamina.",
+    "duration": 3,
+    "reward": [
+      { "resource": "life", "min": 2, "max": 2 },
+      { "resource": "stamina", "min": 2, "max": 2 }
+    ],
+    "isRestAction": true,
+    "unlocked": true
+  },
+  "scavenge": {
+    "id": "scavenge",
+    "name": "Scavenge",
+    "description": "Search nearby alleys for useful items.",
+    "duration": 4,
+    "cost": [
+      { "resource": "stamina", "amt": 3 }
+    ],
+    "reward": [
+      { "resource": "gold", "min": 1, "max": 1 },
+      { "skill": "survival", "amt": 2 },
+      { "skill": "exploration", "amt": 2 }
+    ],
+    "unlocked": false,
+    "requirement": [
+      { "skill": "survival", "level": 1 }
+    ]
+  },
+  "train_combat": {
+    "id": "train_combat",
+    "name": "Combat Training",
+    "description": "Practice basic combat techniques.",
+    "duration": 4,
+    "cost": [
+      { "resource": "stamina", "amt": 3 },
+      { "resource": "gold", "amt": 1 }
+    ],
+    "reward": [
+      { "skill": "combat", "amt": 2 }
+    ],
+    "unlocked": false,
+    "requirement": [
+      { "skill": "survival", "level": 3 },
+      { "location": "combat_academy"}
+    ]
+  },
+  "study_scrolls": {
+    "id": "study_scrolls",
+    "name": "Study Scrolls",
+    "description": "Study the scrolls you've gathered.",
+    "duration": 4,
+    "cost": [
+      { "resource": "stamina", "amt": 1 },
+      { "resource": "gold", "amt": 1 }
+    ],
+    "reward": [
+      { "skill": "arcana", "amt": 2 }
+    ],
+    "unlocked": false,
+    "requirement": [
+      { "resource": "scroll", "amt": 1 },
+      { "location": "library"}
+    ]
+  },
+  "clean_stables": {
+    "id": "clean_stables",
+    "name": "Clean Stables",
+    "description": "Muck out stables and move hay.",
+    "duration": 2,
+    "cost": [
+      { "resource": "stamina", "amt": 1 }
+    ],
+    "reward": [
+      { "resource": "gold", "min": 2, "max": 2 },
+      { "skill": "survival", "amt": 2 }
+    ],
+    "unlocked": false,
+    "requirement": [
+      { "location": "stables" }
+    ]    
+  },
+  "coin_purse": {
+    "id": "coin_purse",
+    "name": "Coin Purse",
+    "description": "Purchase a small coin purse to hold more gold.",
+    "cost": [
+      { "resource": "gold", "amt": 10 }
+    ],
+    "reward": [
+      { "resource": "gold", "maxChange": 15 }
+    ],
+    "unlocked": false,
+    "requirement": [
+      { "resource": "gold", "amt": 10 }
+    ]
+  }
+}
