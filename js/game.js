@@ -1,4 +1,6 @@
 // js/game.js
+import { ActionController } from '../js/controllers/actionController.js'
+
 class Game {
     constructor() {
         // Initialize controllers

@@ -1,6 +1,7 @@
 {
   "health": {
     "id": "health",
+    "type": "stat",
     "name": "Health",
     "description": "Your life force in this world.",
     "current": 10,
@@ -10,6 +11,7 @@
   },
   "stamina": {
     "id": "stamina",
+    "type": "stat",
     "name": "Stamina",
     "description": "A measure of your endurance and how much work you can do.",
     "current": 10,
@@ -19,6 +21,7 @@
   },
   "mana": {
     "id": "mana",
+    "type": "stat",
     "name": "Mana",
     "description": "A measure of your ability to channel the arcane forces.",
     "current": 0,
@@ -31,6 +34,7 @@
   },
   "gold": {
     "id": "gold",
+    "type": "currency",
     "name": "Gold",
     "description": "Bright shinnies. Sometimes not so bright too, but they're all gold.",
     "amount": 0,
@@ -39,6 +43,7 @@
   },
   "scroll": {
     "id": "scroll",
+    "type": "currency",
     "name": "Scroll",
     "description": "A worn piece of vellum with cryptic writings.",
     "amount": 0,
