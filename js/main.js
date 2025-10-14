@@ -23,12 +23,18 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 // Example simple renderer
 function renderGame(state, defs) {
-  const root = document.getElementById("game-root");
+    console.log(state);
+    console.log(defs);
+  const root = document.getElementById("game-container");
   root.innerHTML = `
     <h1>Everlyn RPG</h1>
     <p>Resources:</p>
     <ul>${Object.values(state.resources)
       .map(r => `<li>${defs.resources[r.id].name}: ${r.amount}</li>`)
+      .join("")}</ul>
+    <p>Skills:</p>
+    <ul>${Object.values(state.skills)
+      .map(s => `<li>${defs.skills[s.id].name}: Level - ${s.level} - XP - ${s.experience}</li>`)
       .join("")}</ul>
   `;
 }

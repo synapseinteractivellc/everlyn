@@ -6,8 +6,10 @@ export function createInitialState(defs) {
       id,
       {
         id,
-        amount: 0,
+        amount: defs.resources[id].amount,
         maximum: defs.resources[id].maximum ?? Infinity,
+        changePerTick: defs.resources[id].changePerTick,
+        unlocked:  defs.resources[id].unlocked
       },
     ])
   );

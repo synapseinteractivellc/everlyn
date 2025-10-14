@@ -30,14 +30,64 @@ const asArray = (raw) => Array.isArray(raw) ? raw : (raw && typeof raw === "obje
 function validateResources(raw, errors) {
   const out = [];
   if (!Array.isArray(raw)) { errors.push("resources.json must be an array"); return out; }
+
+  const oneOf = (v, list) => list.includes(v);
+  const toArray = (v) => Array.isArray(v) ? v : (v && typeof v === "object" ? [v] : []);
+
   raw.forEach((r, i) => {
     if (!r || typeof r !== "object") { errors.push(`resources[${i}] must be an object`); return; }
+
+    // required basics
     if (!isStr(r.id))   errors.push(`resources[${i}].id missing/non-string`);
     if (!isStr(r.name)) errors.push(`resources[${i}].name missing/non-string`);
-    if (r.maximum !== undefined && !posNum(r.maximum))
+    if (r.type !== undefined && !oneOf(r.type, ["stat", "currency"])) {
+      errors.push(`resources[${i}].type must be "stat" or "currency" if present`);
+    }
+
+    // numerics
+    if (r.amount !== undefined && !isNum(r.amount)) {
+      errors.push(`resources[${i}].amount must be a number if present`);
+    }
+    if (r.maximum !== undefined && !(isNum(r.maximum) && r.maximum > 0)) {
       errors.push(`resources[${i}].maximum must be a positive number if present`);
-    out.push({ id: r.id, name: r.name, maximum: r.maximum });
+    }
+    if (r.changePerTick !== undefined && !isNum(r.changePerTick)) {
+      errors.push(`resources[${i}].changePerTick must be a number if present`);
+    }
+    if (isNum(r.amount) && isNum(r.maximum) && r.amount > r.maximum) {
+      errors.push(`resources[${i}].amount cannot exceed maximum`);
+    }
+
+    // requirement array (normalized)
+    const reqs = toArray(r.requirement).map((rq, j) => {
+      const ok = rq && typeof rq === "object";
+      const resource = ok ? rq.resource : undefined;
+      const amt = ok ? rq.amt : undefined;
+      if (!isStr(resource)) errors.push(`resources[${i}].requirement[${j}].resource missing/non-string`);
+      if (!posNum(amt))     errors.push(`resources[${i}].requirement[${j}].amt must be a positive number`);
+      return { resource, amt: Number(amt) };
+    });
+
+    // unlocked: boolean or derived from presence of requirements
+    let unlocked;
+    if (typeof r.unlocked === "boolean") unlocked = r.unlocked;
+    else unlocked = reqs.length === 0; // default: unlocked if no requirements
+
+    out.push({
+      id: r.id,
+      name: r.name,
+      type: r.type ?? "currency",
+      description: isStr(r.description) ? r.description : "",
+      amount: isNum(r.amount) ? r.amount : 0,
+      maximum: isNum(r.maximum) ? r.maximum : Number.MAX_SAFE_INTEGER,
+      changePerTick: isNum(r.changePerTick) ? r.changePerTick : 0,
+      unlocked,
+      requirement: reqs,
+      // keep any extra fields
+      ...r,
+    });
   });
+
   return out;
 }
 
@@ -320,6 +370,19 @@ export async function loadContent() {
       if (rq.kind === "resource" && !resources[rq.resource]) errors.push(`action:${a.id} req unknown resource:${rq.resource}`);
     }
   }
+
+  // Resources can depend on other resources (requirements)
+  for (const r of resourcesValidated) {
+    for (const rq of (r.requirements || [])) {
+      if (rq.resource && !resources[rq.resource]) {
+        errors.push(`resource:${r.id} requirement references unknown resource:${rq.resource}`);
+      }
+      if (!(typeof rq.amt === "number") || rq.amt < 0) {
+        errors.push(`resource:${r.id} requirement for ${rq.resource} has invalid amt (must be >= 0)`);
+      }
+    }
+  }
+
 
   // 6) fail fast if anything’s wrong
   if (errors.length) {

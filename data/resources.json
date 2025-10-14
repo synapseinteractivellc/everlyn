@@ -1,12 +1,12 @@
 {
-  "health": {
+  "life": {
     "id": "life",
     "type": "stat",
     "name": "life",
     "description": "Your life force in this world.",
-    "current": 10,
-    "max": 10,
-    "regenPerSecond": 0,
+    "amount": 10,
+    "maximum": 10,
+    "changePerTick": 0,
     "unlocked": true
   },
   "stamina": {
@@ -14,9 +14,9 @@
     "type": "stat",
     "name": "Stamina",
     "description": "A measure of your endurance and how much work you can do.",
-    "current": 10,
-    "max": 10,
-    "regenPerSecond": 0,
+    "amount": 10,
+    "maximum": 10,
+    "changePerTick": 0,
     "unlocked": true
   },
   "mana": {
@@ -24,9 +24,9 @@
     "type": "stat",
     "name": "Mana",
     "description": "A measure of your ability to channel the arcane forces.",
-    "current": 0,
-    "max": 5,
-    "regenPerSecond": 0,
+    "amount": 0,
+    "maximum": 5,
+    "changePerTick": 0,
     "unlocked": false,
     "requirement": [
       { "resource": "scroll", "amt": 1}
@@ -38,7 +38,8 @@
     "name": "Gold",
     "description": "Bright shinnies. Sometimes not so bright too, but they're all gold.",
     "amount": 0,
-    "max": 10,
+    "maximum": 10,    
+    "changePerTick": 0,
     "unlocked": true
   },
   "scroll": {
@@ -47,9 +48,10 @@
     "name": "Scroll",
     "description": "A worn piece of vellum with cryptic writings.",
     "amount": 0,
-    "max": 10,
-    "initiallyUnlocked": false,
-    "unlocked": [
+    "maximum": 10,
+    "changePerTick": 0,
+    "unlocked": false,
+    "requirement": [
       { "resource": "gold", "amt": 10}
     ]
   }
