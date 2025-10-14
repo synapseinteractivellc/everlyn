@@ -1,8 +1,8 @@
 {
   "health": {
-    "id": "health",
+    "id": "life",
     "type": "stat",
-    "name": "Health",
+    "name": "life",
     "description": "Your life force in this world.",
     "current": 10,
     "max": 10,
