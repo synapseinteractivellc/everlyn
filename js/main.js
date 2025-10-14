@@ -23,8 +23,6 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 // Example simple renderer
 function renderGame(state, defs) {
-    console.log(state);
-    console.log(defs);
   const root = document.getElementById("game-container");
   root.innerHTML = `
     <h1>Everlyn RPG</h1>
