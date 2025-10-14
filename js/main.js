@@ -59,6 +59,7 @@ function renderGame(state, defs) {
 
   rootEl.innerHTML = `
     <h1>Everlyn RPG</h1>
+    <p>Updated: October 14th. Rebuilding UI after switching to new data structure.
     <p>Resources:</p>
     <ul>${resources
       .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}</li>`)
