@@ -67,7 +67,7 @@ function renderGame(state, defs) {
   console.log(state);
   rootEl.innerHTML = `
     <h1>Everlyn RPG</h1>
-    <p>Updated: October 14th. Rebuilding UI after switching to new data structure.</p>
+    <p>Updated: October 15th. Rebuilding UI after switching to new data structure.</p>
     <p>Resources:</p>
     <ul>${unlockedResources
       .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`)
