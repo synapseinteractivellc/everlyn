@@ -26,6 +26,7 @@ export class ActionController {
     // Let Model run the rules
     const result = this.model.tickProgress(action, deltaTime);
     if (result.completed) {
+      console.log("Action complete:", actionId);
       this.log(this.formatActionCompleted(result.event, this.s));
       this.onStateChange(this.s); // After completion, controller can decide to stay on same action 
       // or apply policies like “auto-rest if exhausted” 
@@ -34,6 +35,7 @@ export class ActionController {
   }
 
   startAction(actionId) {
+    console.log("Action fired:", actionId);
     const result = this.model.start(actionId);
     if (!result.ok) {
       if (result.reason === 'cant-afford') this.switchToRestAction();

@@ -57,10 +57,12 @@ function renderGame(state, defs) {
   const resources = state.resources ? Object.values(state.resources) : [];
   const skills = state.skills ? Object.values(state.skills) : [];
   const classes = state.classes ? Object.values(state.classes) : [];
+  const actions = state.actions ? Object.values(state.actions) : [];
 
   let unlockedResources = resources.filter(r => r.unlocked === true);
   let unlockedSkills = skills.filter(s => s.unlocked === true);
-  let unlockedClasses = classes.filter(c => c.unlocked === true);
+  let unlockedClasses = classes.filter(c => c.unlocked === true);  
+  let unlockedActions = actions.filter(a => a.unlocked === true);
 
   console.log(state);
   rootEl.innerHTML = `
@@ -69,6 +71,12 @@ function renderGame(state, defs) {
     <p>Resources:</p>
     <ul>${unlockedResources
       .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`)
+      .join("")}</ul>
+    <p>Actions:</p>
+    <ul>${unlockedActions
+      .map((a) => `<li><button type="button" class="action-btn" data-action-id="${a.id}">
+              ${defs.actions?.[a.id]?.name ?? a.id}
+            </button></li>`)
       .join("")}</ul>
     <p>Skills:</p>
     <ul>${unlockedSkills
@@ -85,8 +93,28 @@ function renderGame(state, defs) {
       )
       .join("")}</ul>
   `;
+  
+  // Add click handlers for action buttons
+  rootEl.querySelectorAll(".action-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const actionId = btn.getAttribute("data-action-id");
+      if (window.Game?.actionController?.startAction && actionId) {
+        window.Game.actionController.startAction(actionId);
+        console.log("Action fired:", actionId);
+      }
+    });
+  });
 }
 
 function highlightButton(actionId) {
   console.log("Switched to action:", actionId);
+}
+
+function gameTick() {
+  const now = Date.now();
+  const deltaTime = now - this.lastTick;
+  this.lastTick = now;
+  
+  // Update game state
+  this.actionController.update(deltaTime);
 }
