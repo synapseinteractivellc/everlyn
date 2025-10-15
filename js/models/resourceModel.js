@@ -15,4 +15,10 @@ export class ResourceModel {
     r.amount -= amount;
     return { ok:true, applied: -amount };
   }
+
+  changeMax(id, amount) {
+    const r = this.s.resources[id];
+    r.maximum += amount;
+    return { ok:true, applied: r.amount };
+  }
 }

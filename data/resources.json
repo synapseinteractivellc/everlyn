@@ -24,7 +24,7 @@
     "type": "stat",
     "name": "Mana",
     "description": "A measure of your ability to channel the arcane forces.",
-    "amount": 0,
+    "amount": 5,
     "maximum": 5,
     "changePerTick": 0,
     "unlocked": false,

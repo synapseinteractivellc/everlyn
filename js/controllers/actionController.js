@@ -1,6 +1,4 @@
 // js/controller/actionController.js
-import { ActionModel } from '../models/actionModel.js';
-
 export class ActionController {
   constructor(state, actionModel, { onLog, onStateChange, onSwitchAction } = {}) {
     this.model = actionModel;
@@ -16,12 +14,6 @@ export class ActionController {
 
     const action = this.model.getCurrentAction();
     if (!action) return;
-
-    // If can’t afford and not rest → switch policy belongs to controller
-    if (!this.model.canAfford(action) && !action.isRestAction) {
-      this.switchToRestAction();
-      return;
-    }
 
     // Let Model run the rules
     const result = this.model.tickProgress(action, deltaTime);

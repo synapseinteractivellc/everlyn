@@ -26,12 +26,20 @@ export class ActionModel {
   }
 
   start(actionId) {
-    console.log("Action fired:", actionId);
     const action = this.s.actions[actionId];
     if (!action || !action.unlocked) return { ok: false, reason: 'locked' };
 
-    if (!this.canAfford(action) && !action.isRestAction) {
+    if (!this.canAfford(action.id).ok) {
       return { ok: false, reason: 'cant-afford' };
+    }
+
+    if (action.currentProgress == 0) {
+      const costs = this.applyCosts(action);
+      if (!costs.ok) {
+        return {        
+          completed:false, event:{ type:'ActionCostFailed', results:costs.results } 
+        };
+      }
     }
 
     this.s.currentAction = actionId;
@@ -48,7 +56,7 @@ export class ActionModel {
 
   tickProgress(action, deltaTime) {
     // authoritative progress math lives in the Model
-    action.currentProgress += deltaTime / action.baseDuration;
+    action.currentProgress += deltaTime / action.duration;
     if (action.currentProgress >= 1) {
       return this.complete(action);
     }
@@ -72,38 +80,50 @@ export class ActionModel {
   // and state like: this.s.resources, this.s.skills
   applyRewards(action) {
     const entries = Array.isArray(action.reward) ? action.reward : [];
-    const deltas = { resources:{}, skills:{} };
+    const deltas = { resources: {}, skills: {} };
 
     for (const e of entries) {
       if (e.resource) {
+        console.log(e);
+        if (typeof e.maxChange === 'number') {
+          // Handle maxChange reward
+          const res = this.resources.maxChange(e.resource, e.maxChange);
+          if (res.ok && res.applied) {
+            deltas.resources[e.resource] = (deltas.resources[e.resource] ?? 0) + res.applied;
+          }
+          continue;
+        }
+        // Handle normal min/max/amt reward
         const min = Number.isFinite(e.min) ? e.min : (e.amt ?? 0);
         const max = Number.isFinite(e.max) ? e.max : min;
         const roll = Math.floor((this.rng() ?? Math.random()) * (max - min + 1)) + min;
         const res = this.resources.grant(e.resource, roll);
-        if (res.ok && res.applied) deltas.resources[e.resource] = (deltas.resources[e.resource] ?? 0) + res.applied;
+        if (res.ok && res.applied) {
+          deltas.resources[e.resource] = (deltas.resources[e.resource] ?? 0) + res.applied;
+        }
         continue;
       }
       if (e.skill) {
         const xp = e.amt ?? 0;
         const res = this.skills.addXP(e.skill, xp);
-        if (res.ok && res.applied) deltas.skills[e.skill] = (deltas.skills[e.skill] ?? 0) + res.applied;
+        if (res.ok && res.applied) {
+          deltas.skills[e.skill] = (deltas.skills[e.skill] ?? 0) + res.applied;
+        }
         continue;
       }
     }
-    return { ok:true, deltas };
+    return { ok: true, deltas };
   }
 
 
   complete(action) {
-    const costs = this.applyCosts(action);
-    if (!costs.ok) return { completed:false, event:{ type:'ActionCostFailed', results:costs.results } };
-
     const rewards = this.applyRewards(action);
 
     // bookkeeping that is local to the action instance
     action.completionCount = (action.completionCount || 0) + 1;
     action.currentProgress = 0;
     action.lastActionStartTime = this.now();
+    this.checkRestDone();
 
     // improvements can stay here, but DO NOT mutate shared definitions
     // use multipliers stored on instance, or derive at payout time
@@ -127,5 +147,20 @@ export class ActionModel {
     this.s.previousAction = this.s.currentAction;
     this.s.currentAction = null;
     return id;
+  }
+
+  checkRestDone() {
+    const allResources = this.s.resources ? Object.values(this.s.defs.resources) : [];
+    let stats = allResources.filter(r => r.type === "stat");
+    if (this.s.defs.actions[this.s.currentAction].type === "rest") {
+      const allFull = stats.every(stat => {
+        const res = this.s.resources[stat.id];
+        return res && res.amount === res.maximum;
+      });
+      if (allFull && this.s.previousAction) {
+        this.s.currentAction = this.s.previousAction;
+        this.s.previousAction = null;
+      }
+    }
   }
 }

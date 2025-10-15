@@ -118,7 +118,7 @@ export function createInitialState(defs) {
     locations,
     currentAction: null,
     previousAction: null,
-    defaultRestAction: null,
+    defaultRestAction: actions.rest.id,
     actionLog: [],
   };
 }
