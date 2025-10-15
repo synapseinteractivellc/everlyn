@@ -3,17 +3,30 @@ import { composeGame } from "./boot/composeGame.js";
 
 // Resolve container once, after DOM is ready, and guard all renders.
 let rootEl = null;
+let rootE2 = null;
 
 window.addEventListener("DOMContentLoaded", async () => {
-  rootEl = document.getElementById("game-container");
+  rootEl = document.getElementById("game1");
+  rootE2 = document.getElementById("game2");
   if (!rootEl) {
     console.error(
-      "[Everlyn] Missing #game-container. Is the deployed HTML the one you expect?"
+      "[Everlyn] Missing #game1. Is the deployed HTML the one you expect?"
     );
     // Show a friendly message so the page doesn't look dead.
     document.body.insertAdjacentHTML(
       "beforeend",
-      `<pre style="color:red;">Missing #game-container in DOM.</pre>`
+      `<pre style="color:red;">Missing #game1 in DOM.</pre>`
+    );
+    return; // bail early; no container to render into
+  }
+  if (!rootE2) {
+    console.error(
+      "[Everlyn] Missing #game2. Is the deployed HTML the one you expect?"
+    );
+    // Show a friendly message so the page doesn't look dead.
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `<pre style="color:red;">Missing #game2 in DOM.</pre>`
     );
     return; // bail early; no container to render into
   }
@@ -24,7 +37,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
       // Important: only render if the container still exists
       onStateChange: (s) => {
-        if (!rootEl) {
+        if (!rootEl || !rootE2) {
           console.warn("[Everlyn] onStateChange fired before container ready.");
           return;
         }
@@ -36,6 +49,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     window.Game = { defs, state, actionController };
     renderGame(state, defs);
+    // Start the game loop:
+    let lastTick = performance.now();
+    function loop(now) {
+      const delta = now - lastTick;
+      lastTick = now;
+      actionController.update(delta);
+      updateGame(state, defs);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
   } catch (err) {
     console.error(err);
     document.body.innerHTML = `<pre style="color:red;">Failed to load game content:\n${err.message}</pre>`;
@@ -43,7 +66,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 function renderGame(state, defs) {
-  if (!rootEl) {
+  if (!rootEl || !rootE2) {
     console.warn("[Everlyn] renderGame() called without a container.");
     return;
   }
@@ -52,31 +75,51 @@ function renderGame(state, defs) {
     console.warn("[Everlyn] renderGame() missing state/defs, skipping this tick.");
     return;
   }
+  updateGame(state, defs);
+  // Optional: guard against undefined collections to avoid secondary errors
+  const actions = state.actions ? Object.values(state.actions) : [];  
+  let unlockedActions = actions.filter(a => a.unlocked === true);
 
+  rootE2.innerHTML = `
+    <p>Actions:</p>
+    <ul>${unlockedActions
+      .map((a) => `<li><button type="button" class="action-btn" data-action-id="${a.id}">
+              ${defs.actions?.[a.id]?.name ?? a.id}
+            </button></li>`)
+      .join("")}</ul>
+  `;
+  
+  // Add click handlers for action buttons
+  rootE2.querySelectorAll(".action-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const actionId = btn.getAttribute("data-action-id");
+      if (window.Game?.actionController?.startAction && actionId) {
+        window.Game.actionController.startAction(actionId);
+      }
+    });
+  });
+}
+
+function highlightButton(actionId) {
+  console.log("Switched to action:", actionId);
+}
+
+function updateGame(state, defs) {
   // Optional: guard against undefined collections to avoid secondary errors
   const resources = state.resources ? Object.values(state.resources) : [];
   const skills = state.skills ? Object.values(state.skills) : [];
   const classes = state.classes ? Object.values(state.classes) : [];
-  const actions = state.actions ? Object.values(state.actions) : [];
 
   let unlockedResources = resources.filter(r => r.unlocked === true);
   let unlockedSkills = skills.filter(s => s.unlocked === true);
-  let unlockedClasses = classes.filter(c => c.unlocked === true);  
-  let unlockedActions = actions.filter(a => a.unlocked === true);
+  let unlockedClasses = classes.filter(c => c.unlocked === true);
 
-  console.log(state);
   rootEl.innerHTML = `
     <h1>Everlyn RPG</h1>
     <p>Updated: October 15th. Rebuilding UI after switching to new data structure.</p>
     <p>Resources:</p>
     <ul>${unlockedResources
       .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`)
-      .join("")}</ul>
-    <p>Actions:</p>
-    <ul>${unlockedActions
-      .map((a) => `<li><button type="button" class="action-btn" data-action-id="${a.id}">
-              ${defs.actions?.[a.id]?.name ?? a.id}
-            </button></li>`)
       .join("")}</ul>
     <p>Skills:</p>
     <ul>${unlockedSkills
@@ -93,21 +136,6 @@ function renderGame(state, defs) {
       )
       .join("")}</ul>
   `;
-  
-  // Add click handlers for action buttons
-  rootEl.querySelectorAll(".action-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const actionId = btn.getAttribute("data-action-id");
-      if (window.Game?.actionController?.startAction && actionId) {
-        window.Game.actionController.startAction(actionId);
-        console.log("Action fired:", actionId);
-      }
-    });
-  });
-}
-
-function highlightButton(actionId) {
-  console.log("Switched to action:", actionId);
 }
 
 function gameTick() {

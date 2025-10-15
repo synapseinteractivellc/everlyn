@@ -34,6 +34,13 @@ export function createInitialState(defs) {
         id,
         currentProgress: 0,
         completionCount: 0,
+        duration: defs.actions[id].duration * 1000,
+        cost: Array.isArray(defs.actions[id].cost)
+          ? defs.actions[id].cost.map(cost => ({ ...cost }))
+          : [],
+        reward: Array.isArray(defs.actions[id].reward)
+          ? defs.actions[id].reward.map(reward => ({ ...reward }))
+          : [],
         lastActionStartTime: null,
         unlocked: !!defs.actions[id].unlocked, // initial unlock state from defs
       },

@@ -2,8 +2,8 @@
 import { ActionModel } from '../models/actionModel.js';
 
 export class ActionController {
-  constructor(state, { onLog, onStateChange, onSwitchAction } = {}) {
-    this.model = new ActionModel(state);
+  constructor(state, actionModel, { onLog, onStateChange, onSwitchAction } = {}) {
+    this.model = actionModel;
     this.s = state;
     this.onLog = onLog || (() => {});
     this.onStateChange = onStateChange || (() => {});
@@ -26,16 +26,17 @@ export class ActionController {
     // Let Model run the rules
     const result = this.model.tickProgress(action, deltaTime);
     if (result.completed) {
-      console.log("Action complete:", actionId);
       this.log(this.formatActionCompleted(result.event, this.s));
-      this.onStateChange(this.s); // After completion, controller can decide to stay on same action 
-      // or apply policies like “auto-rest if exhausted” 
-      this.checkRestAction();
+      this.onStateChange(this.s); 
+      // After completion, controller can decide to stay on same action 
+      // or apply policies like “auto-rest if exhausted”
+      if (this.s.defs.actions[this.s.currentAction].type == "purchase") {
+        this.switchToRestAction();
+      } else this.startAction(this.s.currentAction);
     }
   }
 
   startAction(actionId) {
-    console.log("Action fired:", actionId);
     const result = this.model.start(actionId);
     if (!result.ok) {
       if (result.reason === 'cant-afford') this.switchToRestAction();
@@ -65,14 +66,6 @@ export class ActionController {
     }
   }
 
-  checkRestAction() {
-    if (!this.isCurrentActionRest()) return;
-    if (this.areStatPoolsFull()) {
-      const prev = this.s.previousAction;
-      if (prev) this.startAction(prev);
-    }
-  }
-
   isCurrentActionRest() {
     const cur = this.s.currentAction;
     if (!cur) return false;
@@ -83,13 +76,6 @@ export class ActionController {
   isRestAction(id) {
     const a = this.s.actions[id];
     return !!(a && a.isRestAction);
-  }
-
-  areStatPoolsFull() {
-    for (const pool of Object.values(this.s.statPools || {})) {
-      if (pool.current < pool.max) return false;
-    }
-    return true;
   }
 
   formatActionCompleted(event, state) {

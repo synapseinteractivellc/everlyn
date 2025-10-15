@@ -1,6 +1,7 @@
 {
   "beg": {
     "id": "beg",
+    "type": "action",
     "name": "Beg",
     "description": "Ask strangers for spare coins.",
     "duration": 2,
@@ -14,7 +15,8 @@
     "unlocked": true
   },
   "rest": {
-    "id": "rest",
+    "id": "rest",    
+    "type": "rest",
     "name": "Rest",
     "description": "Take a short break to restore stamina.",
     "duration": 3,
@@ -27,6 +29,7 @@
   },
   "scavenge": {
     "id": "scavenge",
+    "type": "action",
     "name": "Scavenge",
     "description": "Search nearby alleys for useful items.",
     "duration": 4,
@@ -45,6 +48,7 @@
   },
   "train_combat": {
     "id": "train_combat",
+    "type": "action",
     "name": "Combat Training",
     "description": "Practice basic combat techniques.",
     "duration": 4,
@@ -63,6 +67,7 @@
   },
   "study_scrolls": {
     "id": "study_scrolls",
+    "type": "action",
     "name": "Study Scrolls",
     "description": "Study the scrolls you've gathered.",
     "duration": 4,
@@ -81,6 +86,7 @@
   },
   "clean_stables": {
     "id": "clean_stables",
+    "type": "action",
     "name": "Clean Stables",
     "description": "Muck out stables and move hay.",
     "duration": 2,
@@ -98,6 +104,7 @@
   },
   "coin_purse": {
     "id": "coin_purse",
+    "type": "purchase",
     "name": "Coin Purse",
     "description": "Purchase a small coin purse to hold more gold.",
     "cost": [

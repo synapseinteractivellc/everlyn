@@ -11,7 +11,7 @@ export class SkillModel {
     if (this.checkMaxLevel(id)) {
       if (sk.experience > sk.nextLevelExperience) sk.experience = sk.nextLevelExperience;
     }
-    
+
     return { ok:true, applied: xp };
   }
 
@@ -32,7 +32,7 @@ export class SkillModel {
 
   checkMaxLevel(id) {
     const sk = this.s.skills[id];
-    if (sk.level >= this.s.defs.skills.id.maxLevel) return true;
+    if (sk.level >= this.s.defs.skills[id].maxLevel) return true;
     return false;
   }
 }
