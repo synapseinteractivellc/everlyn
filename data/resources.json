@@ -2,7 +2,7 @@
   "life": {
     "id": "life",
     "type": "stat",
-    "name": "life",
+    "name": "Life",
     "description": "Your life force in this world.",
     "amount": 10,
     "maximum": 10,

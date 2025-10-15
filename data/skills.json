@@ -1,21 +1,19 @@
 {
   "survival": {
     "id": "survival",
+    "tier": 0,
     "name": "Survival",
     "description": "Knowledge on how to survive in this unforgiving world.",
-    "level": 0,
     "maxLevel": 5,
-    "experience": 0,
     "nextLevelExperience": 25,
     "unlocked": true
   },
   "exploration": {
     "id": "exploration",
+    "tier": 0,
     "name": "Exploration",
     "description": "You are better at navigating and remembering where places are located. Small bonuses to discovering new things.",
-    "level": 0,   
     "maxLevel": 5,
-    "experience": 0, 
     "nextLevelExperience": 25,
     "unlocked": false,
     "requirement": [
@@ -24,12 +22,11 @@
   },
   "arcana": {
     "id": "arcana",
+    "tier": 1,
     "name": "Arcana",
     "description": "The mysteries of the arcane are at your fingertips",
-    "level": 0,
     "maxLevel": 5,
-    "experience": 0,
-    "nextLevelExperience": 25,
+    "nextLevelExperience": 50,
     "unlocked": false,
     "requirement": [
       { "resource": "scroll", "amt": 1 }
@@ -37,12 +34,11 @@
   },
   "combat": {
     "id": "combat",
+    "tier": 1,
     "name": "Combat",
     "description": "It takes more than muscle to win a fight. You have to know how to hit and get hit.",
-    "level": 0,
     "maxLevel": 5,
-    "experience": 0,
-    "nextLevelExperience": 25,
+    "nextLevelExperience": 50,
     "unlocked": false,
     "requirement": [
       { "skill": "survival", "level": 3 }

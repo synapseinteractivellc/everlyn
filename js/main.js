@@ -56,19 +56,32 @@ function renderGame(state, defs) {
   // Optional: guard against undefined collections to avoid secondary errors
   const resources = state.resources ? Object.values(state.resources) : [];
   const skills = state.skills ? Object.values(state.skills) : [];
+  const classes = state.classes ? Object.values(state.classes) : [];
 
+  let unlockedResources = resources.filter(r => r.unlocked === true);
+  let unlockedSkills = skills.filter(s => s.unlocked === true);
+  let unlockedClasses = classes.filter(c => c.unlocked === true);
+
+  console.log(state);
   rootEl.innerHTML = `
     <h1>Everlyn RPG</h1>
     <p>Updated: October 14th. Rebuilding UI after switching to new data structure.</p>
     <p>Resources:</p>
-    <ul>${resources
-      .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}</li>`)
+    <ul>${unlockedResources
+      .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`)
       .join("")}</ul>
     <p>Skills:</p>
-    <ul>${skills
+    <ul>${unlockedSkills
       .map(
         (s) =>
-          `<li>${defs.skills?.[s.id]?.name ?? s.id}: Level - ${s.level} - XP - ${s.experience}</li>`
+          `<li>${defs.skills?.[s.id]?.name ?? s.id}: Level - ${s.level} - XP - ${s.experience}/${s.nextLevelExperience}</li>`
+      )
+      .join("")}</ul>
+    <p>Classes:</p>
+    <ul>${unlockedClasses
+      .map(
+        (c) =>
+          `<li>${defs.classes?.[c.id]?.name ?? c.id}</li>`
       )
       .join("")}</ul>
   `;

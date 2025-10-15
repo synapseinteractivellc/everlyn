@@ -6,7 +6,10 @@
     "cost": [
       { "resource": "gold", "amt": 20 }
     ],
-    "effects": [ { "type": "increaseRegen", "resource": "stamina", "amount": 1 } ],
+    "effects": [ 
+      { "type": "increaseRegen", "resource": "life", "amount": 1 },
+      { "type": "increaseRegen", "resource": "stamina", "amount": 1 }
+    ],
     "unlocked": true
   }
 }

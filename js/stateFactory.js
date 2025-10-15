@@ -9,7 +9,7 @@ export function createInitialState(defs) {
         amount: defs.resources[id].amount,
         maximum: defs.resources[id].maximum ?? Infinity,
         changePerTick: defs.resources[id].changePerTick,
-        unlocked:  defs.resources[id].unlocked
+        unlocked: !!defs.resources[id].unlocked
       },
     ])
   );
@@ -21,6 +21,8 @@ export function createInitialState(defs) {
         id,
         level: 0,
         experience: 0,
+        nextLevelExperience: defs.skills[id].nextLevelExperience,
+        unlocked: !!defs.skills[id].unlocked, // initial unlock state from defs
       },
     ])
   );
@@ -47,7 +49,6 @@ export function createInitialState(defs) {
         id,
         unlocked: !!defs.classes[id].unlocked,
         selected: false, // player’s chosen class
-        level: 0,
       },
     ])
   );
