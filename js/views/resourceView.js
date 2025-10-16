@@ -36,6 +36,8 @@ export default class ResourceView {
       currencies.forEach((r) => {
         const div = document.createElement('div');
         div.className = 'currency';
+        // Tooltip
+        div.title = `Rate: ${r.changePerTick ?? 0}\n${defs.resources?.[r.id]?.description ?? ''}`;
 
         // Name
         const nameSpan = document.createElement('span');
@@ -49,12 +51,6 @@ export default class ResourceView {
         amountSpan.textContent = `: ${r.amount}/${r.maximum}`;
         div.appendChild(amountSpan);
 
-        // Tooltip
-        const rateSpan = document.createElement('span');
-        rateSpan.className = 'currency-rate';
-        rateSpan.title = `Rate: ${r.changePerTick ?? 0}\n${defs.resources?.[r.id]?.description ?? ''}`;
-        rateSpan.textContent = ' ⓘ';
-        div.appendChild(rateSpan);
 
         this.currencyContainer.appendChild(div);
       });
@@ -66,19 +62,14 @@ export default class ResourceView {
       statPools.forEach((r) => {
         const div = document.createElement('div');
         div.className = 'stat-pool';
+        // Tooltip
+        div.title = `Rate: ${r.changePerTick ?? 0}\n${defs.resources?.[r.id]?.description ?? ''}`;
 
         // Name
         const nameSpan = document.createElement('span');
         nameSpan.className = 'stat-name';
         nameSpan.textContent = defs.resources?.[r.id]?.name ?? r.id;
         div.appendChild(nameSpan);
-        
-        // Tooltip
-        const rateSpan = document.createElement('span');
-        rateSpan.className = 'stat-rate';
-        rateSpan.title = `Rate: ${r.changePerTick ?? 0}\n${defs.resources?.[r.id]?.description ?? ''}`;
-        rateSpan.textContent = ' ⓘ';
-        div.appendChild(rateSpan);
 
         // Progress bar container
         const progressContainer = document.createElement('div');

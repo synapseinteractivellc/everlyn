@@ -575,7 +575,7 @@ button {
     border-color: var(--secondary-color);
 }
 
-.action-button h3 {
+.action-name {
     margin-bottom: 5px;
 }
 

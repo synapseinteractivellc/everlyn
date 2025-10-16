@@ -74,42 +74,64 @@ export default class ActionView {
     const purchaseChanged = !this.arraysEqual(purchaseIds, this.prevPurchaseIds);
 
     if (this.actionsContainer && (restChanged || actionChanged)) {
-      this.actionsContainer.innerHTML = `
+      this.actionsContainer.innerHTML = '';
+      availableRests.forEach((a) => {
+        const button = document.createElement('button');
+        button.className = 'action-button';
+        button.setAttribute('data-action-id', a.id);
+        // Tooltip
+        let tooltip = this.createToolTip(a, defs);
+        button.title = tooltip;
+
+        // Name
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'action-name';
+        nameSpan.textContent = defs.actions?.[a.id]?.name ?? a.id
+        button.appendChild(nameSpan);
+
+        this.actionsContainer.appendChild(button);
+      });
+
+      availableActions.forEach((a) => {
+        const button = document.createElement('button');
+        button.className = 'action-button';
+        button.setAttribute('data-action-id', a.id)
+        // Tooltip
+        let tooltip = this.createToolTip(a, defs);
+        button.title = tooltip;
+
+        // Name
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'action-name';
+        nameSpan.textContent = defs.actions?.[a.id]?.name ?? a.id
+        button.appendChild(nameSpan);
+
+        this.actionsContainer.appendChild(button);
+      });
         
-          ${availableRests
-            .map(
-              (a) =>
-                `<button type="button" class="action-button" data-action-id="${a.id}">
-                    ${defs.actions?.[a.id]?.name ?? a.id}
-                </button>`
-            )
-            .join("")}
-        
-        
-          ${availableActions
-            .map(
-              (a) =>
-                `<button type="button" class="action-button" data-action-id="${a.id}">
-                    ${defs.actions?.[a.id]?.name ?? a.id}
-                </button>`
-            )
-            .join("")}
-        `;
       this.prevRestIds = restIds;
       this.prevActionIds = actionIds;
     }
 
     if (this.purchasesContainer && purchaseChanged) {
-      this.purchasesContainer.innerHTML = 
-        `${availablePurchases
-            .map(
-              (a) =>
-                `<button type="button" class="purchase-button" data-action-id="${a.id}">
-                    ${defs.actions?.[a.id]?.name ?? a.id}
-                </button>`
-            )
-            .join("")}
-        `;
+      this.purchasesContainer.innerHTML = '';
+      availablePurchases.forEach((a) => {
+        const button = document.createElement('button');
+        button.setAttribute('data-action-id', a.id)
+        button.className = 'action-button';
+        // Tooltip
+        let tooltip = this.createToolTip(a, defs);
+        button.title = tooltip;
+
+        // Name
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'action-name';
+        nameSpan.textContent = defs.actions?.[a.id]?.name ?? a.id
+        button.appendChild(nameSpan);
+        
+        this.purchasesContainer.appendChild(button);
+      });
+  
       this.prevPurchaseIds = purchaseIds;
     }
   }
@@ -121,5 +143,48 @@ export default class ActionView {
       if (a[i] !== b[i]) return false;
     }
     return true;
+  }
+
+  createToolTip(a, defs) {
+    const tooltip = [];
+    // Description
+    const desc = defs.actions[a.id].description;
+    tooltip.push(`${desc}`);
+
+    // Costs
+    const cost = a.cost;
+    if (cost && cost.length > 0) {
+      tooltip.push('Costs:');
+      cost.forEach(c => {
+        tooltip.push(`- ${c.amt} ${c.resource}`);
+      });
+    }
+
+    // Rewards
+    const rewards = a.reward;
+    if (rewards && rewards.length > 0) {
+      tooltip.push('Rewards:');
+      rewards.forEach(r => {
+      if (r?.resource) {
+        if (r.min !== undefined && r.max !== undefined) {
+        if (r.min === r.max) {
+          tooltip.push(`+ ${r.min} ${defs.resources[r.resource].name ?? r.resource}`);
+        } else {
+          tooltip.push(`+ ${r.min} – ${r.max} ${r.resource}`);
+        }
+        } else if (r.amount !== undefined) {
+        tooltip.push(`+ ${r.amount} ${r.resource}`);
+        }
+      } else if (r.skill) {
+        tooltip.push(`+ ${r.amt} ${defs.skills[r.skill].name ?? r.skill} XP`);
+      } else {
+        // fallback for unknown reward types
+        tooltip.push(`Unknown`);
+      }
+      });
+    }
+
+    // Join with newlines
+    return tooltip.join('\n');
   }
 }
