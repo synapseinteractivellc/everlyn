@@ -1,27 +1,30 @@
 // js/views/skillView.js
-const skills = state.skills ? Object.values(state.skills) : [];
-let unlockedSkills = skills.filter(s => s.unlocked === true);
-
-let skillsContainer = null;
-skillsContainer = document.getElementById("skills-container");
-
-if (!skillsContainer) {
-    console.error(
-        "[Everlyn] Missing #skillsContainer. Is the deployed HTML the one you expect?"
-    );
-    // Show a friendly message so the page doesn't look dead.
-    document.body.insertAdjacentHTML(
+export default class SkillView {
+  constructor() {
+    this.skillsContainer = document.getElementById("skills-container");
+    if (!this.skillsContainer) {
+      console.error("[Everlyn] Missing #skills-container in DOM.");
+      document.body.insertAdjacentHTML(
         "beforeend",
-        `<pre style="color:red;">Missing #skillsContainer in DOM.</pre>`
-    );
-    return; // bail early; no container to render into
-}
+        `<pre style="color:red;">Missing #skills-container in DOM.</pre>`
+      );
+    }
+  }
 
-skillsContainer.innerHTML = `
-    <ul>${unlockedSkills
-      .map(
-        (s) =>
-          `<li>${defs.skills?.[s.id]?.name ?? s.id}: Level - ${s.level} - XP - ${s.experience}/${s.nextLevelExperience}</li>`
-      )
-      .join("")}</ul>
-`;
+  update(state, defs) {
+    if (!state || !defs || !this.skillsContainer) return;
+
+    const skills = state.skills ? Object.values(state.skills) : [];
+    const unlocked = skills.filter((s) => s.unlocked === true);
+
+    this.skillsContainer.innerHTML = `
+      <ul>
+        ${unlocked
+          .map(
+            (s) =>
+              `<li>${defs.skills?.[s.id]?.name ?? s.id}: Level ${s.level} – XP ${s.experience}/${s.nextLevelExperience}</li>`
+          )
+          .join("")}
+      </ul>`;
+  }
+}

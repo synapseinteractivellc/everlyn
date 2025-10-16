@@ -29,6 +29,7 @@ export class ActionController {
   }
 
   startAction(actionId) {
+    console.log("Start Action: ", actionId);
     const result = this.model.start(actionId);
     if (!result.ok) {
       if (result.reason === 'cant-afford') this.switchToRestAction();

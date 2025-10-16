@@ -1,46 +1,58 @@
 // js/views/resourceView.js
-const resources = state.resources ? Object.values(state.resources) : [];
-let unlockedResources = resources.filter(r => r.unlocked === true);
-let stats = unlockedResources.filter(r => r.type === "stat");
-let currency = unlockedResources.filter(r => r.type === "currency");
+export default class ResourceView {
+  constructor() {
+    this.currencyContainer = document.getElementById("currencies-container");
+    this.statPoolsContainer = document.getElementById("stat-pools-container");
 
-let statPoolContainer = null;
-let currencyContainer = null;
-
-
-statPoolContainer = document.getElementById("stat-pools-container");
-currencyContainer = document.getElementById("currencies-container");
-
-if (!statPoolContainer) {
-    console.error(
-        "[Everlyn] Missing #statPoolContainer. Is the deployed HTML the one you expect?"
-    );
-    // Show a friendly message so the page doesn't look dead.
-    document.body.insertAdjacentHTML(
+    if (!this.currencyContainer) {
+      console.error("[Everlyn] Missing #currencies-container in DOM.");
+      document.body.insertAdjacentHTML(
         "beforeend",
-        `<pre style="color:red;">Missing #statPoolContainer in DOM.</pre>`
-    );
-    return; // bail early; no container to render into
-}
-if (!currencyContainer) {
-    console.error(
-        "[Everlyn] Missing #currencyContainer. Is the deployed HTML the one you expect?"
-    );
-    // Show a friendly message so the page doesn't look dead.
-    document.body.insertAdjacentHTML(
+        `<pre style="color:red;">Missing #currencies-container in DOM.</pre>`
+      );
+    }
+    if (!this.statPoolsContainer) {
+      console.error("[Everlyn] Missing #stat-pools-container in DOM.");
+      document.body.insertAdjacentHTML(
         "beforeend",
-        `<pre style="color:red;">Missing #currencyContainer in DOM.</pre>`
-    );
-    return; // bail early; no container to render into
-}
+        `<pre style="color:red;">Missing #stat-pools-container in DOM.</pre>`
+      );
+    }
+  }
 
-statPoolContainer.innerHTML = `
-    <ul>${stats
-      .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`)
-      .join("")}</ul>
-`;
-currencyContainer.innerHTML = `
-    <ul>${currency
-      .map((r) => `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`)
-      .join("")}</ul>
-`;
+  update(state, defs) {
+    if (!state || !defs) return;
+
+    const resources = state.resources ? Object.values(state.resources) : [];
+    
+    const unlocked = resources.filter((r) => r.unlocked === true);
+
+    const currencies = unlocked.filter((r) => defs.resources[r.id].type === "currency");
+ 
+    const statPools = unlocked.filter((r) => defs.resources[r.id].type === "stat");
+
+    if (this.currencyContainer) {
+      this.currencyContainer.innerHTML = `
+        <ul>
+          ${currencies
+            .map(
+              (r) =>
+                `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`
+            )
+            .join("")}
+        </ul>`;
+    }
+
+    if (this.statPoolsContainer) {
+      this.statPoolsContainer.innerHTML = `
+        <ul>
+          ${statPools
+            .map(
+              (r) =>
+                `<li>${defs.resources?.[r.id]?.name ?? r.id}: ${r.amount}/${r.maximum}</li>`
+            )
+            .join("")}
+        </ul>`;
+    }
+  }
+}
