@@ -26,6 +26,7 @@ export class ActionModel {
   }
 
   start(actionId) {
+    console.log("Start action: ", actionId);
     const action = this.s.actions[actionId];
     if (!action || !action.unlocked) return { ok: false, reason: 'locked' };
 

@@ -536,7 +536,7 @@ button {
     line-height: 20px;
 }
 
-.progress-health { background-color: #e74c3c; }
+.progress-life { background-color: #e74c3c; }
 .progress-stamina { background-color: #2ecc71; }
 .progress-mana { background-color: #3498db; }
 .progress-action { background-color: #f39c12; }
