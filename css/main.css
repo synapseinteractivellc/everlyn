@@ -627,6 +627,7 @@ button {
     border-radius: 6px;
     padding: 0.8rem;
     margin: 10px 0;
+    color: #000;
 }
 
 .skill h3 {
@@ -635,11 +636,13 @@ button {
 
 .skill-progress {
     margin-top: 5px;
+    background-color: #ecea7b;
+    color: #000;
 }
 
 .skill-exp {
     font-size: 12px;
-    text-align: right;
+    text-align: center;
 }
 
 /* ================================
