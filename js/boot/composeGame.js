@@ -6,7 +6,7 @@ import { ResourceModel } from '../models/resourceModel.js';
 import { SkillModel } from '../models/skillModel.js';
 import { ActionController } from '../controllers/actionController.js';
 
-export async function composeGame({ onLog, onStateChange, onSwitchAction }) {
+export async function composeGame({ onLog, onStateChange }) {
   const defs = await loadContent();
   const state = createInitialState(defs);
 
@@ -23,7 +23,6 @@ export async function composeGame({ onLog, onStateChange, onSwitchAction }) {
   const actionController = new ActionController(state, actionModel, {
     onLog,
     onStateChange,
-    onSwitchAction,
   });
 
   return { defs, state, actionModel, actionController };

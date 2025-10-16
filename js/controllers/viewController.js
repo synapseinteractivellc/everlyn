@@ -2,6 +2,7 @@
 import ResourceView from "../views/resourceView.js";
 import ActionView from "../views/actionView.js";
 import SkillView from "../views/skillView.js";
+import ActionLogView from "../views/actionLogView.js";
 
 export default class ViewController {
   constructor(defs, state, actionController) {
@@ -13,6 +14,7 @@ export default class ViewController {
     this.resourceView = new ResourceView();
     this.actionView = new ActionView(actionController);
     this.skillView = new SkillView();
+    this.ActionLogView = new ActionLogView();
 
     this.currentScreen = "main";
     this.initNav();
@@ -56,5 +58,6 @@ export default class ViewController {
     this.resourceView.update(state, defs);
     this.actionView.update(state, defs);
     this.skillView.update(state, defs);
+    this.ActionLogView.update(state, defs);
   }
 }

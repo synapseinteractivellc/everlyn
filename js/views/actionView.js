@@ -24,7 +24,7 @@ export default class ActionView {
     // Event delegation for actions
     if (this.actionsContainer) {
       this.actionsContainer.addEventListener("click", (e) => {
-        const btn = e.target.closest(".action-btn");
+        const btn = e.target.closest(".action-button");
         if (btn) {
           const actionId = btn.getAttribute("data-action-id");
           if (this.actionController?.startAction && actionId) {
@@ -37,7 +37,7 @@ export default class ActionView {
     // Event delegation for purchases
     if (this.purchasesContainer) {
       this.purchasesContainer.addEventListener("click", (e) => {
-        const btn = e.target.closest(".action-btn");
+        const btn = e.target.closest(".purchase-button");
         if (btn) {
           const actionId = btn.getAttribute("data-action-id");
           if (this.actionController?.startAction && actionId) {

@@ -14,10 +14,6 @@ window.addEventListener("DOMContentLoaded", async () => {
           viewController.update(s, defs);
         }
       },
-      onSwitchAction: (id) => {
-        // you can highlight the active action button here if desired
-        console.log("Switched to action:", id);
-      },
     });
 
     // expose game for debugging

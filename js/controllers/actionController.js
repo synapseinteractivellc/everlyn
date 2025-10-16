@@ -1,11 +1,10 @@
 // js/controller/actionController.js
 export class ActionController {
-  constructor(state, actionModel, { onLog, onStateChange, onSwitchAction } = {}) {
+  constructor(state, actionModel, { onLog, onStateChange } = {}) {
     this.model = actionModel;
     this.s = state;
     this.onLog = onLog || (() => {});
     this.onStateChange = onStateChange || (() => {});
-    this.onSwitchAction = onSwitchAction || (() => {});
   }
 
   update(deltaTime) {
@@ -29,14 +28,12 @@ export class ActionController {
   }
 
   startAction(actionId) {
-    console.log("Start Action: ", actionId);
     const result = this.model.start(actionId);
     if (!result.ok) {
       if (result.reason === 'cant-afford') this.switchToRestAction();
       return false;
     }
     this.log(result.message);
-    this.onSwitchAction(actionId);
     this.onStateChange(this.s);
     return true;
   }
@@ -87,7 +84,7 @@ export class ActionController {
         const name = res?.name || id;
         return `${amount > 0 ? '+' : ''}${amount} ${name}`;
       });
-      parts.push(`Received ${resourceMsgs.join(', ')}.`);
+      parts.push(` ${resourceMsgs.join(', ')}`);
     }
 
     // ---- Skill XP rewards ----
@@ -103,16 +100,12 @@ export class ActionController {
     // Future-proofing: add other reward types as needed
     // if (rewards.items) { ... }
 
-    // Optional timestamp formatting
-    const time = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    parts.push(`[${time}]`);
-
     return parts.join(' ');
   }
 
 
   log(message) {
-    this.s.actionLog.unshift({ message, timestamp: Date.now() });
+    this.s.actionLog.unshift({ message });
     if (this.s.actionLog.length > 100) this.s.actionLog.pop();
     this.onLog(message);
   }

@@ -6,7 +6,6 @@ export class SkillModel {
     if (!sk) return { ok:false, reason:'missing-skill' };
     sk.experience = (sk.experience ?? 0) + xp;
     // handle level-ups here
-    console.log("Skill:", sk);
     if (!this.checkMaxLevel(sk)) this.levelUp(sk);
     // cap XP if at Max Level
     if (this.checkMaxLevel(sk)) {

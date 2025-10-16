@@ -26,7 +26,6 @@ export class ActionModel {
   }
 
   start(actionId) {
-    console.log("Start action: ", actionId);
     const action = this.s.actions[actionId];
     if (!action || !action.unlocked) return { ok: false, reason: 'locked' };
 
@@ -34,6 +33,7 @@ export class ActionModel {
       return { ok: false, reason: 'cant-afford' };
     }
 
+    console.log(action.currentProgress);
     if (action.currentProgress == 0) {
       const costs = this.applyCosts(action);
       if (!costs.ok) {
@@ -47,11 +47,12 @@ export class ActionModel {
     action.lastActionStartTime = this.now();
     // Don’t touch UI here—return a message for controller/view
     const resumed = action.currentProgress > 0;
+
     return {
       ok: true,
       message: resumed
-        ? `You resumed ${action.name} at ${Math.floor(action.currentProgress * 100)}%.`
-        : `You started ${action.name}.`,
+        ? `You resumed ${action.id} at ${Math.floor(action.currentProgress * 100)}%.`
+        : `You started ${action.id}.`,
     };
   }
 
@@ -85,7 +86,6 @@ export class ActionModel {
 
     for (const e of entries) {
       if (e.resource) {
-        console.log(e);
         if (typeof e.maxChange === 'number') {
           // Handle maxChange reward
           const res = this.resources.maxChange(e.resource, e.maxChange);
