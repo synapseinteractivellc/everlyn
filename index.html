@@ -63,6 +63,88 @@
         </div>
     </div>
 
+    <div id="game-container" style="display: none;">
+        <div id="header">
+            <div class="header-content">
+                <h1 id="game-title">Everlyn: City of Wonder</h1>
+                <div id="character-info">Unnamed the Level 1 Waif</div>
+            </div>
+            <div class="header-disclaimer">
+                <p>Disclaimer: This game is a work in progress. Features and content are subject to change.</p>
+                <p>Last updated: 4/22 @ 1:50am EST</p>
+            </div>            
+            <div class="header-buttons">
+                <button id="save-button" class="header-button">Save</button>
+                <button id="wipe-button" class="header-button">Wipe</button>
+            </div>
+        </div>
+        
+        <div id="nav-bar">
+            <div class="nav-button active" data-screen="main">Main</div>
+            <div class="nav-button" data-screen="upgrades">Upgrades</div>
+            <div class="nav-button" data-screen="skills">Skills</div>
+            <div class="nav-button" data-screen="house">House</div>
+            <div class="nav-button" data-screen="status">Status</div>
+        </div>
+        
+        <div id="main-content">
+            <div id="currency-sidebar">
+                <h3>Resources</h3>
+                <div id="currencies-container"></div>
+            </div>
+            
+            <div id="action-area">
+                <!-- Content changes based on active screen -->
+                <div id="screen-main" class="screen active">
+                    <h2>Available Actions</h2>
+                    <div id="actions-container"></div>
+                </div>
+
+                <div id="screen-purchases" class="screen">
+                    <h2>Available Purchases</h2>
+                    <div id="purchases-container"></div>
+                </div>
+                
+                <div id="screen-skills" class="screen">
+                    <h2>Skills</h2>
+                    <div id="skills-container"></div>
+                </div>
+                
+                <div id="screen-house" class="screen">
+                    <h2>House</h2>
+                    <div id="house-container">
+                        <p>You are currently homeless.</p>
+                    </div>
+                </div>
+                
+                <div id="screen-status" class="screen">
+                    <h2>Character Status</h2>
+                    <div id="status-container"></div>
+                </div>
+            </div>
+            
+            <div id="status-sidebar">
+                <div id="current-action">
+                    <h3>Current Action</h3>
+                    <div id="action-name">None</div>
+                    <div class="progress-container">
+                        <div id="action-progress" class="progress-bar progress-action" style="width: 0%;">0%</div>
+                    </div>
+                </div>
+                
+                <div id="stat-pools">
+                    <h3>Stat Pools</h3>
+                    <div id="stat-pools-container"></div>
+                </div>
+            </div>
+            
+            <div id="log-sidebar">
+                <h3>Adventure Log</h3>
+                <div id="action-log"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="game1">
         
     </div>
