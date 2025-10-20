@@ -55,7 +55,6 @@ export function createInitialState(defs) {
       {
         id,
         unlocked: !!defs.classes[id].unlocked,
-        selected: false, // player’s chosen class
       },
     ])
   );
