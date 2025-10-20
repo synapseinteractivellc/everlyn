@@ -1,6 +1,7 @@
 // js/main.js
 import { composeGame } from "./boot/composeGame.js";
 import ViewController from "./controllers/viewController.js";
+import { setupCharacterCreation } from "./createCharacter.js";
 
 let viewController = null;
 
@@ -19,12 +20,6 @@ window.addEventListener("DOMContentLoaded", async () => {
     // expose game for debugging
     window.Game = { defs, state, actionController };
 
-    // reveal the game container and hide character creation as needed
-    const gameContainer = document.getElementById("game-container");
-    if (gameContainer) {
-      gameContainer.style.display = "";
-    }
-
     // instantiate our view controller
     viewController = new ViewController(defs, state, actionController);
     // initial render
@@ -40,6 +35,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
+
+    // initialize character creation overlay
+    setupCharacterCreation(state);
   } catch (err) {
     console.error(err);
     document.body.innerHTML = `<pre style="color:red;">Failed to load game:\n${err.message}</pre>`;

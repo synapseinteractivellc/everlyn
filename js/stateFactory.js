@@ -107,6 +107,13 @@ export function createInitialState(defs) {
 
   return {
     defs, // frozen static content reference
+    character: {
+      name: '',        // player‑entered name
+      classId: null,   // id of selected class (e.g. 'Waif' or 'Vagabond')
+      level: 0,
+      xp: 0,
+      xpToNext: 50    // arbitrary default; can be tuned later
+    },
     resources,
     skills,
     actions,
