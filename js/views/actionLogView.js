@@ -49,7 +49,24 @@ export default class ActionLogView {
                 // Get the action object from state
                 const actionObj = state.actions?.[currentActionId];
                 const actionDef = defs.actions?.[currentActionId];
-                this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId}`;
+                
+                this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId} <button class="stop-action-btn" aria-label="Stop current action">×</button>`;
+
+                const stopBtn = this.currentAction.querySelector('.stop-action-btn');
+                if (stopBtn) {
+                    // Replace the node to clear any previous listeners (avoids duplicate handlers on repeated updates)
+                    const newBtn = stopBtn.cloneNode(true);
+                    stopBtn.parentNode.replaceChild(newBtn, stopBtn);
+                    newBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const controller = (typeof window !== 'undefined' && window.actionController) ? window.actionController : null;
+                        if (controller && typeof controller.stopCurrentAction === 'function') {
+                            controller.stopCurrentAction();
+                        } else {
+                            console.error('[Everlyn] actionController.stopCurrentAction is not available.');
+                        }
+                    });
+                }
 
                 // Safely get currentProgress (should be between 0 and 1)
                 let currentProgress = 0;

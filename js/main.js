@@ -2,6 +2,7 @@
 import { composeGame } from "./boot/composeGame.js";
 import ViewController from "./controllers/viewController.js";
 import { setupCharacterCreation } from "./createCharacter.js";
+import SaveController from "./controllers/saveController.js";
 
 let viewController = null;
 
@@ -22,8 +23,16 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     // instantiate our view controller
     viewController = new ViewController(defs, state, actionController);
-    // initial render
+    
+    // load any saved game before the initial render
+    const saveController = new SaveController(state, defs);
+    const loaded = saveController.load();
+    // initial render after load (shows saved character if exists)
     viewController.update(state, defs);
+
+    // start autosave and attach the Save/Wipe buttons
+    saveController.startAutoSave();
+    saveController.attachButtons();
 
     // start the game loop
     let lastTick = performance.now();
