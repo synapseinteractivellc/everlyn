@@ -39,6 +39,7 @@ export class ActionController {
   }
 
   stopCurrentAction() {
+    console.log("Stop action");
     const id = this.model.stop();
     if (!id) return null;
     this.log(`You paused your current action. Progress is saved.`);

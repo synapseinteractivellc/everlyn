@@ -3,6 +3,7 @@ import ResourceView from "../views/resourceView.js";
 import ActionView from "../views/actionView.js";
 import SkillView from "../views/skillView.js";
 import ActionLogView from "../views/actionLogView.js";
+import CharacterView from "../views/characterView.js";
 
 export default class ViewController {
   constructor(defs, state, actionController) {
@@ -11,10 +12,11 @@ export default class ViewController {
     this.actionController = actionController;
 
     // instantiate sub‑views
+    this.characterView = new CharacterView();
     this.resourceView = new ResourceView();
     this.actionView = new ActionView(actionController);
     this.skillView = new SkillView();
-    this.ActionLogView = new ActionLogView();
+    this.ActionLogView = new ActionLogView(this.actionController);
 
     this.currentScreen = "main";
     this.initNav();
@@ -63,6 +65,7 @@ export default class ViewController {
     this.state = state;
     this.defs = defs;
     // update all subviews regardless of current screen
+    this.characterView.update(state);
     this.resourceView.update(state, defs);
     this.actionView.update(state, defs);
     this.skillView.update(state, defs);

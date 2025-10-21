@@ -1,10 +1,12 @@
 // js/views/actionLogView.js
 
 export default class ActionLogView {
-    constructor() {
+    constructor(actionController) {
+        this.actionController = actionController;
         this.currentAction = document.getElementById("action-name");
         this.currentActionProgressContainer = document.getElementById("current-action-progress-container");
         this.actionLog = document.getElementById("action-log");
+
 
         if (!this.currentAction) {
         console.error("[Everlyn] Missing #action-name in DOM.");
@@ -48,25 +50,30 @@ export default class ActionLogView {
             } else {
                 // Get the action object from state
                 const actionObj = state.actions?.[currentActionId];
-                const actionDef = defs.actions?.[currentActionId];
-                
-                this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId} <button class="stop-action-btn" aria-label="Stop current action">×</button>`;
+                const actionDef = defs.actions?.[currentActionId];     
 
-                // figure out why not working
-                const stopBtn = this.currentAction.querySelector('.stop-action-btn');
-                if (stopBtn) {
-                    // Replace the node to clear any previous listeners (avoids duplicate handlers on repeated updates)
-                    const newBtn = stopBtn.cloneNode(true);
-                    stopBtn.parentNode.replaceChild(newBtn, stopBtn);
-                    newBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const controller = (typeof window !== 'undefined' && window.actionController) ? window.actionController : null;
-                        if (controller && typeof controller.stopCurrentAction === 'function') {
-                            controller.stopCurrentAction();
-                        } else {
-                            console.error('[Everlyn] actionController.stopCurrentAction is not available.');
-                        }
-                    });
+                // Only reattach stop button handler when the current action actually changes
+                if (this._lastCurrentActionId !== currentActionId) {
+                    console.log("Fire: ", this._lastCurrentActionId, ". Start: ", currentActionId);
+                    this._lastCurrentActionId = currentActionId;
+                    this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId} <button class="stop-action-btn" aria-label="Stop current action">×</button>`;
+
+                    const stopBtn = this.currentAction.querySelector('.stop-action-btn');
+                    if (stopBtn) {
+                        console.log("Stop click");
+                        // Replace the node to clear any previous listeners (avoids duplicate handlers on repeated updates)
+                        const newBtn = stopBtn.cloneNode(true);
+                        stopBtn.parentNode.replaceChild(newBtn, stopBtn);
+                        newBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            const controller = this.actionController;
+                            if (controller && typeof controller.stopCurrentAction === 'function') {
+                                controller.stopCurrentAction();
+                            } else {
+                                console.error('[Everlyn] actionController.stopCurrentAction is not available.');
+                            }
+                        });
+                    }
                 }
 
                 // Safely get currentProgress (should be between 0 and 1)
