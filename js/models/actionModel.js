@@ -163,4 +163,8 @@ export class ActionModel {
       }
     }
   }
+
+  checkUnlock(action) {
+
+  }
 }
