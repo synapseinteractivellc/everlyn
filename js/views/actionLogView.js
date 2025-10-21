@@ -52,6 +52,7 @@ export default class ActionLogView {
                 
                 this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId} <button class="stop-action-btn" aria-label="Stop current action">×</button>`;
 
+                // figure out why not working
                 const stopBtn = this.currentAction.querySelector('.stop-action-btn');
                 if (stopBtn) {
                     // Replace the node to clear any previous listeners (avoids duplicate handlers on repeated updates)
