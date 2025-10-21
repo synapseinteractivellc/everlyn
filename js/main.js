@@ -45,8 +45,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
     requestAnimationFrame(loop);
 
-    // initialize character creation overlay
+    if (!loaded) {
+      // initialize character creation overlay
     setupCharacterCreation(state);
+    }
+    viewController.update(state, defs);
+    
   } catch (err) {
     console.error(err);
     document.body.innerHTML = `<pre style="color:red;">Failed to load game:\n${err.message}</pre>`;

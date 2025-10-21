@@ -4,6 +4,7 @@ import { createInitialState } from '../stateFactory.js';
 // deep merge helper; merges nested objects so new props aren’t lost
 function deepMerge(target, source) {
   for (const key of Object.keys(source)) {
+    console.log("Deep merge try", key);
     const srcVal = source[key];
     const tgtVal = target[key];
     if (srcVal && typeof srcVal === 'object' && !Array.isArray(srcVal)) {
@@ -48,12 +49,16 @@ export default class SaveController {
     try {
       const parsed = JSON.parse(raw);
       const savedState = parsed.state || parsed;
-      const fresh = createInitialState(this.defs);
+      console.log("Saved State: ", savedState);
+      console.log("State from try: ", this.state);
+      const fresh = createInitialState(this.defs);      
+      console.log("Fresh from try: ", fresh);
       deepMerge(fresh, savedState);
       deepMerge(this.state, fresh); // update existing references
       console.log('Game loaded.');
       return true;
     } catch (err) {
+      console.log("State from err: ", this.state);
       console.error('Failed to load save:', err);
       return false;
     }
