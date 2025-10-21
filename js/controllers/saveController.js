@@ -1,14 +1,19 @@
 // js/controllers/saveController.js
 import { createInitialState } from '../stateFactory.js';
 
-// deep merge helper; merges nested objects so new props aren’t lost
+// deep merge helper; merges nested objects so new props aren’t lost.
+// It skips frozen objects (like defs) to avoid writing to read-only properties.
 function deepMerge(target, source) {
   for (const key of Object.keys(source)) {
-    console.log("Deep merge try", key);
+    // never merge the static definitions; they are deep-frozen in loadContent.js
+    if (key === 'defs') continue;
     const srcVal = source[key];
     const tgtVal = target[key];
+
     if (srcVal && typeof srcVal === 'object' && !Array.isArray(srcVal)) {
-      if (!tgtVal) target[key] = {};
+      if (!tgtVal || typeof tgtVal !== 'object') {
+        target[key] = {};
+      }
       deepMerge(target[key], srcVal);
     } else {
       target[key] = srcVal;
@@ -49,16 +54,16 @@ export default class SaveController {
     try {
       const parsed = JSON.parse(raw);
       const savedState = parsed.state || parsed;
-      console.log("Saved State: ", savedState);
-      console.log("State from try: ", this.state);
-      const fresh = createInitialState(this.defs);      
-      console.log("Fresh from try: ", fresh);
+      const fresh = createInitialState(this.defs);
+
+      // first merge the saved values into the new fresh state
       deepMerge(fresh, savedState);
-      deepMerge(this.state, fresh); // update existing references
-      console.log('Game loaded.');
+
+      // then update the live state; defs is skipped automatically
+      deepMerge(this.state, fresh);
+      
       return true;
     } catch (err) {
-      console.log("State from err: ", this.state);
       console.error('Failed to load save:', err);
       return false;
     }

@@ -1,13 +1,14 @@
 // js/createCharacter.js
 import { CharacterModel } from './models/characterModel.js';
 
-export function setupCharacterCreation(state) {
+export function setupCharacterCreation(state, viewController) {
   const charModel = new CharacterModel(state);
   const overlay = document.getElementById('character-creation-overlay');
   const gameContainer = document.getElementById('game-container');
   const form = document.getElementById('character-form');
   const nameInput = document.getElementById('character-name');
   const classButtons = document.querySelectorAll('.class-choice');
+  const vC = viewController;
   let selectedClass = 'Waif'; // default
 
   // highlight selected class
@@ -37,8 +38,7 @@ export function setupCharacterCreation(state) {
     const info = document.getElementById('character-info');
     info.textContent = `${name} the Level ${state.character.level} ${selectedClass}`;
     // hide overlay / show game
-    overlay.style.display = 'none';
-    gameContainer.style.display = '';
+    vC.loadGameScreen();
   });
 
   // show overlay initially if no name yet

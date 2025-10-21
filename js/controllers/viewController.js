@@ -33,6 +33,14 @@ export default class ViewController {
     });
   }
 
+  loadGameScreen() {
+    const overlay = document.getElementById('character-creation-overlay');
+    const gameContainer = document.getElementById('game-container');
+
+    overlay.style.display = 'none';
+    gameContainer.style.display = '';
+  }
+
   showScreen(screen) {
     this.currentScreen = screen;
     // update screen visibility

@@ -33,7 +33,6 @@ export class ActionModel {
       return { ok: false, reason: 'cant-afford' };
     }
 
-    console.log(action.currentProgress);
     if (action.currentProgress == 0) {
       const costs = this.applyCosts(action);
       if (!costs.ok) {

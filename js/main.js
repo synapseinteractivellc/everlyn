@@ -47,9 +47,13 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     if (!loaded) {
       // initialize character creation overlay
-    setupCharacterCreation(state);
+    setupCharacterCreation(state, viewController);
     }
-    viewController.update(state, defs);
+
+    if (loaded) {
+      viewController.loadGameScreen();
+      viewController.update(state, defs);
+    }
     
   } catch (err) {
     console.error(err);
