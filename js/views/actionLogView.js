@@ -55,7 +55,7 @@ export default class ActionLogView {
                 // Only reattach stop button handler when the current action actually changes
                 if (this._lastCurrentActionId !== currentActionId) {
                     this._lastCurrentActionId = currentActionId;
-                    this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId} <button class="stop-action-btn" aria-label="Stop current action">×</button>`;
+                    this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId} <button class="stop-action-btn" aria-label="Stop current action">X</button>`;
 
                     const stopBtn = this.currentAction.querySelector('.stop-action-btn');
                     if (stopBtn) {

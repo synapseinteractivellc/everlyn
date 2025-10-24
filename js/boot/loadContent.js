@@ -181,6 +181,12 @@ function validateActions(raw, errors) {
       return null;
     }).filter(Boolean);
 
+    // maxCompletions: allow absent or # > 0 for "limited" actions such as purchases
+    if (a.maxCompletions !== undefined && !(isNum(a.maxCompletions) && a.maxCompletions > 0)) {
+      errors.push(`actions[${i}].maxCompletions must be > 0 if present`);
+    }
+    const maxCompletions = a.maxCompletions ?? Infinity;
+
     out.push({
       id: a.id,
       name: a.name,
@@ -191,6 +197,7 @@ function validateActions(raw, errors) {
       requirement,
       unlocked: !!a.unlocked,
       isRestAction: !!a.isRestAction,
+      maxCompletions,
       // keep any extra fields you might have added
       ...a,
     });

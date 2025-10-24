@@ -43,6 +43,7 @@ export function createInitialState(defs) {
           : [],
         lastActionStartTime: null,
         unlocked: !!defs.actions[id].unlocked, // initial unlock state from defs
+        maxCompletions: defs.actions[id].maxCompletions,
       },
     ])
   );

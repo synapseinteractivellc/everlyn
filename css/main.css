@@ -605,7 +605,7 @@ button {
     font-weight: bold;
 }
 
-.cancel-action-button {
+.stop-action-btn {
     color: #e74c3c !important;
     background: none;
     border: none;
@@ -614,7 +614,7 @@ button {
     font-weight: bold;
 }
 
-.cancel-action-button:hover {
+.stop-action-btn:hover {
     color: #c0392b !important;
 }
 

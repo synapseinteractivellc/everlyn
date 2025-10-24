@@ -51,7 +51,6 @@ export class ActionController {
       if (result.reason === 'cant-afford') this.switchToRestAction();
       return false;
     }
-    this.log(result.message);
     this.onStateChange(this.s);
     return true;
   }
@@ -93,7 +92,12 @@ export class ActionController {
     const parts = [];
 
     // Start with a base message
-    const actionName = action?.name || actionId;
+    let actionName = action?.name || actionId;
+
+    if (typeof actionName === 'string' || actionName instanceof String) {
+      actionName = actionName.toString().replace(/_/g, ' ');
+    }
+
     parts.push(`You completed ${actionName}.`);
 
     // ---- Resource rewards ----

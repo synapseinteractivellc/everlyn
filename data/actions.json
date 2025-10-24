@@ -116,6 +116,7 @@
     "unlocked": false,
     "requirement": [
       { "resource": "gold", "amt": 10 }
-    ]
+    ],
+    "maxCompletions": 2
   }
 }

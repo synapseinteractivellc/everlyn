@@ -38,7 +38,6 @@ export default class ActionView {
     if (this.purchasesContainer) {
       this.purchasesContainer.addEventListener("click", (e) => {
         const btn = e.target.closest(".purchase-button");
-        console.log(btn);
         if (btn) {
           const actionId = btn.getAttribute("data-action-id");
           if (this.actionController?.startAction && actionId) {
@@ -65,9 +64,30 @@ export default class ActionView {
     const unlockedActions = unlocked.filter((a) => defs.actions[a.id].type === "action");
     const unlockedPurchases = unlocked.filter((a) => defs.actions[a.id].type === "purchase");
 
-    const availableRests = unlocked.filter((a) => defs.actions[a.id].type === "rest");
-    const availableActions = unlocked.filter((a) => defs.actions[a.id].type === "action");
-    const availablePurchases = unlocked.filter((a) => defs.actions[a.id].type === "purchase");
+    const availableRests = [];
+    const availableActions = [];
+    const availablePurchases = [];
+
+    for (const a of unlockedRests) {
+      const def = defs.actions?.[a.id] ?? {};
+      const max = def?.maxCompletions ?? Infinity;
+      const done = a?.completionCount ?? 0;
+      if (done < max) availableRests.push(a);
+    }
+
+    for (const a of unlockedActions) {
+      const def = defs.actions?.[a.id] ?? {};
+      const max = def?.maxCompletions ?? Infinity;
+      const done = a?.completionCount ?? 0;
+      if (done < max) availableActions.push(a);
+    }
+
+    for (const a of unlockedPurchases) {
+      const def = defs.actions?.[a.id] ?? {};
+      const max = def?.maxCompletions ?? Infinity;
+      const done = a?.completionCount ?? 0;
+      if (done < max) availablePurchases.push(a);
+    }
 
     // Get current button IDs
     const restIds = availableRests.map((a) => a.id);
