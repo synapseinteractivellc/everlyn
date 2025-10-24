@@ -41,7 +41,6 @@ export default class ActionView {
         if (btn) {
           const actionId = btn.getAttribute("data-action-id");
           if (this.actionController?.startAction && actionId) {
-            console.log("Click: ", actionId);
             this.actionController.startAction(actionId);
           }
         }
@@ -211,7 +210,7 @@ export default class ActionView {
     // Completion counts
     const completionCount = document.createElement('span');
     completionCount.className = 'action-details';
-    const max = def?.maxCompletions;
+    const max = a.maxCompletions;
     const done = a.completionCount ?? 0;
     if (Number.isFinite(max)) {
       completionCount.textContent = `${done}/${max}`;

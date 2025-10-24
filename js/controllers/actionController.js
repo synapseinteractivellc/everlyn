@@ -10,9 +10,6 @@ export class ActionController {
   update(deltaTime) {
     // First: see if any actions unlocked this tick
     let unlockedChanged = false;
-    if (typeof this.model.checkUnlocks === "function") {
-      unlockedChanged = this.model.checkUnlocks();
-    }
 
     // If idle, still notify the view about unlock changes
     if (!this.s.currentAction) {
@@ -31,7 +28,10 @@ export class ActionController {
     if (result.completed) {
       this.log(this.formatActionCompleted(result.event, this.s));
       this.onStateChange(this.s);
-
+      if (typeof this.model.checkUnlocks === "function") {
+        unlockedChanged = this.model.checkUnlocks();
+      }
+      
       // After a purchase finishes, switch back to rest; otherwise resume same action
       if (this.s.defs.actions[this.s.currentAction].type === "purchase") {
         this.switchToRestAction();

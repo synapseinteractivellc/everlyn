@@ -237,6 +237,8 @@ export class ActionModel {
         changed = true;
       }
     }
+
+    this.resources.checkUnlocks();
     return changed;
   }
 }
