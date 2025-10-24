@@ -29,6 +29,7 @@ export default class ViewController {
       btn.addEventListener("click", () => {
         const screen = btn.getAttribute("data-screen");
         if (screen) {
+          console.log("Screen: ", screen);
           this.showScreen(screen);
         }
       });

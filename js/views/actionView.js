@@ -38,9 +38,11 @@ export default class ActionView {
     if (this.purchasesContainer) {
       this.purchasesContainer.addEventListener("click", (e) => {
         const btn = e.target.closest(".purchase-button");
+        console.log(btn);
         if (btn) {
           const actionId = btn.getAttribute("data-action-id");
           if (this.actionController?.startAction && actionId) {
+            console.log("Click: ", actionId);
             this.actionController.startAction(actionId);
           }
         }
@@ -58,6 +60,10 @@ export default class ActionView {
 
     const actions = state.actions ? Object.values(state.actions) : [];
     const unlocked = actions.filter((a) => a.unlocked === true);
+
+    const unlockedRests = unlocked.filter((a) => defs.actions[a.id].type === "rest");    
+    const unlockedActions = unlocked.filter((a) => defs.actions[a.id].type === "action");
+    const unlockedPurchases = unlocked.filter((a) => defs.actions[a.id].type === "purchase");
 
     const availableRests = unlocked.filter((a) => defs.actions[a.id].type === "rest");
     const availableActions = unlocked.filter((a) => defs.actions[a.id].type === "action");
@@ -118,7 +124,7 @@ export default class ActionView {
       availablePurchases.forEach((a) => {
         const button = document.createElement('button');
         button.setAttribute('data-action-id', a.id)
-        button.className = 'action-button';
+        button.className = 'purchase-button';
         // Tooltip
         let tooltip = this.createToolTip(a, defs);
         button.title = tooltip;
@@ -165,22 +171,24 @@ export default class ActionView {
     if (rewards && rewards.length > 0) {
       tooltip.push('Rewards:');
       rewards.forEach(r => {
-      if (r?.resource) {
-        if (r.min !== undefined && r.max !== undefined) {
-        if (r.min === r.max) {
-          tooltip.push(`+ ${r.min} ${defs.resources[r.resource].name ?? r.resource}`);
+        if (r?.resource) {
+          if (r.min !== undefined && r.max !== undefined) {
+            if (r.min === r.max) {
+              tooltip.push(`+ ${r.min} ${defs.resources[r.resource].name ?? r.resource}`);
+            } else {
+              tooltip.push(`+ ${r.min} – ${r.max} ${r.resource}`);
+            }
+          } else if (r.amount !== undefined) {
+            tooltip.push(`+ ${r.amount} ${r.resource}`);
+          } else if (r.maxChange !== undefined) {
+            tooltip.push(`Increase max capacity of ${defs.resources[r.resource].name ?? r.resource} by ${r.maxChange}`);
+          }
+        } else if (r.skill) {
+          tooltip.push(`+ ${r.amt} ${defs.skills[r.skill].name ?? r.skill} XP`);
         } else {
-          tooltip.push(`+ ${r.min} – ${r.max} ${r.resource}`);
+          // fallback for unknown reward types
+          tooltip.push(`Unknown`);
         }
-        } else if (r.amount !== undefined) {
-        tooltip.push(`+ ${r.amount} ${r.resource}`);
-        }
-      } else if (r.skill) {
-        tooltip.push(`+ ${r.amt} ${defs.skills[r.skill].name ?? r.skill} XP`);
-      } else {
-        // fallback for unknown reward types
-        tooltip.push(`Unknown`);
-      }
       });
     }
 

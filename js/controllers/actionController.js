@@ -8,23 +8,41 @@ export class ActionController {
   }
 
   update(deltaTime) {
-    // if nothing to do, consider checking rest policy
-    if (!this.s.currentAction) return;
+    // First: see if any actions unlocked this tick
+    let unlockedChanged = false;
+    if (typeof this.model.checkUnlocks === "function") {
+      unlockedChanged = this.model.checkUnlocks();
+    }
+
+    // If idle, still notify the view about unlock changes
+    if (!this.s.currentAction) {
+      if (unlockedChanged) this.onStateChange(this.s);
+      return;
+    }
 
     const action = this.model.getCurrentAction();
-    if (!action) return;
+    if (!action) {
+      if (unlockedChanged) this.onStateChange(this.s);
+      return;
+    }
 
-    // Let Model run the rules
+    // Advance progress
     const result = this.model.tickProgress(action, deltaTime);
     if (result.completed) {
       this.log(this.formatActionCompleted(result.event, this.s));
-      this.onStateChange(this.s); 
-      // After completion, controller can decide to stay on same action 
-      // or apply policies like “auto-rest if exhausted”
-      if (this.s.defs.actions[this.s.currentAction].type == "purchase") {
+      this.onStateChange(this.s);
+
+      // After a purchase finishes, switch back to rest; otherwise resume same action
+      if (this.s.defs.actions[this.s.currentAction].type === "purchase") {
         this.switchToRestAction();
-      } else this.startAction(this.s.currentAction);
+      } else {
+        this.startAction(this.s.currentAction);
+      }
+      return;
     }
+
+    // If unlocks happened while progressing, let the view know
+    if (unlockedChanged) this.onStateChange(this.s);
   }
 
   startAction(actionId) {

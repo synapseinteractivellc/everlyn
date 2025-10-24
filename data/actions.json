@@ -9,8 +9,8 @@
       { "resource": "stamina", "amt": 2 }
     ],
     "reward": [
-      { "resource": "gold", "min": 0, "max": 2 },
-      { "skill": "survival", "amt": 1 }
+      { "resource": "gold", "min": 5, "max": 5 },
+      { "skill": "survival", "amt": 10 }
     ],
     "unlocked": true
   },
@@ -22,7 +22,7 @@
     "duration": 3,
     "reward": [
       { "resource": "life", "min": 2, "max": 2 },
-      { "resource": "stamina", "min": 2, "max": 2 }
+      { "resource": "stamina", "min": 5, "max": 5 }
     ],
     "isRestAction": true,
     "unlocked": true

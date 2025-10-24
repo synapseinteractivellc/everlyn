@@ -54,13 +54,11 @@ export default class ActionLogView {
 
                 // Only reattach stop button handler when the current action actually changes
                 if (this._lastCurrentActionId !== currentActionId) {
-                    console.log("Fire: ", this._lastCurrentActionId, ". Start: ", currentActionId);
                     this._lastCurrentActionId = currentActionId;
                     this.currentAction.innerHTML = `${actionDef?.name ?? currentActionId} <button class="stop-action-btn" aria-label="Stop current action">×</button>`;
 
                     const stopBtn = this.currentAction.querySelector('.stop-action-btn');
                     if (stopBtn) {
-                        console.log("Stop click");
                         // Replace the node to clear any previous listeners (avoids duplicate handlers on repeated updates)
                         const newBtn = stopBtn.cloneNode(true);
                         stopBtn.parentNode.replaceChild(newBtn, stopBtn);

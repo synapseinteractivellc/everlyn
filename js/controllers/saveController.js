@@ -54,13 +54,18 @@ export default class SaveController {
     try {
       const parsed = JSON.parse(raw);
       const savedState = parsed.state || parsed;
-      const fresh = createInitialState(this.defs);
+      const fresh = createInitialState(this.defs);      
+
+      // If no character name return false
+      if(savedState.character.name == '') {
+        return false;
+      }
 
       // first merge the saved values into the new fresh state
       deepMerge(fresh, savedState);
 
       // then update the live state; defs is skipped automatically
-      deepMerge(this.state, fresh);
+      deepMerge(this.state, fresh);      
       
       return true;
     } catch (err) {
@@ -92,7 +97,7 @@ export default class SaveController {
     setTimeout(() => {
       localStorage.removeItem(this.saveKey);
       location.reload();
-    }, 3000);
+    }, 1000);
   }
 
   // Attach click handlers to save/wipe buttons
